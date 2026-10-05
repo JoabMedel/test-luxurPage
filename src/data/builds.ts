@@ -21,7 +21,8 @@ export interface Build {
   y: number;
   /** reveal from which bottom corner */
   from: 'left' | 'right';
-  photo: null | { src: string; srcSm?: string; alt: string; credit: string; position?: string };
+  /** `night`: pull a daylight photo down to the page's night key (CSS only, file untouched) */
+  photo: null | { src: string; srcSm?: string; alt: string; credit: string; position?: string; grade?: 'night' };
 }
 
 export const BUILDS: Build[] = [
@@ -44,6 +45,7 @@ export const BUILDS: Build[] = [
       alt: 'KAZE, a mint-teal RWB 964 widebody seen from the rear: tall wing, gold RWB lettering and a titanium exhaust',
       credit: 'Shanket Bhikha / StanceAutoMag',
       position: '64% 50%',
+      grade: 'night',
     },
   },
   {

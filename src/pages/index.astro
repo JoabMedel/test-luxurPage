@@ -148,7 +148,7 @@ const builtWidth = RWB.width;
               data-from={b.from}
             >
               <figure>
-                <div class="build-media">
+                <div class:list={['build-media', b.photo?.grade && `grade-${b.photo.grade}`]}>
                   <div class="build-media-inner">
                     {b.photo ? (
                       <img

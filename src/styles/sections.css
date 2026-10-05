@@ -470,8 +470,23 @@ img.reel-shot.is-on {
   height: 100%;
   object-fit: cover;
 }
+/* daylight photo graded down to the night key: lower exposure, heavier
+   top (sky) and edges, so it sits in the black section like the rest */
+.grade-night .build-media-inner > img {
+  filter: brightness(0.68) contrast(1.12) saturate(0.88);
+}
+.grade-night::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(to bottom, rgb(0 0 0 / 0.66), rgb(0 0 0 / 0.18) 38%, rgb(0 0 0 / 0) 58%, rgb(0 0 0 / 0) 72%, rgb(0 0 0 / 0.38)),
+    radial-gradient(120% 90% at 55% 55%, rgb(0 0 0 / 0) 55%, rgb(0 0 0 / 0.45));
+}
 .pending {
   position: absolute;
+  z-index: 1;
   left: 0.8vw;
   top: 0.7vw;
   color: rgb(255 255 255 / 0.42);
