@@ -22,7 +22,17 @@ export interface Build {
   /** reveal from which bottom corner */
   from: 'left' | 'right';
   /** `night`: pull a daylight photo down to the page's night key (CSS only, file untouched) */
-  photo: null | { src: string; srcSm?: string; alt: string; credit: string; position?: string; grade?: 'night' };
+  photo: null | {
+    src: string;
+    /** intrinsic width of `src`, for srcset */
+    width: number;
+    srcSm?: string;
+    alt: string;
+    /** photographer credit shown on the card; omit until confirmed */
+    credit?: string;
+    position?: string;
+    grade?: 'night';
+  };
 }
 
 export const BUILDS: Build[] = [
@@ -41,6 +51,7 @@ export const BUILDS: Build[] = [
     from: 'left',
     photo: {
       src: '/media/builds/kaze.webp',
+      width: 1875,
       srcSm: '/media/builds/kaze-sm.webp',
       alt: 'KAZE, a mint-teal RWB 964 widebody seen from the rear: tall wing, gold RWB lettering and a titanium exhaust',
       credit: 'Shanket Bhikha / StanceAutoMag',
@@ -54,14 +65,21 @@ export const BUILDS: Build[] = [
     model: '993',
     city: 'PARIS',
     line: 'Riveted at midnight, named at dawn.',
-    paint: '#C8102E',
-    paintName: 'Guards red',
+    paint: '#1B2A6B',
+    paintName: 'midnight blue',
     col: [9, 13],
     drop: 14,
     ratio: 4 / 5,
     y: -150,
     from: 'right',
-    photo: null,
+    photo: {
+      src: '/media/builds/noir.webp',
+      width: 1920,
+      srcSm: '/media/builds/noir-sm.webp',
+      alt: 'NOIR, a midnight-blue RWB 993 widebody on a rooftop car park: RAUH-Welt windshield banner, riveted flares and gold deep-dish wheels',
+      position: '47% 50%',
+      grade: 'night',
+    },
   },
   {
     id: 'sakura',
@@ -69,14 +87,21 @@ export const BUILDS: Build[] = [
     model: '930',
     city: 'LOS ANGELES',
     line: 'Air-cooled, never calm.',
-    paint: '#E0457B',
-    paintName: 'Rubystone',
+    paint: '#9A4BC9',
+    paintName: 'matte violet',
     col: [3, 11],
     drop: 0,
     ratio: 16 / 9,
     y: -100,
     from: 'left',
-    photo: null,
+    photo: {
+      src: '/media/builds/sakura.webp',
+      width: 1920,
+      srcSm: '/media/builds/sakura-sm.webp',
+      alt: 'SAKURA, a matte-violet RWB widebody parked low in front of a corrugated-steel workshop, deep-dish wheels and a tall rear wing',
+      position: '44% 50%',
+      grade: 'night',
+    },
   },
   {
     id: 'tetsu',
@@ -84,14 +109,21 @@ export const BUILDS: Build[] = [
     model: '964',
     city: 'BANGKOK',
     line: 'Wider than the rules.',
-    paint: '#F2C200',
-    paintName: 'Signal yellow',
+    paint: '#E8711A',
+    paintName: 'signal orange',
     col: [1, 5],
     drop: 16,
     ratio: 3 / 4,
     y: -160,
     from: 'left',
-    photo: null,
+    photo: {
+      src: '/media/builds/tetsu.webp',
+      width: 2000,
+      srcSm: '/media/builds/tetsu-sm.webp',
+      alt: 'TETSU, an orange RWB 964 widebody on a riverside promenade at dusk: round headlights lit, RAUH-Welt windshield banner, deep-dish wheels',
+      position: '46% 50%',
+      grade: 'night',
+    },
   },
   {
     id: 'midori',
@@ -99,14 +131,21 @@ export const BUILDS: Build[] = [
     model: '993',
     city: 'MELBOURNE',
     line: 'Built where its owner lives.',
-    paint: '#3FA535',
-    paintName: 'Viper green',
+    paint: '#5F7A2E',
+    paintName: 'olive green',
     col: [7, 13],
     drop: 0,
     ratio: 4 / 3,
     y: 100,
     from: 'right',
-    photo: null,
+    photo: {
+      src: '/media/builds/midori.webp',
+      width: 2000,
+      srcSm: '/media/builds/midori-sm.webp',
+      alt: 'MIDORI, an olive-green RWB widebody on the move along a tree-lined highway, riveted flares and gold deep-dish wheels',
+      position: '52% 50%',
+      grade: 'night',
+    },
   },
   {
     id: 'hoshi',

@@ -153,7 +153,7 @@ const builtWidth = RWB.width;
                     {b.photo ? (
                       <img
                         src={b.photo.src}
-                        srcset={b.photo.srcSm ? `${b.photo.srcSm} 800w, ${b.photo.src} 1875w` : undefined}
+                        srcset={b.photo.srcSm ? `${b.photo.srcSm} 800w, ${b.photo.src} ${b.photo.width}w` : undefined}
                         sizes="(max-width: 991px) 92vw, 50vw"
                         alt={b.photo.alt}
                         style={b.photo.position ? `object-position:${b.photo.position}` : undefined}
@@ -165,7 +165,7 @@ const builtWidth = RWB.width;
                     )}
                   </div>
                   {b.photo ? (
-                    <span class="pending pending--credit t-label">Photo · {b.photo.credit}</span>
+                    b.photo.credit && <span class="pending pending--credit t-label">Photo · {b.photo.credit}</span>
                   ) : (
                     <span class="pending t-label">Photo · client · {b.name} {b.model} at night</span>
                   )}
