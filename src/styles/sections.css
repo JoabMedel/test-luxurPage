@@ -413,6 +413,7 @@ img.reel-shot.is-on {
   top: 0;
   height: 0;
   z-index: 5;
+  mix-blend-mode: difference; /* title stays legible over bright photos */
 }
 .builds-title {
   position: absolute;
@@ -476,6 +477,10 @@ img.reel-shot.is-on {
   color: rgb(255 255 255 / 0.42);
   font-size: calc(var(--fs-ui) * 0.9);
 }
+.pending--credit {
+  color: var(--white);
+  mix-blend-mode: difference;
+}
 .build figcaption {
   margin-top: 0.9vw;
   display: grid;
@@ -516,6 +521,7 @@ img.reel-shot.is-on {
 @media (max-width: 991px) {
   .builds-bar {
     height: auto;
+    mix-blend-mode: normal;
     background: var(--black);
     padding: calc(var(--m) + 9vw) var(--m) 3vw;
   }

@@ -151,12 +151,24 @@ const builtWidth = RWB.width;
                 <div class="build-media">
                   <div class="build-media-inner">
                     {b.photo ? (
-                      <img src={b.photo.src} alt={b.photo.alt} loading="lazy" decoding="async" />
+                      <img
+                        src={b.photo.src}
+                        srcset={b.photo.srcSm ? `${b.photo.srcSm} 800w, ${b.photo.src} 1875w` : undefined}
+                        sizes="(max-width: 991px) 92vw, 50vw"
+                        alt={b.photo.alt}
+                        style={b.photo.position ? `object-position:${b.photo.position}` : undefined}
+                        loading="lazy"
+                        decoding="async"
+                      />
                     ) : (
                       <CarPlate id={b.id} paint={b.paint} label={`${b.name}, a ${b.model} widebody in ${b.paintName}. Illustration standing in for the client photograph.`} />
                     )}
                   </div>
-                  {!b.photo && <span class="pending t-label">Photo · client · {b.name} {b.model} at night</span>}
+                  {b.photo ? (
+                    <span class="pending pending--credit t-label">Photo · {b.photo.credit}</span>
+                  ) : (
+                    <span class="pending t-label">Photo · client · {b.name} {b.model} at night</span>
+                  )}
                 </div>
                 <figcaption>
                   <p class="t-label build-label">

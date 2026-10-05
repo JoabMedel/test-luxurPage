@@ -2,7 +2,7 @@
 
 Decidido antes de producir. Orden de preferencia: **1 código → 2 material existente → 3 Higgsfield → 4 Three.js/3D**. Cada recurso se queda en el primer nivel que funciona.
 
-No se ha recibido material del cliente. Todo lo que debe ser **real** (autos terminados, Akira Nakai, taller real, proceso real) queda como **marco reservado** con su ficha técnica, nunca generado con IA. Tampoco se toman fotos de la web: los builds de esta página (KAZE, NOIR…) no se corresponden con fotos con licencia comercial verificable y presentar otro auto como ese build sería falso.
+Material del cliente recibido: foto de KAZE (2026-10-05). Todo lo que debe ser **real** (autos terminados, Akira Nakai, taller real, proceso real) queda como **marco reservado** con su ficha técnica, nunca generado con IA. Tampoco se toman fotos de la web: los builds de esta página (KAZE, NOIR…) no se corresponden con fotos con licencia comercial verificable y presentar otro auto como ese build sería falso.
 
 | # | Recurso | Sección | Nivel | Origen / solución | Por qué |
 |---|---|---|---|---|---|
@@ -23,7 +23,7 @@ No se ha recibido material del cliente. Todo lo que debe ser **real** (autos ter
 | 14 | Detalle: puñado de remaches en una palma | Glitch, reel | 3 · Imagen | Higgsfield (mano anónima) | Ídem. |
 | 15 | Taller CGI que enmarca la pantalla | Film → taller | 3 · Imagen | Higgsfield, vista frontal con la pared central libre; la pantalla y su reflejo se montan en CSS | La pantalla debe alinearse con el film: se compone en código. |
 | 16 | 911 bajo lona, un solo fluorescente | Glitch | 3 · Imagen | Higgsfield. Auto totalmente cubierto, sin identificar | Puesta en escena; no se presenta como un build real. |
-| 17 | 6 builds (KAZE, NOIR, SAKURA, TETSU, MIDORI, HOSHI) | BUILDS | 2 · **Cliente** | Marco reservado: placa nocturna con silueta ilustrada en SVG con el color de carrocería de cada build y la ficha de foto pendiente | Son autos reales. |
+| 17 | 6 builds (KAZE, NOIR, SAKURA, TETSU, MIDORI, HOSHI) | BUILDS | 2 · **Cliente** | **KAZE:** foto entregada por el cliente (`public/media/builds/kaze.webp`, crédito Shanket Bhikha / StanceAutoMag). Resto: marco reservado con silueta SVG en el color de cada build y ficha de foto pendiente | Son autos reales. |
 | 18 | Nakai-san trabajando sobre una aleta (panorámica) | The Man | 2 · **Cliente** | Marco reservado con ficha | Persona real: nunca se genera. |
 | 19 | Línea de remaches (cuadrado pequeño) | The Man | 3 · Imagen | Recorte de #14 | Detalle sin persona. |
 | 20 | Letras sueltas de "RAUH-WELT" en el racimo | Racimo | 1 · Código | Glifos del SVG #1 | Código antes que archivo. |
@@ -34,4 +34,5 @@ No se ha recibido material del cliente. Todo lo que debe ser **real** (autos ter
 ## Créditos
 
 - Recursos 4, 9–16 y 19: generados con Higgsfield (GPT Image 2.5) para este proyecto. Renders conceptuales y de puesta en escena, no documentales.
-- Recursos 6, 7, 17 y 18: **pendientes del cliente**. Cuando lleguen, colocarlos en `public/media/` y declararlos en `src/data/media.ts` con su crédito.
+- Recurso 17 · KAZE: foto de Shanket Bhikha para StanceAutoMag, entregada por el cliente el 2026-10-05. **Pendiente: confirmar licencia de uso comercial** (la foto lleva marca de agua del medio).
+- Recursos 6, 7, 17 (resto) y 18: **pendientes del cliente**. Cuando lleguen, colocarlos en `public/media/` y declararlos en `src/data/media.ts` con su crédito.

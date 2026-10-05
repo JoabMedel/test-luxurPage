@@ -21,7 +21,7 @@ export interface Build {
   y: number;
   /** reveal from which bottom corner */
   from: 'left' | 'right';
-  photo: null | { src: string; alt: string; credit: string };
+  photo: null | { src: string; srcSm?: string; alt: string; credit: string; position?: string };
 }
 
 export const BUILDS: Build[] = [
@@ -31,14 +31,20 @@ export const BUILDS: Build[] = [
     model: '964',
     city: 'TOKYO',
     line: 'Low enough to read the asphalt.',
-    paint: '#1E73D8',
-    paintName: 'Riviera blue',
+    paint: '#3FC9B5',
+    paintName: 'mint teal',
     col: [1, 7],
     drop: 0,
     ratio: 4 / 5,
     y: 80,
     from: 'left',
-    photo: null,
+    photo: {
+      src: '/media/builds/kaze.webp',
+      srcSm: '/media/builds/kaze-sm.webp',
+      alt: 'KAZE, a mint-teal RWB 964 widebody seen from the rear: tall wing, gold RWB lettering and a titanium exhaust',
+      credit: 'Shanket Bhikha / StanceAutoMag',
+      position: '64% 50%',
+    },
   },
   {
     id: 'noir',
