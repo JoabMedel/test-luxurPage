@@ -1,43 +1,31 @@
-# Astro Starter Kit: Minimal
+# RAUH-Welt BEGRIFF — landing
+
+Immersive one-page site for RWB (Chiba, JP): a black-and-white contemporary-art gallery where workshop objects react to the visitor. Astro 7 + GSAP (ScrollTrigger, SplitText) + Lenis, with raw WebGL2 for the hero ink only.
+
+## Run
+
+Requires Node ≥ 22.12 (the shell default here is v18 — use `nvm use 22`).
 
 ```sh
-pnpm create astro@latest -- --template minimal
+pnpm install
+pnpm dev          # Astro 7 runs as a daemon: `pnpm astro dev stop` to stop it
+pnpm build && pnpm preview
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Structure
 
-## 🚀 Project Structure
+| Path | What |
+| --- | --- |
+| `src/pages/index.astro` | All 11 scenes (loader → closing), semantic markup |
+| `src/lib/wordmark.ts` | Wordmark geometry (SVG paths) shared by the DOM, the loader and the WebGL mask |
+| `src/scripts/main.ts` | Lenis + GSAP ticker, loader, scene init |
+| `src/scripts/fluid.ts` | Ink simulation revealing the riveted-aluminium wordmark |
+| `src/scripts/scenes.ts` | Nav/menu, reel, builds, film → workshop, cluster repulsion, glitch, closing |
+| `src/scripts/highway.ts`, `engine.ts` | Coded stand-ins for the night film and the flat-six sound |
+| `src/data/*.ts` | Builds, media registry, contact links (placeholders) |
+| `docs/ASSETS.md` | Asset inventory: where each visual comes from and why |
+| `tools/convert-media.mjs` | Re-encodes generated PNG originals (`assets-src/`, git-ignored) to WebP |
 
-Inside of your Astro project, you'll see the following folders and files:
+## Client deliverables still needed
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
-
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
-
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `pnpm install`             | Installs dependencies                            |
-| `pnpm dev`             | Starts local dev server at `localhost:4321`      |
-| `pnpm build`           | Build your production site to `./dist/`          |
-| `pnpm preview`         | Preview your build locally, before deploying     |
-| `pnpm astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `pnpm astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Photos of the six builds and of Akira Nakai, reel and night-film footage (MP4/HEVC + captions), confirmed contact/social URLs and credits. Slots are in `src/data/builds.ts`, `src/data/media.ts` and `src/data/site.ts`; see `docs/ASSETS.md`.

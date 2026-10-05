@@ -1,41 +1,33 @@
 ---
 import '../styles/global.css';
-const { title = 'Landing' } = Astro.props;
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'RAUH-Welt BEGRIFF — Hand-built in Chiba, Japan',
+  description = 'Akira Nakai turns air-cooled Porsche 911s into hand-cut widebodies, one by one and in person.',
+} = Astro.props;
 ---
 
 <!doctype html>
-<html lang="es">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#000000" />
     <title>{title}</title>
-  </head>
-  <body class="bg-neutral-950 text-white antialiased">
-    <slot />
-
-    <script>
-      import Lenis from 'lenis';
-      import gsap from 'gsap';
-      import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-      gsap.registerPlugin(ScrollTrigger);
-
-      // Scroll suave sincronizado con GSAP
-      const lenis = new Lenis();
-      lenis.on('scroll', ScrollTrigger.update);
-      gsap.ticker.add((time) => lenis.raf(time * 1000));
-      gsap.ticker.lagSmoothing(0);
-
-      // Cualquier elemento con data-reveal aparece al entrar en pantalla
-      gsap.utils.toArray<HTMLElement>('[data-reveal]').forEach((el) => {
-        gsap.from(el, {
-          y: 60,
-          opacity: 0,
-          duration: 1,
-          ease: 'power3.out',
-          scrollTrigger: { trigger: el, start: 'top 85%' },
-        });
-      });
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preload" as="image" href="/media/loader-wheel.webp" type="image/webp" />
+    <script is:inline>
+      document.documentElement.classList.add('js');
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('reduced');
     </script>
+  </head>
+  <body class="is-loading">
+    <slot />
   </body>
 </html>

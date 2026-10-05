@@ -1,0 +1,101 @@
+---
+/**
+ * Stand-in for a build photograph until the client delivers it.
+ * A drawn (not photographic) widebody air-cooled silhouette in a dark studio,
+ * lit in the build's single paint colour. Clearly labelled as pending.
+ */
+interface Props {
+  id: string;
+  paint: string;
+  label: string;
+}
+const { id, paint, label } = Astro.props;
+const g = (n: string) => `${id}-${n}`;
+
+const body =
+  'M62 292L58 262C58 240 80 230 118 226C190 220 280 210 350 196C380 190 400 178 425 150C455 116 500 100 560 98C625 96 680 108 725 136C790 176 850 196 900 204L905 186L968 176L972 196C978 222 976 252 966 280L952 296L872 296A102 102 0 0 0 668 296L332 300A97 97 0 0 0 138 296Z';
+const glass = 'M446 148C472 120 510 108 560 106C616 105 660 115 698 138L688 146L458 152Z';
+const rivets = (cx: number, r: number, n: number) =>
+  Array.from({ length: n }, (_, i) => {
+    const a = Math.PI + (Math.PI * (i + 0.5)) / n;
+    return [cx + Math.cos(a) * r, 296 + Math.sin(a) * r];
+  });
+const wheel = (cx: number) => ({ cx, spokes: [0, 72, 144, 216, 288] });
+---
+
+<svg class="carplate" viewBox="0 0 1000 400" preserveAspectRatio="xMidYMid meet" role="img" aria-label={label}>
+  <defs>
+    <radialGradient id={g('floor')} cx="500" cy="350" r="700" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color={paint} stop-opacity="0.34"></stop>
+      <stop offset="0.55" stop-color={paint} stop-opacity="0.06"></stop>
+      <stop offset="1" stop-color="#000" stop-opacity="0"></stop>
+    </radialGradient>
+    <linearGradient id={g('paint')} x1="0" y1="90" x2="0" y2="300" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity="0.75"></stop>
+      <stop offset="0.1" stop-color={paint}></stop>
+      <stop offset="0.38" stop-color={paint}></stop>
+      <stop offset="0.62" stop-color={paint} stop-opacity="0.55"></stop>
+      <stop offset="1" stop-color="#000"></stop>
+    </linearGradient>
+    <linearGradient id={g('shade')} x1="0" y1="0" x2="1000" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#000" stop-opacity="0.55"></stop>
+      <stop offset="0.35" stop-color="#000" stop-opacity="0"></stop>
+      <stop offset="0.7" stop-color="#000" stop-opacity="0.1"></stop>
+      <stop offset="1" stop-color="#000" stop-opacity="0.6"></stop>
+    </linearGradient>
+    <linearGradient id={g('glass')} x1="446" y1="0" x2="698" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0b0b0b"></stop>
+      <stop offset="0.45" stop-color="#2a2a2a"></stop>
+      <stop offset="0.55" stop-color="#0b0b0b"></stop>
+      <stop offset="1" stop-color="#050505"></stop>
+    </linearGradient>
+    <linearGradient id={g('fade')} x1="0" y1="364" x2="0" y2="470" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity="0.22"></stop>
+      <stop offset="0.6" stop-color="#fff" stop-opacity="0"></stop>
+    </linearGradient>
+    <mask id={g('refl')}>
+      <rect x="-200" y="364" width="1400" height="120" fill={`url(#${g('fade')})`}></rect>
+    </mask>
+    <g id={g('car')}>
+      <path d={body} fill={`url(#${g('paint')})`}></path>
+      <path d={body} fill={`url(#${g('shade')})`}></path>
+      <path d={body} fill="#000" fill-opacity="0.22"></path>
+      <path d={glass} fill={`url(#${g('glass')})`}></path>
+      <path d="M128 238C300 226 600 218 905 222" fill="none" stroke="#fff" stroke-opacity="0.22" stroke-width="1.4"></path>
+      <path d="M118 226C190 220 280 210 350 196C380 190 400 178 425 150" fill="none" stroke="#fff" stroke-opacity="0.55" stroke-width="2"></path>
+      <path d="M560 98C625 96 680 108 725 136C790 176 850 196 900 204" fill="none" stroke="#fff" stroke-opacity="0.4" stroke-width="2"></path>
+      <path d="M600 108L604 230M456 152L470 236L604 236" fill="none" stroke="#000" stroke-opacity="0.45" stroke-width="1.6"></path>
+      <path d="M872 296A102 102 0 0 0 668 296" fill="none" stroke="#000" stroke-opacity="0.55" stroke-width="10"></path>
+      <path d="M332 300A97 97 0 0 0 138 296" fill="none" stroke="#000" stroke-opacity="0.55" stroke-width="10"></path>
+      {
+        [...rivets(770, 110, 13), ...rivets(235, 104, 12)].map(([x, y]) => (
+          <circle cx={x} cy={y} r="2.1" fill="#fff" fill-opacity="0.75" />
+        ))
+      }
+      <ellipse cx="146" cy="226" rx="24" ry="6" fill="#fff" fill-opacity="0.85"></ellipse>
+      <rect x="958" y="210" width="16" height="8" rx="2" fill="#ff2a1a"></rect>
+      <path d="M452 160L432 158L430 170L452 172Z" fill="#000" fill-opacity="0.6"></path>
+      {
+        [wheel(235), wheel(770)].map((w) => (
+          <g transform={`translate(${w.cx} 296)`}>
+            <circle r="66" fill="#050505" />
+            <circle r="50" fill="#1a1a1a" />
+            <circle r="48" fill="none" stroke="#d9d9d9" stroke-width="5" />
+            <circle r="34" fill="#0c0c0c" />
+            {w.spokes.map((a) => (
+              <rect x="-3" y="-33" width="6" height="26" fill="#3a3a3a" transform={`rotate(${a})`} />
+            ))}
+            <circle r="7" fill="#2b2b2b" />
+          </g>
+        ))
+      }
+    </g>
+  </defs>
+  <rect x="-2000" y="-2000" width="5000" height="4400" fill="#000"></rect>
+  <rect x="-2000" y="-2000" width="5000" height="4400" fill={`url(#${g('floor')})`}></rect>
+  <ellipse cx="505" cy="364" rx="470" ry="10" fill="#000"></ellipse>
+  <use href={`#${g('car')}`} transform="translate(0 2)"></use>
+  <g mask={`url(#${g('refl')})`}>
+    <use href={`#${g('car')}`} transform="translate(0 726) scale(1 -1)" opacity="0.7"></use>
+  </g>
+</svg>

@@ -1,17 +1,350 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import Wordmark from '../components/Wordmark.astro';
+import CarPlate from '../components/CarPlate.astro';
+import { BUILDS } from '../data/builds';
+import { MEDIA } from '../data/media';
+import { SITE } from '../data/site';
+import { RWB, CAP, layout } from '../lib/wordmark';
+import '../styles/sections.css';
+
+const R = MEDIA.renders;
+const clusterLetters = layout('RAUH-WELT').glyphs;
+
+/* cluster composition: % of the cluster box, width in vw, base rotation */
+const clusterItems = [
+  { kind: 'img', key: 'fender', x: 5, y: 12, w: 27, r: -6 },
+  { kind: 'img', key: 'wheel', x: 37, y: 20, w: 23, r: 0 },
+  { kind: 'img', key: 'wing', x: 62, y: 0, w: 30, r: 4 },
+  { kind: 'img', key: 'fan', x: 22, y: 56, w: 15, r: -4 },
+  { kind: 'img', key: 'rivet', x: 74, y: 52, w: 12, r: 8 },
+] as const;
+const letterSpots = [
+  { x: 2, y: 64, r: -18 },
+  { x: 47, y: 3, r: 12 },
+  { x: 60, y: 66, r: -9 },
+  { x: 91, y: 30, r: 22 },
+  { x: 45, y: 82, r: 34 },
+  { x: 15, y: 0, r: -11 },
+  { x: 86, y: 78, r: 15 },
+  { x: 33, y: 2, r: -26 },
+  { x: 7, y: 86, r: 9 },
+];
+
+const builtWidth = RWB.width;
 ---
 
-<Layout title="Landing base">
-  <section class="flex min-h-screen items-center justify-center px-6">
-    <h1 data-reveal class="text-center text-6xl font-bold tracking-tight md:text-8xl">
-      Landing <span class="text-purple-400">base</span>
-    </h1>
-  </section>
+<Layout>
+  <a class="skip-link pill pill--solid" href="#manifesto">Skip to content</a>
 
-  <section class="flex min-h-screen items-center justify-center px-6">
-    <p data-reveal class="max-w-xl text-center text-2xl text-neutral-300">
-      Astro + Tailwind + GSAP + Lenis funcionando.
-    </p>
-  </section>
+  <!-- 0 · LOADER ------------------------------------------------------- -->
+  <div class="loader" id="loader" aria-hidden="true">
+    <div class="loader-stage">
+      <svg class="loader-rwb" viewBox={`-6 -6 ${builtWidth + 12} ${CAP + 12}`}>
+        {
+          RWB.glyphs.map((g) => (
+            <g class="loader-l" data-char={g.char} transform={`translate(${g.x} 0)`}>
+              <path d={g.d} fill-rule="evenodd" pathLength="1" />
+            </g>
+          ))
+        }
+      </svg>
+      <img class="loader-wheel" src={MEDIA.loaderWheel.src} alt="" width="720" height="730" decoding="async" />
+    </div>
+    <p class="loader-count"><span id="loader-num">000</span></p>
+  </div>
+  <p class="sr-only" role="status" id="load-status">Loading RAUH-Welt BEGRIFF</p>
+
+  <!-- NAV (difference) ----------------------------------------------- -->
+  <header class="nav" id="nav">
+    <a class="nav-logo t-menu" id="nav-logo" href="#top" aria-label="RAUH-Welt BEGRIFF, back to top">
+      <span class="nl-i">R</span><span class="nl-x"><span>·AUH-</span></span><span class="nl-i">W</span><span class="nl-x"><span>·ELT&nbsp;</span></span><span class="nl-i">B</span><span class="nl-x"><span>·EGRIFF</span></span>
+    </a>
+    <button class="nav-menu t-menu" id="menu-btn" aria-expanded="false" aria-controls="menu-panel">
+      <span class="nav-menu-word">Menu</span> <span class="nav-menu-dots" aria-hidden="true">::</span>
+    </button>
+    <nav class="menu-panel" id="menu-panel" aria-label="Main" hidden>
+      <ul>
+        <li><a href="#builds"><span class="mp-inner">Builds</span></a></li>
+        <li><a href="#the-man"><span class="mp-inner">The Man</span></a></li>
+        <li><a href="#contact"><span class="mp-inner">Contact</span></a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <!-- 1 · HERO ------------------------------------------------------- -->
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <h1 id="hero-title" class="hero-mark-wrap">
+        <span class="sr-only">RAUH-Welt BEGRIFF</span>
+        <Wordmark id="hero-mark" class="hero-mark" label="RAUH-WELT" />
+      </h1>
+      <canvas class="hero-fluid" id="hero-fluid" aria-hidden="true"></canvas>
+
+      <div class="hero-tl">
+        <p class="t-p hero-intro diff">One man. One saw.<br />Every car gets a name.</p>
+        <a class="pill pill--solid hero-cta" id="hero-cta" href={SITE.book}>Book a build <span class="arrow" aria-hidden="true">→</span></a>
+      </div>
+      <p class="hero-bl t-ui diff">Hand-built in Chiba, Japan</p>
+      <div class="hero-br">
+        <p class="t-ui diff hero-social">
+          <a href={SITE.instagram} rel="noopener" target="_blank"><span class="d-only">Instagram</span><span class="m-only">IG</span></a>
+          <span aria-hidden="true">/</span>
+          <a href={SITE.youtube} rel="noopener" target="_blank"><span class="d-only">YouTube</span><span class="m-only">YT</span></a>
+        </p>
+        <span class="chip" aria-label="Language: English">EN</span>
+      </div>
+    </section>
+
+    <!-- 2 · MANIFESTO ------------------------------------------------- -->
+    <section class="manifesto grid12" id="manifesto" aria-labelledby="manifesto-title">
+      <p class="t-label m-label" data-fade>( Manifesto ) — (01)</p>
+      <h2 class="t-h m-title" id="manifesto-title" data-lines>
+        <span class="line-mask"><span class="line-inner">Factories build cars.</span></span>
+        <span class="line-mask"><span class="line-inner">Nakai-san builds characters.</span></span>
+      </h2>
+    </section>
+
+    <!-- 3 · REEL -------------------------------------------------------- -->
+    <section class="reel" id="reel" aria-labelledby="reel-title">
+      <div class="reel-sticky">
+        <div class="reel-copy">
+          <p class="t-label" id="reel-title">( The first cut )</p>
+          <p class="t-q reel-text" data-lines-auto>
+            No templates and no second tries. The fender is cut once, by eye, and the car is never the same again.
+          </p>
+        </div>
+        <div class="reel-card" id="reel-card">
+          <div class="reel-media" id="reel-media" role="img" aria-label="Montage: a fender edge fresh from the saw, sparks, rivets in a palm, a wide car on a night highway, a covered car in the workshop">
+            <img class="reel-shot is-on" src={MEDIA.detailCut.src} alt="" loading="lazy" decoding="async" />
+            <canvas class="reel-shot reel-sparks" data-shot="sparks"></canvas>
+            <img class="reel-shot" src={MEDIA.detailRivets.src} alt="" loading="lazy" decoding="async" />
+            <canvas class="reel-shot reel-road" data-shot="road"></canvas>
+            <img class="reel-shot" src={MEDIA.tarp.src} alt="" loading="lazy" decoding="async" />
+          </div>
+          <p class="reel-tc t-label" aria-hidden="true"><span>REEL</span><span id="reel-tc">00:00:00:00</span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 · BUILDS ------------------------------------------------------ -->
+    <section class="builds is-dark" id="builds" aria-labelledby="builds-title">
+      <div class="builds-bar" id="builds-bar">
+        <h2 class="builds-title" id="builds-title" aria-label="Builds">
+          {[...'BUILDS'].map((c) => <span class="bt-l" aria-hidden="true">{c}</span>)}
+        </h2>
+      </div>
+      <div class="builds-head grid12">
+        <p class="t-q builds-quote" data-lines-auto>Stock is a suggestion.<br />Width is a statement.</p>
+      </div>
+
+      <ol class="builds-grid grid12">
+        {
+          BUILDS.map((b, i) => (
+            <li
+              class="build"
+              style={`--c0:${b.col[0]};--c1:${b.col[1]};--drop:${b.drop}vw;--ratio:${b.ratio}`}
+              data-y={b.y}
+              data-from={b.from}
+            >
+              <figure>
+                <div class="build-media">
+                  <div class="build-media-inner">
+                    {b.photo ? (
+                      <img src={b.photo.src} alt={b.photo.alt} loading="lazy" decoding="async" />
+                    ) : (
+                      <CarPlate id={b.id} paint={b.paint} label={`${b.name}, a ${b.model} widebody in ${b.paintName}. Illustration standing in for the client photograph.`} />
+                    )}
+                  </div>
+                  {!b.photo && <span class="pending t-label">Photo · client · {b.name} {b.model} at night</span>}
+                </div>
+                <figcaption>
+                  <p class="t-label build-label">
+                    <span class="build-n">{String(i + 1).padStart(2, '0')}</span> {b.name} · {b.model} · {b.city}
+                  </p>
+                  <p class="t-q build-line">{b.line}</p>
+                </figcaption>
+              </figure>
+            </li>
+          ))
+        }
+      </ol>
+
+      <div class="builds-foot grid12">
+        <a class="all-builds" href={SITE.allBuilds} rel="noopener" target="_blank">All builds <span aria-hidden="true">↪</span></a>
+        <span class="t-label builds-count">(06)</span>
+        <span class="t-label builds-sign">© CHIBA · JP</span>
+      </div>
+    </section>
+
+    <!-- 5 · FILM → WORKSHOP ------------------------------------------- -->
+    <section class="film is-dark" id="film" aria-label="Night film">
+      <div class="film-sticky" id="film-sticky">
+        <img
+          class="film-workshop"
+          id="film-workshop"
+          src={MEDIA.workshop.src}
+          srcset={`${MEDIA.workshop.src.replace('.webp', '-sm.webp')} 1280w, ${MEDIA.workshop.src} 2560w`}
+          sizes="100vw"
+          alt={MEDIA.workshop.alt}
+          loading="lazy"
+          decoding="async"
+        />
+        <canvas class="film-reflection" id="film-reflection" aria-hidden="true"></canvas>
+        <div class="film-screen" id="film-screen">
+          <canvas class="film-canvas" id="film-canvas" role="img" aria-label="A wide, low air-cooled 911 silhouette driving down an empty highway under sodium lights at night"></canvas>
+        </div>
+        <div class="film-fade" aria-hidden="true"></div>
+        <button class="pill pill--line sound-pill" id="sound-btn" aria-pressed="false">
+          <span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i></span>
+          Sound <span class="sound-state">off</span>
+        </button>
+        <p class="film-caption t-label" id="film-caption" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <!-- 6 · THE MAN ----------------------------------------------------- -->
+    <section class="man is-dark grid12" id="the-man" aria-labelledby="man-title">
+      <p class="t-label man-label" id="man-title">( The Man )</p>
+      <p class="t-q man-text" data-lines-auto>
+        Akira Nakai builds every RWB himself. He travels to the car, cuts the body by eye and hands it back wider, lower and with a name of its own.
+      </p>
+      <figure class="man-pano" data-clip>
+        {
+          MEDIA.nakai ? (
+            <img src={MEDIA.nakai.src} alt={MEDIA.nakai.alt} loading="lazy" decoding="async" />
+          ) : (
+            <div class="frame-pending" role="img" aria-label="Reserved for the client photograph of Akira Nakai at work on a fender">
+              <span class="fp-cross" aria-hidden="true" />
+              <span class="t-label fp-text">
+                Photo · client<br />Nakai-san at work on a fender<br />21:9 · available light
+              </span>
+            </div>
+          )
+        }
+      </figure>
+      <figure class="man-square" data-clip>
+        <img src="/media/detail-rivet-line.webp" alt="A line of dome rivets across raw aluminium sheet" loading="lazy" decoding="async" width="700" height="700" />
+        <figcaption class="t-label">One cut. /<br />No undo.</figcaption>
+      </figure>
+    </section>
+
+    <!-- 7 · SERVICES + CLUSTER ----------------------------------------- -->
+    <section class="services is-dark" id="services" aria-labelledby="services-title">
+      <h2 class="t-h services-title grid12" id="services-title" data-lines>
+        <span class="line-mask"><span class="line-inner">Width follows</span></span>
+        <span class="line-mask"><span class="line-inner">character.</span></span>
+      </h2>
+      <div class="services-cols grid12">
+        <p class="t-ui sv-a" data-fade>We build :</p>
+        <ul class="t-q sv-list" data-lines-auto>
+          <li>• Widebody conversions</li>
+          <li>• Aero and rear wings</li>
+          <li>• Stance and wheels</li>
+          <li>• Paint and livery</li>
+          <li>• On-location builds</li>
+        </ul>
+        <p class="t-p sv-c" data-fade>Every build is a conversation between the car, its owner and the saw.</p>
+      </div>
+
+      <div class="cluster" id="cluster">
+        {
+          clusterItems.map((it) => (
+            <div class="cl-item cl-img" style={`--x:${it.x}%;--y:${it.y}%;--w:${it.w}vw;--r:${it.r}deg`}>
+              <img src={R[it.key].src} alt={R[it.key].alt} loading="lazy" decoding="async" draggable="false" />
+            </div>
+          ))
+        }
+        {
+          clusterLetters.map((g, i) => (
+            <div
+              class="cl-item cl-letter"
+              style={`--x:${letterSpots[i].x}%;--y:${letterSpots[i].y}%;--w:${(g.width / 100) * 4.6}vw;--r:${letterSpots[i].r}deg`}
+              aria-hidden="true"
+            >
+              <svg viewBox={`0 0 ${g.width} ${CAP}`}>
+                <path d={g.d} fill-rule="evenodd" />
+              </svg>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- 8 · OWNERS ------------------------------------------------------ -->
+    <section class="owners is-dark grid12" aria-labelledby="owners-title">
+      <h2 class="t-q owners-title" id="owners-title" data-lines-auto>No RWB without its owner :</h2>
+      <div class="owners-col ow-a">
+        <p class="t-label">Built by</p>
+        <p class="t-q">Akira Nakai</p>
+      </div>
+      <div class="owners-col ow-b">
+        <p class="t-label">Next build cities</p>
+        <ul class="t-q">
+          <li>Tokyo</li>
+          <li>Los Angeles</li>
+          <li>Bangkok</li>
+          <li>Melbourne</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 9 · GLITCH ------------------------------------------------------ -->
+    <section class="glitch is-dark" id="glitch" aria-labelledby="glitch-line">
+      <div class="glitch-sticky">
+        <img
+          class="glitch-bg"
+          id="glitch-bg"
+          src={MEDIA.tarp.src}
+          srcset={`${MEDIA.tarp.src.replace('.webp', '-sm.webp')} 1280w, ${MEDIA.tarp.src} 2560w`}
+          sizes="100vw"
+          alt={MEDIA.tarp.alt}
+          loading="lazy"
+          decoding="async"
+        />
+        <div class="glitch-blocks" aria-hidden="true">
+          <p class="gb t-label" style="--x:6%;--y:14%" data-scramble>every car has a name</p>
+          <p class="gb t-label" style="--x:68%;--y:22%" data-scramble>every car has a name</p>
+          <p class="gb t-label" style="--x:12%;--y:76%" data-scramble>every car has a name</p>
+          <p class="gb t-label" style="--x:62%;--y:84%" data-scramble data-garbage>#/9x_&lt;rwb&gt;:::0x7E4·%%·||</p>
+          <p class="gb t-label" style="--x:80%;--y:56%" data-scramble>air-cooled · hand-cut</p>
+        </div>
+        <p class="t-h glitch-type" id="glitch-line">We don't sell parts. We give air-cooled legends a second, wider life.</p>
+        <img class="glitch-d glitch-d1" src={MEDIA.detailCut.src} srcset={`${MEDIA.detailCut.src.replace('.webp', '-sm.webp')} 640w, ${MEDIA.detailCut.src} 1200w`} sizes="24vw" alt={MEDIA.detailCut.alt} loading="lazy" decoding="async" />
+        <img class="glitch-d glitch-d2" src={MEDIA.detailRivets.src} srcset={`${MEDIA.detailRivets.src.replace('.webp', '-sm.webp')} 640w, ${MEDIA.detailRivets.src} 1200w`} sizes="18vw" alt={MEDIA.detailRivets.alt} loading="lazy" decoding="async" />
+      </div>
+    </section>
+  </main>
+
+  <!-- 10 · CLOSING ------------------------------------------------------ -->
+  <footer class="closing is-dark" id="contact" aria-labelledby="closing-title">
+    <div class="closing-top grid12">
+      <h2 class="t-h closing-title" id="closing-title" data-lines>
+        <span class="line-mask"><span class="line-inner">Ready to</span></span>
+        <span class="line-mask"><span class="line-inner">go wide?</span></span>
+      </h2>
+      <ul class="t-q closing-social">
+        <li><a href={SITE.instagram} rel="noopener" target="_blank">Instagram</a></li>
+        <li><a href={SITE.youtube} rel="noopener" target="_blank">YouTube</a></li>
+        <li><a href={SITE.facebook} rel="noopener" target="_blank">Facebook</a></li>
+      </ul>
+      <div class="closing-ctas">
+        <a class="pill pill--line" href={SITE.book}>Book a build <span class="arrow" aria-hidden="true">→</span></a>
+        <a class="pill pill--line" href={SITE.write}>Write to Chiba <span aria-hidden="true">@</span></a>
+      </div>
+    </div>
+    <div class="closing-mark-wrap">
+      <Wordmark id="closing-mark" class="closing-mark" label="RAUH-WELT" />
+    </div>
+    <div class="credits grid12 t-label">
+      <p class="cr-a">© RAUH-Welt BEGRIFF — Chiba, Japan</p>
+      <p class="cr-b">Site by {SITE.studio}</p>
+      <p class="cr-c">Photography by {SITE.photographer}</p>
+      <p class="cr-d"><span aria-current="true" class="lang-on">EN</span> / <span class="lang-off" title="Japanese version in preparation">JP</span></p>
+    </div>
+  </footer>
+
+  <script>
+    import '../scripts/main';
+  </script>
 </Layout>
