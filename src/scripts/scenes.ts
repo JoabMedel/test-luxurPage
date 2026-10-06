@@ -6,7 +6,7 @@ import { env, MQ, rand, whileVisible } from './env';
 import { Highway, Sparks } from './highway';
 import { Engine } from './engine';
 import { lineReveal } from './text';
-import { CAP } from '../lib/wordmark';
+import { LOGO } from '../lib/logo';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
@@ -603,7 +603,7 @@ export function closing() {
   if (env.reduced) {
     gsap.from(mark, { opacity: 0, duration: 0.8, ease: 'power3.out', scrollTrigger: { trigger: mark, start: 'top 95%', once: true } });
   } else {
-    gsap.set(letters, { y: CAP * 1.2 });
+    gsap.set(letters, { y: LOGO.height * 1.2 }); // 120 % of the letter height, in SVG units
     gsap.set(hyphen, { scale: 0 });
     const tl = gsap.timeline({ paused: true });
     tl.to(letters, { y: 0, duration: 1.2, ease: 'power4.inOut', stagger: { each: 0.03, from: 'random' } }, 0).to(

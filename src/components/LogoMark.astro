@@ -10,9 +10,11 @@ interface Props {
   class?: string;
   /** accessible name; pass "" when the surrounding element already names it */
   label?: string;
+  /** wrap each glyph in its own group (+ hit area) for per-letter animation */
+  split?: boolean;
 }
 
-const { id, class: className = '', label = 'RAUH-Welt' } = Astro.props;
+const { id, class: className = '', label = 'RAUH-Welt', split = false } = Astro.props;
 ---
 
 <svg
@@ -23,5 +25,16 @@ const { id, class: className = '', label = 'RAUH-Welt' } = Astro.props;
   aria-label={label || undefined}
   aria-hidden={label ? undefined : 'true'}
 >
-  {LOGO.glyphs.map((g) => <path d={g.d} data-char={g.char} />)}
+  {
+    split
+      ? LOGO.glyphs.map((g, i) => (
+          <g class="wm-l" data-i={i} data-char={g.char}>
+            <rect class="wm-hit" x={g.x} y="0" width={g.w} height={LOGO.height} fill="transparent" />
+            <g class="wm-l-inner">
+              <path d={g.d} />
+            </g>
+          </g>
+        ))
+      : LOGO.glyphs.map((g) => <path d={g.d} data-char={g.char} />)
+  }
 </svg>

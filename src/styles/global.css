@@ -245,11 +245,7 @@ button {
   transform: none;
 }
 
-/* wordmark */
-.wordmark {
-  overflow: visible;
-}
-.wordmark path,
+/* brand logotype */
 .logomark path {
   fill: currentColor;
 }

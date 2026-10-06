@@ -6,8 +6,8 @@ Material del cliente recibido: fotos de los 6 builds (2026-10-05). Todo lo que d
 
 | # | Recurso | Sección | Nivel | Origen / solución | Por qué |
 |---|---|---|---|---|---|
-| 1 | Logo "RAUH-Welt" (portada) | Portada | 1 · Código | Trazado SVG generado por `tools/build-logo.mjs` → `src/lib/logo.ts` a partir de **Ultra** (Astigmatic, SIL OFL 1.1), la alternativa libre más fiel al slab serif pesado del logo original (cuya tipografía no tiene licencia libre). Debajo, línea en japonés en Zen Old Mincho 900 (OFL): «ラウ・ヴェルト・ベグリフ» / «荒々しい世界という概念» | El trazado se comparte con la máscara WebGL, así que la tinta sigue alineada al píxel. |
-| 1b | Wordmark extendido "RAUH-WELT" (loader RWB, cierre, letras del racimo) | Loader, racimo, cierre | 1 · Código | SVG generado por `src/lib/wordmark.ts` | Animación por letras. |
+| 1 | Logo "RAUH-Welt" (portada y cierre) | Portada, cierre | 1 · Código | Trazado SVG generado por `tools/build-logo.mjs` → `src/lib/logo.ts` a partir de **Ultra** (Astigmatic, SIL OFL 1.1), la alternativa libre más fiel al slab serif pesado del logo original (cuya tipografía no tiene licencia libre). Debajo, línea en japonés en Zen Old Mincho 900 (OFL): «ラウ・ヴェルト・ベグリフ» / «荒々しい世界という概念» | El trazado se comparte con la máscara WebGL, así que la tinta sigue alineada al píxel. |
+| 1b | Wordmark extendido "RWB" / letras "RAUH-WELT" (loader, racimo) | Loader, racimo | 1 · Código | SVG generado por `src/lib/wordmark.ts` | Animación por letras. |
 | 2 | "RWB" del loader (trazo + separación) | Loader | 1 · Código | Misma geometría SVG, `stroke-dashoffset` + GSAP | Dibujo y separación son movimiento puro. |
 | 3 | Llanta girando en el loader | Loader | 1 + 3 | Render de la llanta (#9) girado por CSS/GSAP | El giro es código; solo el objeto es imagen. |
 | 4 | Capa oculta: "RAUH-WELT" en aluminio remachado con destello | Portada | 1 + 3 | **Textura** de chapa de aluminio con líneas de remaches (Higgsfield, imagen) recortada con el SVG dentro del shader; el destello lento es un barrido especular en el shader | El texto generado por IA no se alinearía con el SVG; el barrido de luz lo imita el código, así que no hace falta video. |
