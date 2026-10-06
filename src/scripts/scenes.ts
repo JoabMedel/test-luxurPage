@@ -600,12 +600,16 @@ export function closing() {
 
   gsap.set(inners, { transformOrigin: '50% 50%' });
 
+  // hovers only start once every letter has landed: a hover during the rise
+  // would otherwise interrupt it and leave letters stranded out of line
+  let introDone = env.reduced;
+
   if (env.reduced) {
     gsap.from(mark, { opacity: 0, duration: 0.8, ease: 'power3.out', scrollTrigger: { trigger: mark, start: 'top 95%', once: true } });
   } else {
     gsap.set(letters, { y: LOGO.height * 1.2 }); // 120 % of the letter height, in SVG units
     gsap.set(hyphen, { scale: 0 });
-    const tl = gsap.timeline({ paused: true });
+    const tl = gsap.timeline({ paused: true, onComplete: () => (introDone = true) });
     tl.to(letters, { y: 0, duration: 1.2, ease: 'power4.inOut', stagger: { each: 0.03, from: 'random' } }, 0).to(
       hyphen,
       { scale: 1, duration: 0.9, ease: 'back.out(0.9)' },
@@ -627,23 +631,62 @@ export function closing() {
     );
   }
 
-  // hover: shrink to 5 %, spring back
-  groups.forEach((g, i) => {
-    const inner = inners[i];
-    let busy = false;
-    const poke = () => {
-      if (busy || env.reduced) return;
-      busy = true;
-      gsap.to(inner, {
-        scale: 0.05,
-        duration: 0.6,
+  // hover · "go wide": the letters under the cursor widen and sit lower (the
+  // RWB treatment: wider, lower) with a gaussian falloff; the others give up
+  // a little width so the logo keeps its overall span and never overflows.
+  if (env.reduced) return;
+  const boxes = groups.map((g) => {
+    const r = g.querySelector('.wm-hit')!;
+    return { x: +r.getAttribute('x')!, w: +r.getAttribute('width')! };
+  });
+  const gaps = boxes.map((b, i) => (i < boxes.length - 1 ? boxes[i + 1].x - (b.x + b.w) : 0));
+  const total = boxes.reduce((a, b) => a + b.w, 0);
+  const WIDEN = 0.42; // peak extra width before compensation
+  const LOWER = 0.14; // peak drop in height
+  const SIGMA = 72; // falloff in logo units (≈ one letter)
+
+  let pointerU: number | null = null;
+  let queued = false;
+  let originSet = false;
+
+  const apply = () => {
+    queued = false;
+    if (!introDone || pointerU === null) return;
+    if (!originSet) {
+      gsap.set(inners, { transformOrigin: '0% 100%' }); // grow rightwards from the baseline
+      originSet = true;
+    }
+    const f = boxes.map((b) => Math.exp(-(((pointerU! - (b.x + b.w / 2)) / SIGMA) ** 2)));
+    const k = (WIDEN * boxes.reduce((a, b, i) => a + b.w * f[i], 0)) / total;
+    let cursor = boxes[0].x;
+    boxes.forEach((b, i) => {
+      const sx = 1 + WIDEN * f[i] - k;
+      gsap.to(inners[i], {
+        x: cursor - b.x,
+        scaleX: sx,
+        scaleY: 1 - LOWER * f[i],
+        duration: 0.45,
         ease: 'power4.out',
-        overwrite: true,
-        onComplete: () => {
-          gsap.to(inner, { scale: 1, duration: 1.8, ease: 'elastic.out(1, 0.8)', onComplete: () => (busy = false) });
-        },
+        overwrite: 'auto',
       });
-    };
-    g.addEventListener('pointerenter', poke);
+      cursor += b.w * sx + gaps[i];
+    });
+  };
+  const queue = () => {
+    if (!queued) {
+      queued = true;
+      requestAnimationFrame(apply);
+    }
+  };
+
+  mark.addEventListener('pointermove', (e) => {
+    const r = mark.getBoundingClientRect();
+    pointerU = ((e.clientX - r.left) / r.width) * LOGO.width;
+    queue();
+  });
+  mark.addEventListener('pointerleave', () => {
+    pointerU = null;
+    if (!introDone) return;
+    gsap.to(inners, { x: 0, scaleX: 1, scaleY: 1, duration: 1.2, ease: 'elastic.out(1, 0.45)', overwrite: 'auto' });
   });
 }

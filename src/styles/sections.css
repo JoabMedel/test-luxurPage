@@ -1165,10 +1165,6 @@ img.reel-shot.is-on {
   color: var(--white);
   overflow: hidden;
 }
-.closing-mark .wm-l-inner {
-  transform-box: fill-box;
-  transform-origin: 50% 50%;
-}
 .credits {
   padding-block: 1.6vw var(--m);
   align-items: end;

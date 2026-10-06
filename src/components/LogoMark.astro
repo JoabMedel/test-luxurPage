@@ -26,6 +26,9 @@ const { id, class: className = '', label = 'RAUH-Welt', split = false } = Astro.
   aria-hidden={label ? undefined : 'true'}
 >
   {
+    split && <rect class="wm-area" x="0" y="0" width={LOGO.width} height={LOGO.height} fill="transparent" />
+  }
+  {
     split
       ? LOGO.glyphs.map((g, i) => (
           <g class="wm-l" data-i={i} data-char={g.char}>
