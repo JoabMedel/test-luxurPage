@@ -91,6 +91,15 @@ html:not(.js) .loader {
 .nav-logo.is-visible {
   visibility: visible;
 }
+.nl-i {
+  display: inline-block;
+  height: 0.92em; /* = NAV_GLYPH_EM in index.astro */
+  margin-inline-end: -0.1em; /* tuck the italic overhang so the folded mark reads RWB, not R W B */
+  overflow: visible;
+}
+.nl-i path {
+  fill: currentColor;
+}
 .nl-x {
   display: inline-block;
   overflow: clip;

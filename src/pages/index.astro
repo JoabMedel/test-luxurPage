@@ -26,6 +26,10 @@ const letterSpots = [
 ];
 
 const builtWidth = RWB.width;
+
+/* nav mark: RWB initials as glyphs (height in em); the name unfolds between them */
+const NAV_GLYPH_EM = 0.92;
+const NAV_UNFOLD = ['·AUH-', '·ELT\u00a0', '·EGRIFF'];
 ---
 
 <Layout>
@@ -52,7 +56,21 @@ const builtWidth = RWB.width;
   <!-- NAV (difference) ----------------------------------------------- -->
   <header class="nav" id="nav">
     <a class="nav-logo t-menu" id="nav-logo" href="#top" aria-label="RAUH-Welt BEGRIFF, back to top">
-      <span class="nl-i">R</span><span class="nl-x"><span>·AUH-</span></span><span class="nl-i">W</span><span class="nl-x"><span>·ELT&nbsp;</span></span><span class="nl-i">B</span><span class="nl-x"><span>·EGRIFF</span></span>
+      {
+        RWB.glyphs.map((g, i) => (
+          <Fragment>
+            <svg
+              class="nl-i"
+              viewBox={`0 0 ${g.width + RWB_OVERHANG} ${CAP}`}
+              style={`width:${(((g.width + RWB_OVERHANG) / CAP) * NAV_GLYPH_EM).toFixed(3)}em`}
+              aria-hidden="true"
+            >
+              <path d={g.d} fill-rule="evenodd" />
+            </svg>
+            <span class="nl-x"><span>{NAV_UNFOLD[i]}</span></span>
+          </Fragment>
+        ))
+      }
     </a>
     <button class="nav-menu t-menu" id="menu-btn" aria-expanded="false" aria-controls="menu-panel">
       <span class="nav-menu-word">Menu</span> <span class="nav-menu-dots" aria-hidden="true">::</span>
