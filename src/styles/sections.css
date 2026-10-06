@@ -558,7 +558,9 @@ img.reel-shot.is-on {
     grid-column: 1 / 13;
     margin-top: 0;
   }
-  .build-media {
+  /* portrait frames become 4:3 on phones; landscape ones keep their ratio
+     so per-photo crops (position/pan) stay valid */
+  .build.is-portrait .build-media {
     aspect-ratio: 4 / 3;
   }
   .build figcaption {

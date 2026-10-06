@@ -142,7 +142,7 @@ const builtWidth = RWB.width;
         {
           BUILDS.map((b, i) => (
             <li
-              class="build"
+              class:list={['build', b.ratio < 1 && 'is-portrait']}
               style={`--c0:${b.col[0]};--c1:${b.col[1]};--drop:${b.drop}vw;--ratio:${b.ratio}`}
               data-y={b.y}
               data-from={b.from}
@@ -156,7 +156,13 @@ const builtWidth = RWB.width;
                         srcset={b.photo.srcSm ? `${b.photo.srcSm} 800w, ${b.photo.src} ${b.photo.width}w` : undefined}
                         sizes="(max-width: 991px) 92vw, 50vw"
                         alt={b.photo.alt}
-                        style={b.photo.position ? `object-position:${b.photo.position}` : undefined}
+                        style={[
+                          b.photo.position && `object-position:${b.photo.position}`,
+                          b.photo.zoom &&
+                            `transform-origin:${b.photo.zoom.origin};transform:translateY(-${b.photo.zoom.lift}%) scale(${b.photo.zoom.scale})`,
+                        ]
+                          .filter(Boolean)
+                          .join(';') || undefined}
                         loading="lazy"
                         decoding="async"
                       />

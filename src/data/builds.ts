@@ -31,6 +31,13 @@ export interface Build {
     /** photographer credit shown on the card; omit until confirmed */
     credit?: string;
     position?: string;
+    /**
+     * Extra framing on top of the parallax overscan: scale around `origin`
+     * (the subject), then lift by `lift` % of the image height. With the
+     * −5→−20 parallax keep lift ≤ oy + (100 − oy) · scale − 96.9 (oy = origin Y
+     * in %) so the bottom never shows a gap.
+     */
+    zoom?: { scale: number; origin: string; lift: number };
     grade?: 'night';
   };
 }
@@ -99,7 +106,10 @@ export const BUILDS: Build[] = [
       width: 1920,
       srcSm: '/media/builds/sakura-sm.webp',
       alt: 'SAKURA, a matte-violet RWB widebody parked low in front of a corrugated-steel workshop, deep-dish wheels and a tall rear wing',
-      position: '44% 50%',
+      // car spans x 13–77 %, y 46–94 % of the photo (centre 45 % / 70 %):
+      // centre it horizontally, zoom 1.3× around it and lift it toward the middle
+      position: '28% 50%',
+      zoom: { scale: 1.3, origin: '50% 70.2%', lift: 11.8 },
       grade: 'night',
     },
   },
@@ -135,7 +145,7 @@ export const BUILDS: Build[] = [
     paintName: 'olive green',
     col: [7, 13],
     drop: 0,
-    ratio: 4 / 3,
+    ratio: 16 / 9, // 4:3 could not hold the whole car once zoomed
     y: 100,
     from: 'right',
     photo: {
@@ -143,7 +153,9 @@ export const BUILDS: Build[] = [
       width: 2000,
       srcSm: '/media/builds/midori-sm.webp',
       alt: 'MIDORI, an olive-green RWB widebody on the move along a tree-lined highway, riveted flares and gold deep-dish wheels',
-      position: '52% 50%',
+      // car spans x 14–91 %, y 43–93 % (centre 52 % / 68 %)
+      position: '78% 50%',
+      zoom: { scale: 1.15, origin: '50% 68%', lift: 7.7 },
       grade: 'night',
     },
   },
@@ -165,7 +177,9 @@ export const BUILDS: Build[] = [
       width: 2000,
       srcSm: '/media/builds/hoshi-sm.webp',
       alt: 'HOSHI, a black-cherry RWB widebody on a tree-lined city street at dusk: RAUH-Welt banner, ducktail wing and polished deep-dish wheels',
-      position: '52% 50%',
+      // car spans x 21–83 %, y 54–88 % (centre 52 % / 71 %)
+      position: '65% 50%',
+      zoom: { scale: 1.3, origin: '50% 71%', lift: 11.6 },
       grade: 'night',
     },
   },
