@@ -5,11 +5,10 @@ import CarPlate from '../components/CarPlate.astro';
 import { BUILDS } from '../data/builds';
 import { MEDIA } from '../data/media';
 import { SITE } from '../data/site';
-import { RWB, CAP, layout } from '../lib/wordmark';
+import { RWB, RWB_OVERHANG, CAP } from '../lib/wordmark';
 import '../styles/sections.css';
 
 const R = MEDIA.renders;
-const clusterLetters = layout('RAUH-WELT').glyphs;
 
 /* cluster composition: % of the cluster box, width in vw, base rotation */
 const clusterItems = [
@@ -19,16 +18,11 @@ const clusterItems = [
   { kind: 'img', key: 'fan', x: 22, y: 56, w: 15, r: -4 },
   { kind: 'img', key: 'rivet', x: 74, y: 52, w: 12, r: 8 },
 ] as const;
+/* the RWB initials, exploded into the gaps between the renders */
 const letterSpots = [
-  { x: 2, y: 64, r: -18 },
-  { x: 47, y: 3, r: 12 },
-  { x: 60, y: 66, r: -9 },
-  { x: 91, y: 30, r: 22 },
-  { x: 45, y: 82, r: 34 },
-  { x: 15, y: 0, r: -11 },
-  { x: 86, y: 78, r: 15 },
-  { x: 33, y: 2, r: -26 },
-  { x: 7, y: 86, r: 9 },
+  { x: 3, y: 66, r: -14 },
+  { x: 47, y: 52, r: 9 },
+  { x: 88, y: 46, r: 18 },
 ];
 
 const builtWidth = RWB.width;
@@ -283,13 +277,13 @@ const builtWidth = RWB.width;
           ))
         }
         {
-          clusterLetters.map((g, i) => (
+          RWB.glyphs.map((g, i) => (
             <div
               class="cl-item cl-letter"
-              style={`--x:${letterSpots[i].x}%;--y:${letterSpots[i].y}%;--w:${(g.width / 100) * 4.6}vw;--r:${letterSpots[i].r}deg`}
+              style={`--x:${letterSpots[i].x}%;--y:${letterSpots[i].y}%;--w:${((g.width + RWB_OVERHANG) / 100) * 6.2}vw;--r:${letterSpots[i].r}deg`}
               aria-hidden="true"
             >
-              <svg viewBox={`0 0 ${g.width} ${CAP}`}>
+              <svg viewBox={`0 0 ${g.width + RWB_OVERHANG} ${CAP}`}>
                 <path d={g.d} fill-rule="evenodd" />
               </svg>
             </div>

@@ -1,11 +1,10 @@
 /**
- * RWB wordmark geometry.
+ * "RWB" abbreviation lettering (loader + services cluster).
  *
- * Ultra-black, extended letterforms on a 100-unit cap height: every glyph is
- * wider than it is tall, stems are 32u, bars 24u, counters are slits and the
- * outer corners are generously rounded. The same path data feeds the inline
- * SVGs, the loader stroke drawing and the WebGL mask (via Path2D), so the
- * hidden aluminium layer lines up with the DOM wordmark to the pixel.
+ * Drawn to match the client's reference decal: extended, ultra-black, italic
+ * (14°), generously rounded, pill-shaped counters. Glyphs are designed upright
+ * on a 100-unit cap height, corners rounded with cubic arcs, then sheared.
+ * The paths feed inline SVGs, including the loader's stroke drawing.
  */
 
 type Pt = [x: number, y: number, r?: number];
@@ -20,11 +19,7 @@ export interface PlacedGlyph extends Glyph {
   x: number;
 }
 
-const T = 32; // stem
-const B = 24; // bar
-const RO = 26; // outer radius
-const R1 = 4; // soft corner
-const RI = 5; // inner (concave) corner
+const R1 = 4; // default corner radius
 
 const K = 0.5523; // cubic circle approximation
 
@@ -53,202 +48,11 @@ function round(points: Pt[]): string {
 
 const f = (v: number) => +v.toFixed(2);
 
-const box = (x: number, y: number, w: number, h: number, r = RI): string =>
-  round([
-    [x, y, r],
-    [x + w, y, r],
-    [x + w, y + h, r],
-    [x, y + h, r],
-  ]);
-
-function glyph(char: string): Glyph {
-  switch (char) {
-    case 'R': {
-      const w = 124;
-      return {
-        char,
-        width: w,
-        d:
-          round([
-            [0, 0, RO],
-            [w, 0, RO],
-            [w, 72, 12],
-            [94, 72, 3],
-            [w, 100, R1],
-            [80, 100, R1],
-            [50, 72, 3],
-            [T, 72, RI],
-            [T, 100, R1],
-            [0, 100, R1],
-          ]) + box(T, B, w - 2 * T, 72 - 2 * B),
-      };
-    }
-    case 'A': {
-      const w = 124;
-      return {
-        char,
-        width: w,
-        d:
-          round([
-            [0, 0, RO],
-            [w, 0, RO],
-            [w, 100, R1],
-            [w - T, 100, R1],
-            [w - T, 78, RI],
-            [T, 78, RI],
-            [T, 100, R1],
-            [0, 100, R1],
-          ]) + box(T, B, w - 2 * T, 54 - B),
-      };
-    }
-    case 'U': {
-      const w = 124;
-      return {
-        char,
-        width: w,
-        d: round([
-          [0, 0, R1],
-          [T, 0, R1],
-          [T, 100 - B, 8],
-          [w - T, 100 - B, 8],
-          [w - T, 0, R1],
-          [w, 0, R1],
-          [w, 100, RO],
-          [0, 100, RO],
-        ]),
-      };
-    }
-    case 'H': {
-      const w = 124;
-      return {
-        char,
-        width: w,
-        d: round([
-          [0, 0],
-          [T, 0],
-          [T, 38, RI],
-          [w - T, 38, RI],
-          [w - T, 0],
-          [w, 0],
-          [w, 100],
-          [w - T, 100],
-          [w - T, 62, RI],
-          [T, 62, RI],
-          [T, 100],
-          [0, 100],
-        ]),
-      };
-    }
-    case '-': {
-      const w = 60;
-      return { char, width: w, d: box(0, 38, w, 24, R1) };
-    }
-    case 'W': {
-      const w = 164;
-      const c = (w - 3 * T) / 2;
-      return {
-        char,
-        width: w,
-        d: round([
-          [0, 0],
-          [T, 0],
-          [T, 100 - B, 8],
-          [T + c, 100 - B, RI],
-          [T + c, 0],
-          [2 * T + c, 0],
-          [2 * T + c, 100 - B, RI],
-          [w - T, 100 - B, 8],
-          [w - T, 0],
-          [w, 0],
-          [w, 100, RO],
-          [0, 100, RO],
-        ]),
-      };
-    }
-    case 'E': {
-      const w = 114;
-      return {
-        char,
-        width: w,
-        d: round([
-          [0, 0, RO],
-          [w, 0],
-          [w, B],
-          [T, B, RI],
-          [T, 38, RI],
-          [w - 10, 38],
-          [w - 10, 62],
-          [T, 62, RI],
-          [T, 100 - B, RI],
-          [w, 100 - B],
-          [w, 100],
-          [0, 100, RO],
-        ]),
-      };
-    }
-    case 'L': {
-      const w = 108;
-      return {
-        char,
-        width: w,
-        d: round([
-          [0, 0],
-          [T, 0],
-          [T, 100 - B, 8],
-          [w, 100 - B],
-          [w, 100],
-          [0, 100, RO],
-        ]),
-      };
-    }
-    case 'T': {
-      const w = 124;
-      const s = (w - T) / 2;
-      return {
-        char,
-        width: w,
-        d: round([
-          [0, 0],
-          [w, 0],
-          [w, B],
-          [s + T, B, RI],
-          [s + T, 100],
-          [s, 100],
-          [s, B, RI],
-          [0, B],
-        ]),
-      };
-    }
-    case 'B': {
-      const w = 124;
-      return {
-        char,
-        width: w,
-        d:
-          round([
-            [0, 0],
-            [w, 0, RO],
-            [w, 46, 6],
-            [w - 6, 50, 2],
-            [w, 54, 6],
-            [w, 100, RO],
-            [0, 100],
-          ]) +
-          box(T, B, w - 2 * T, 38 - B) +
-          box(T, 62, w - 2 * T, 100 - B - 62),
-      };
-    }
-    default:
-      throw new Error(`Glyph not drawn: ${char}`);
-  }
-}
-
-export const GAP = 10;
 export const CAP = 100;
 
 type GlyphFn = (char: string) => Glyph;
 
-export function layout(text: string, gap = GAP, draw: GlyphFn = glyph): { glyphs: PlacedGlyph[]; width: number } {
+export function layout(text: string, gap: number, draw: GlyphFn): { glyphs: PlacedGlyph[]; width: number } {
   let x = 0;
   const glyphs = [...text].map((char, i) => {
     const g = draw(char);
@@ -259,12 +63,6 @@ export function layout(text: string, gap = GAP, draw: GlyphFn = glyph): { glyphs
   return { glyphs, width: x };
 }
 
-export const RAUH_WELT = layout('RAUH-WELT');
-
-/* ------------------------------------------------------------------ RWB --
- * The abbreviation has its own lettering, as on the cars' decals: extended,
- * ultra-black, italic (14°), generously rounded, pill-shaped counters.
- * Drawn upright on the same 100-unit cap height, then sheared. */
 
 const SLANT = Math.tan((14 * Math.PI) / 180);
 const shear = (pts: Pt[]): Pt[] => pts.map(([x, y, r]) => [x + (CAP - y) * SLANT, y, r]);
@@ -341,6 +139,9 @@ function rwbGlyph(char: string): Glyph {
   }
 }
 
+/** horizontal ink overhang added by the italic shear, per glyph */
+export const RWB_OVERHANG = CAP * SLANT;
+
 const rwb = layout('RWB', 8, rwbGlyph);
-/** "RWB" abbreviation lockup; width includes the italic overhang */
-export const RWB = { glyphs: rwb.glyphs, width: rwb.width + CAP * SLANT };
+/** "RWB" lockup; width includes the italic overhang */
+export const RWB = { glyphs: rwb.glyphs, width: rwb.width + RWB_OVERHANG };

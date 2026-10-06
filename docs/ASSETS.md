@@ -7,7 +7,7 @@ Material del cliente recibido: fotos de los 6 builds (2026-10-05). Todo lo que d
 | # | Recurso | Sección | Nivel | Origen / solución | Por qué |
 |---|---|---|---|---|---|
 | 1 | Logo "RAUH-Welt" (portada y cierre) | Portada, cierre | 1 · Código | Trazado SVG generado por `tools/build-logo.mjs` → `src/lib/logo.ts` a partir de **Ultra** (Astigmatic, SIL OFL 1.1), la alternativa libre más fiel al slab serif pesado del logo original (cuya tipografía no tiene licencia libre). Debajo, línea en japonés en Zen Old Mincho 900 (OFL): «ラウ・ヴェルト・ベグリフ» / «荒々しい世界という概念» | El trazado se comparte con la máscara WebGL, así que la tinta sigue alineada al píxel. |
-| 1b | Abreviatura "RWB" (loader) y letras sueltas "RAUH-WELT" (racimo) | Loader, racimo | 1 · Código | `src/lib/wordmark.ts`: "RWB" dibujado a medida según la referencia del cliente (extendido, ultranegro, itálica 14°, contraformas en píldora); letras del racimo con el wordmark extendido | El loader dibuja el trazo de la misma geometría. |
+| 1b | Abreviatura "RWB" (loader y racimo de servicios) | Loader, racimo | 1 · Código | `src/lib/wordmark.ts`: "RWB" dibujado a medida según la referencia del cliente (extendido, ultranegro, itálica 14°, contraformas en píldora) | El loader dibuja el trazo de la misma geometría; en el racimo, las tres iniciales flotan entre las piezas. |
 | 2 | "RWB" del loader (trazo + separación) | Loader | 1 · Código | Misma geometría SVG, `stroke-dashoffset` + GSAP | Dibujo y separación son movimiento puro. |
 | 3 | Llanta girando en el loader | Loader | 1 + 3 | Render de la llanta (#9) girado por CSS/GSAP | El giro es código; solo el objeto es imagen. |
 | 4 | Capa oculta: "RAUH-WELT" en aluminio remachado con destello | Portada | 1 + 3 | **Textura** de chapa de aluminio con líneas de remaches (Higgsfield, imagen) recortada con el SVG dentro del shader; el destello lento es un barrido especular en el shader | El texto generado por IA no se alinearía con el SVG; el barrido de luz lo imita el código, así que no hace falta video. |
@@ -27,7 +27,7 @@ Material del cliente recibido: fotos de los 6 builds (2026-10-05). Todo lo que d
 | 17 | 6 builds (KAZE, NOIR, SAKURA, TETSU, MIDORI, HOSHI) | BUILDS | 2 · **Cliente** | Los 6 builds tienen foto entregada por el cliente (`public/media/builds/`), con gradación nocturna por CSS. `CarPlate.astro` queda como respaldo si falta alguna foto | Son autos reales. |
 | 18 | Nakai-san trabajando sobre una aleta (panorámica) | The Man | 2 · **Cliente** | Marco reservado con ficha | Persona real: nunca se genera. |
 | 19 | Línea de remaches (cuadrado pequeño) | The Man | 3 · Imagen | Recorte de #14 | Detalle sin persona. |
-| 20 | Letras sueltas de "RAUH-WELT" en el racimo | Racimo | 1 · Código | Glifos del SVG #1 | Código antes que archivo. |
+| 20 | Iniciales sueltas "R", "W", "B" en el racimo | Racimo | 1 · Código | Glifos de #1b | Código antes que archivo. |
 | — | Modelo 3D (GLB) | — | 4 · **No se usa** | — | Ninguna interacción lo exige (no hay configurador ni pieza girable). |
 
 **Nota sobre Three.js:** la simulación de tinta está escrita en WebGL2 directo (~10 KB) en lugar de Three.js (~170 KB). El resultado visual es el mismo; el peso, mucho menor.
