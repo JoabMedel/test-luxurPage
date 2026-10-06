@@ -6,6 +6,8 @@
 export interface Build {
   id: string;
   name: string;
+  /** the name in kanji (NOIR is French: 黒, "black") */
+  kanji: string;
   model: string;
   city: string;
   line: string;
@@ -46,6 +48,7 @@ export const BUILDS: Build[] = [
   {
     id: 'kaze',
     name: 'KAZE',
+    kanji: '風',
     model: '964',
     city: 'TOKYO',
     line: 'Low enough to read the asphalt.',
@@ -69,6 +72,7 @@ export const BUILDS: Build[] = [
   {
     id: 'noir',
     name: 'NOIR',
+    kanji: '黒',
     model: '993',
     city: 'PARIS',
     line: 'Riveted at midnight, named at dawn.',
@@ -91,6 +95,7 @@ export const BUILDS: Build[] = [
   {
     id: 'sakura',
     name: 'SAKURA',
+    kanji: '桜',
     model: '930',
     city: 'LOS ANGELES',
     line: 'Air-cooled, never calm.',
@@ -116,6 +121,7 @@ export const BUILDS: Build[] = [
   {
     id: 'tetsu',
     name: 'TETSU',
+    kanji: '鉄',
     model: '964',
     city: 'BANGKOK',
     line: 'Wider than the rules.',
@@ -138,6 +144,7 @@ export const BUILDS: Build[] = [
   {
     id: 'midori',
     name: 'MIDORI',
+    kanji: '緑',
     model: '993',
     city: 'MELBOURNE',
     line: 'Built where its owner lives.',
@@ -162,6 +169,7 @@ export const BUILDS: Build[] = [
   {
     id: 'hoshi',
     name: 'HOSHI',
+    kanji: '星',
     model: '964',
     city: 'DUBAI',
     line: 'One car. One name. One cut.',

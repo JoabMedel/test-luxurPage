@@ -10,6 +10,7 @@
   --black: #000000;
   --grey: #8c8c8c;
   --sodium: #e8892b;
+  --shu: #d23b2a; /* 朱 vermilion: reserved for the sun disc and the hanko seal */
 
   --sans: "Inter Tight Variable", "Neue Montreal", "Helvetica Neue", Arial, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
@@ -243,6 +244,37 @@ button {
 }
 .skip-link:focus {
   transform: none;
+}
+
+/* vertical Japanese marginalia (tategaki) */
+.kanji-v {
+  position: absolute;
+  z-index: 0;
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  font-family: var(--mincho);
+  font-weight: 900;
+  font-size: 1.04vw;
+  line-height: 1;
+  letter-spacing: 0.4em;
+  color: var(--grey);
+  pointer-events: none;
+  user-select: none;
+}
+.jp-inline {
+  font-family: var(--mincho);
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  margin-left: 0.4em;
+}
+.hanko {
+  display: inline-block;
+  flex: none;
+}
+@media (max-width: 991px) {
+  .kanji-v {
+    font-size: 3.2vw;
+  }
 }
 
 /* brand logotype */

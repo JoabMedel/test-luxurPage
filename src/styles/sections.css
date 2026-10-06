@@ -332,6 +332,7 @@ html:not(.js) .loader {
 
 /* ============================================================= MANIFESTO */
 .manifesto {
+  position: relative;
   background: var(--white);
   padding-block: 16vw 14vw;
   align-items: start;
@@ -343,6 +344,10 @@ html:not(.js) .loader {
 .m-title {
   grid-column: 4 / 13;
   margin: 0;
+}
+.m-kanji {
+  right: var(--m);
+  top: 16.2vw;
 }
 @media (max-width: 991px) {
   .manifesto {
@@ -368,6 +373,10 @@ html:not(.js) .loader {
   top: 0;
   height: 100vh;
   overflow: clip;
+}
+.reel-kanji {
+  right: var(--m);
+  top: calc(var(--m) + 4vw);
 }
 .reel-copy {
   position: absolute;
@@ -549,6 +558,15 @@ img.reel-shot.is-on {
 .build-label,
 .build-line {
   margin: 0;
+}
+.build-kanji {
+  float: right;
+  font-family: var(--mincho);
+  font-weight: 900;
+  font-size: 1.25vw;
+  line-height: 1;
+  letter-spacing: 0;
+  color: rgb(255 255 255 / 0.55);
 }
 .build-n {
   color: var(--white);
@@ -772,6 +790,7 @@ img.reel-shot.is-on {
 
 /* =============================================================== THE MAN */
 .man {
+  position: relative;
   padding-block: 12vw 10vw;
   row-gap: 0;
   align-items: start;
@@ -808,6 +827,21 @@ img.reel-shot.is-on {
 .man-square figcaption {
   margin-top: 0.9vw;
   color: var(--white);
+}
+.man-kanji {
+  left: var(--m);
+  top: 15vw;
+}
+.man-caption {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1vw;
+}
+.man-hanko {
+  width: 2.6vw;
+  height: 2.6vw;
+  rotate: -4deg;
 }
 .frame-pending {
   position: relative;
@@ -857,8 +891,13 @@ img.reel-shot.is-on {
 
 /* ============================================================== SERVICES */
 .services {
+  position: relative;
   padding-block: 12vw 8vw;
   overflow: clip;
+}
+.services-kanji {
+  right: var(--m);
+  top: 12.6vw;
 }
 .services-title {
   margin: 0;
@@ -1001,6 +1040,11 @@ img.reel-shot.is-on {
   text-transform: none;
   white-space: pre;
 }
+.gb-ja {
+  font-family: var(--mincho);
+  font-weight: 900;
+  letter-spacing: 0.3em;
+}
 .glitch-type {
   position: absolute;
   left: 12vw;
@@ -1096,11 +1140,27 @@ img.reel-shot.is-on {
   flex-wrap: wrap;
 }
 .closing-mark-wrap {
-  margin-top: 12vw;
+  position: relative;
+  padding-top: 12vw;
   display: grid;
   place-items: center;
+  overflow: clip;
+}
+/* hinomaru: the sun rising behind the logo, the credits line as horizon */
+.sun {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 25vw;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--shu);
+  translate: -50% 50%;
+  will-change: transform;
 }
 .closing-mark {
+  position: relative;
+  z-index: 1;
   width: 97.5vw;
   color: var(--white);
   overflow: hidden;
@@ -1118,6 +1178,14 @@ img.reel-shot.is-on {
 }
 .cr-a {
   grid-column: 1 / 5;
+  display: flex;
+  align-items: center;
+  gap: 0.8em;
+}
+.cr-hanko {
+  width: 1.7vw;
+  height: 1.7vw;
+  rotate: 3deg;
 }
 .cr-b {
   grid-column: 5 / 8;
@@ -1178,4 +1246,39 @@ img.reel-shot.is-on {
 .reduced .cl-item,
 .reduced .glitch-d {
   will-change: auto;
+}
+
+/* ======================================================= JP DETAILS · MOBILE */
+@media (max-width: 991px) {
+  .m-kanji {
+    top: 30vw;
+  }
+  .reel-kanji {
+    display: none;
+  }
+  .man-kanji {
+    left: auto;
+    right: var(--m);
+    top: 22vw;
+  }
+  .services-kanji {
+    top: 22vw;
+  }
+  .build-kanji {
+    font-size: 4.4vw;
+  }
+  .man-hanko {
+    width: 8vw;
+    height: 8vw;
+  }
+  .cr-hanko {
+    width: 5.4vw;
+    height: 5.4vw;
+  }
+  .closing-mark-wrap {
+    padding-top: 20vw;
+  }
+  .sun {
+    width: 30vw;
+  }
 }

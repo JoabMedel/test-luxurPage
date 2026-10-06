@@ -509,7 +509,7 @@ export function glitch() {
   const blocks = $$('[data-scramble]', section);
 
   // scramble window travelling through each block
-  const CHARS = '!<>-_\\/[]{}=+*^?#·:01';
+  const CHARS = '!<>-_\\/[]{}=+*^?#·:01アウラヴェルト荒車幅';
   const states = blocks.map((el) => ({ el, text: el.textContent ?? '', pos: -Math.floor(rand(0, 14)), win: el.hasAttribute('data-garbage') ? 12 : 5 }));
   let scr = 0;
   const tick = () => {
@@ -612,6 +612,19 @@ export function closing() {
       1,
     );
     ScrollTrigger.create({ trigger: mark, start: 'top 95%', once: true, onEnter: () => tl.play() });
+  }
+
+  // sunrise: the disc climbs behind the logo as the page ends
+  if (!env.reduced) {
+    gsap.fromTo(
+      '.sun',
+      { yPercent: 45 },
+      {
+        yPercent: -6, // just clears the logo: a sun on the horizon, not a flag
+        ease: 'none',
+        scrollTrigger: { trigger: '.closing-mark-wrap', start: 'top bottom', end: 'bottom bottom', scrub: 1.5 },
+      },
+    );
   }
 
   // hover: shrink to 5 %, spring back

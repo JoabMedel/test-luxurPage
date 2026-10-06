@@ -1,0 +1,27 @@
+---
+/**
+ * Hanko (印鑑): a small vermilion seal, the craftsman's mark.
+ * 荒 = "rough", the RAUH in RAUH-Welt. Edges are roughened with a light
+ * displacement filter so it reads as stamped ink, not a UI badge.
+ */
+interface Props {
+  char?: string;
+  class?: string;
+}
+const { char = '荒', class: className = '' } = Astro.props;
+const fid = `hanko-rough-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<svg class:list={['hanko', className]} viewBox="0 0 100 100" aria-hidden="true">
+  <defs>
+    <filter id={fid} x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="n"></feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="5"></feDisplacementMap>
+    </filter>
+  </defs>
+  <g filter={`url(#${fid})`}>
+    <rect x="6" y="6" width="88" height="88" rx="9" fill="var(--shu)"></rect>
+    <rect x="13" y="13" width="74" height="74" rx="5" fill="none" stroke="#fff" stroke-width="2.4" opacity="0.9"></rect>
+    <text x="50" y="53" text-anchor="middle" dominant-baseline="central" lang="ja" fill="#fff" font-size="58" font-weight="900" font-family="Zen Old Mincho, serif">{char}</text>
+  </g>
+</svg>

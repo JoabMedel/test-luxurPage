@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import LogoMark from '../components/LogoMark.astro';
+import Hanko from '../components/Hanko.astro';
 import CarPlate from '../components/CarPlate.astro';
 import { BUILDS } from '../data/builds';
 import { MEDIA } from '../data/media';
@@ -120,6 +121,7 @@ const NAV_UNFOLD = ['·AUH-', '·ELT\u00a0', '·EGRIFF'];
     <!-- 2 · MANIFESTO ------------------------------------------------- -->
     <section class="manifesto grid12" id="manifesto" aria-labelledby="manifesto-title">
       <p class="t-label m-label" data-fade>( Manifesto ) — (01)</p>
+      <span class="kanji-v m-kanji" lang="ja" aria-hidden="true">宣言</span>
       <h2 class="t-h m-title" id="manifesto-title" data-lines>
         <span class="line-mask"><span class="line-inner">Factories build cars.</span></span>
         <span class="line-mask"><span class="line-inner">Nakai-san builds characters.</span></span>
@@ -129,6 +131,7 @@ const NAV_UNFOLD = ['·AUH-', '·ELT\u00a0', '·EGRIFF'];
     <!-- 3 · REEL -------------------------------------------------------- -->
     <section class="reel" id="reel" aria-labelledby="reel-title">
       <div class="reel-sticky">
+        <span class="kanji-v reel-kanji" lang="ja" aria-hidden="true">一刀</span>
         <div class="reel-copy">
           <p class="t-label" id="reel-title">( The first cut )</p>
           <p class="t-q reel-text" data-lines-auto>
@@ -200,6 +203,7 @@ const NAV_UNFOLD = ['·AUH-', '·ELT\u00a0', '·EGRIFF'];
                 <figcaption>
                   <p class="t-label build-label">
                     <span class="build-n">{String(i + 1).padStart(2, '0')}</span> {b.name} · {b.model} · {b.city}
+                    <span class="build-kanji" lang="ja" aria-hidden="true">{b.kanji}</span>
                   </p>
                   <p class="t-q build-line">{b.line}</p>
                 </figcaption>
@@ -212,7 +216,7 @@ const NAV_UNFOLD = ['·AUH-', '·ELT\u00a0', '·EGRIFF'];
       <div class="builds-foot grid12">
         <a class="all-builds" href={SITE.allBuilds} rel="noopener" target="_blank">All builds <span aria-hidden="true">↪</span></a>
         <span class="t-label builds-count">(06)</span>
-        <span class="t-label builds-sign">© CHIBA · JP</span>
+        <span class="t-label builds-sign">© CHIBA · JP <span class="jp-inline" lang="ja" aria-hidden="true">千葉</span></span>
       </div>
     </section>
 
@@ -245,6 +249,7 @@ const NAV_UNFOLD = ['·AUH-', '·ELT\u00a0', '·EGRIFF'];
     <!-- 6 · THE MAN ----------------------------------------------------- -->
     <section class="man is-dark grid12" id="the-man" aria-labelledby="man-title">
       <p class="t-label man-label" id="man-title">( The Man )</p>
+      <span class="kanji-v man-kanji" lang="ja" aria-hidden="true">職人</span>
       <p class="t-q man-text" data-lines-auto>
         Akira Nakai builds every RWB himself. He travels to the car, cuts the body by eye and hands it back wider, lower and with a name of its own.
       </p>
@@ -264,12 +269,13 @@ const NAV_UNFOLD = ['·AUH-', '·ELT\u00a0', '·EGRIFF'];
       </figure>
       <figure class="man-square" data-clip>
         <img src="/media/detail-rivet-line.webp" alt="A line of dome rivets across raw aluminium sheet" loading="lazy" decoding="async" width="700" height="700" />
-        <figcaption class="t-label">One cut. /<br />No undo.</figcaption>
+        <figcaption class="t-label man-caption"><span>One cut. /<br />No undo.</span><Hanko class="man-hanko" /></figcaption>
       </figure>
     </section>
 
     <!-- 7 · SERVICES + CLUSTER ----------------------------------------- -->
     <section class="services is-dark" id="services" aria-labelledby="services-title">
+      <span class="kanji-v services-kanji" lang="ja" aria-hidden="true">幅は個性に従う</span>
       <h2 class="t-h services-title grid12" id="services-title" data-lines>
         <span class="line-mask"><span class="line-inner">Width follows</span></span>
         <span class="line-mask"><span class="line-inner">character.</span></span>
@@ -346,7 +352,7 @@ const NAV_UNFOLD = ['·AUH-', '·ELT\u00a0', '·EGRIFF'];
           <p class="gb t-label" style="--x:68%;--y:22%" data-scramble>every car has a name</p>
           <p class="gb t-label" style="--x:12%;--y:76%" data-scramble>every car has a name</p>
           <p class="gb t-label" style="--x:62%;--y:84%" data-scramble data-garbage>#/9x_&lt;rwb&gt;:::0x7E4·%%·||</p>
-          <p class="gb t-label" style="--x:80%;--y:56%" data-scramble>air-cooled · hand-cut</p>
+          <p class="gb t-label gb-ja" style="--x:80%;--y:56%" lang="ja" data-scramble>空冷・手切り</p>
         </div>
         <p class="t-h glitch-type" id="glitch-line">We don't sell parts. We give air-cooled legends a second, wider life.</p>
         <img class="glitch-d glitch-d1" src={MEDIA.detailCut.src} srcset={`${MEDIA.detailCut.src.replace('.webp', '-sm.webp')} 640w, ${MEDIA.detailCut.src} 1200w`} sizes="24vw" alt={MEDIA.detailCut.alt} loading="lazy" decoding="async" />
@@ -373,10 +379,11 @@ const NAV_UNFOLD = ['·AUH-', '·ELT\u00a0', '·EGRIFF'];
       </div>
     </div>
     <div class="closing-mark-wrap">
+      <span class="sun" aria-hidden="true"></span>
       <LogoMark id="closing-mark" class="closing-mark" split />
     </div>
     <div class="credits grid12 t-label">
-      <p class="cr-a">© RAUH-Welt BEGRIFF — Chiba, Japan</p>
+      <p class="cr-a"><Hanko class="cr-hanko" />© RAUH-Welt BEGRIFF — Chiba, Japan</p>
       <p class="cr-b">Site by {SITE.studio}</p>
       <p class="cr-c">Photography by {SITE.photographer}</p>
       <p class="cr-d"><span aria-current="true" class="lang-on">EN</span> / <span class="lang-off" title="Japanese version in preparation">JP</span></p>
