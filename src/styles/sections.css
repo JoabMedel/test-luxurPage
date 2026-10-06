@@ -173,18 +173,44 @@ html:not(.js) .loader {
   isolation: isolate;
   touch-action: pan-y;
 }
-.hero-mark-wrap {
+.hero-center {
   position: absolute;
   inset: 0;
-  margin: 0;
   display: grid;
   place-items: center;
+}
+/* no transform on the lockup itself: it would isolate the difference blend of
+   the Japanese line; the parallax moves the logo and the line separately */
+.hero-lockup {
+  width: 97.5vw;
+}
+.hero-title {
+  margin: 0;
   font-size: inherit;
 }
 .hero-mark {
-  width: 97.5vw;
+  width: 100%;
   color: var(--black);
+  overflow: visible;
   will-change: transform;
+}
+/* Japanese line under the logo: brand reading ↔ what the name means */
+.hero-ja {
+  display: flex;
+  align-items: center;
+  gap: 1.6vw;
+  margin: 1.8vw 0 0;
+  font-family: var(--mincho);
+  font-weight: 900;
+  font-size: var(--fs-q);
+  line-height: 1;
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+}
+.hero-ja-rule {
+  flex: 1;
+  height: 1px;
+  background: currentColor;
 }
 .hero-fluid {
   position: absolute;
@@ -267,8 +293,18 @@ html:not(.js) .loader {
   display: none;
 }
 @media (max-width: 991px) {
-  .hero-mark {
+  .hero-lockup {
     width: calc(100vw - var(--m) * 2);
+  }
+  .hero-ja {
+    flex-direction: column;
+    gap: 2.4vw;
+    margin-top: 5vw;
+    font-size: 4vw;
+  }
+  .hero-ja-rule {
+    flex: none;
+    width: 8vw;
   }
   .hero-tl {
     top: calc(var(--m) + 12vw);

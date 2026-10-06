@@ -4,14 +4,14 @@
  * A small stable-fluids solver (WebGL2, no Three.js) whose dye field is used as
  * a hard-edged mask: smoothstep(0.5, 0.51, dye). Inside the mask we paint the
  * hidden layer: black outside the letters, riveted raw aluminium with a slow
- * travelling highlight inside them. The wordmark shape comes from the same SVG
- * path data as the DOM wordmark and is sampled in wordmark-local UVs, so both
- * layers stay aligned while the page scrolls.
+ * travelling highlight inside them. The logo shape comes from the same SVG
+ * path data as the DOM logo (src/lib/logo.ts) and is sampled in logo-local
+ * UVs, so both layers stay aligned while the page scrolls.
  *
  * Settings from the brief: sim 256 (128 on mobile), dye 512, dissipation
  * 0.962 (dye) / 0.988 (velocity), force 5900, curl 0.
  */
-import { CAP, RAUH_WELT } from '../lib/wordmark';
+import { LOGO } from '../lib/logo';
 import { env } from './env';
 
 const CONFIG = {
@@ -263,7 +263,7 @@ export function initFluid(hero: HTMLElement, canvas: HTMLCanvasElement, mark: SV
   const aluTex = gl.createTexture()!;
   let hasAlu = 0;
   let texAspect = 2.33;
-  const markAspect = RAUH_WELT.width / CAP;
+  const markAspect = LOGO.width / LOGO.height;
 
   const buildMask = () => {
     const w = Math.min(4096, Math.round(mark.getBoundingClientRect().width * env.dpr));
@@ -273,11 +273,9 @@ export function initFluid(hero: HTMLElement, canvas: HTMLCanvasElement, mark: SV
     c.height = h;
     const ctx = c.getContext('2d')!;
     ctx.fillStyle = '#fff';
-    const s = w / RAUH_WELT.width;
-    for (const g of RAUH_WELT.glyphs) {
-      ctx.setTransform(s, 0, 0, s, g.x * s, 0);
-      ctx.fill(new Path2D(g.d), 'evenodd');
-    }
+    const s = w / LOGO.width;
+    ctx.setTransform(s, 0, 0, s, 0, 0);
+    for (const g of LOGO.glyphs) ctx.fill(new Path2D(g.d), 'nonzero');
     gl.bindTexture(gl.TEXTURE_2D, maskTex);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);

@@ -2,6 +2,7 @@
 @import "@fontsource-variable/inter-tight/wght.css";
 @import "@fontsource/ibm-plex-mono/400.css";
 @import "@fontsource/ibm-plex-mono/500.css";
+@import "@fontsource/zen-old-mincho/900.css";
 
 /* ------------------------------------------------------------------ tokens */
 :root {
@@ -12,6 +13,7 @@
 
   --sans: "Inter Tight Variable", "Neue Montreal", "Helvetica Neue", Arial, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --mincho: "Zen Old Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
 
   --m: 1.15vw; /* outer margin + grid gap */
   --col: calc((100vw - var(--m) * 13) / 12);
@@ -247,7 +249,8 @@ button {
 .wordmark {
   overflow: visible;
 }
-.wordmark path {
+.wordmark path,
+.logomark path {
   fill: currentColor;
 }
 

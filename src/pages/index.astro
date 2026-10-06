@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Wordmark from '../components/Wordmark.astro';
+import LogoMark from '../components/LogoMark.astro';
 import CarPlate from '../components/CarPlate.astro';
 import { BUILDS } from '../data/builds';
 import { MEDIA } from '../data/media';
@@ -75,10 +76,19 @@ const builtWidth = RWB.width;
   <main>
     <!-- 1 · HERO ------------------------------------------------------- -->
     <section class="hero" id="top" aria-labelledby="hero-title">
-      <h1 id="hero-title" class="hero-mark-wrap">
-        <span class="sr-only">RAUH-Welt BEGRIFF</span>
-        <Wordmark id="hero-mark" class="hero-mark" label="RAUH-WELT" />
-      </h1>
+      <div class="hero-center">
+        <div class="hero-lockup" id="hero-lockup">
+          <h1 id="hero-title" class="hero-title">
+            <span class="sr-only">RAUH-Welt BEGRIFF</span>
+            <LogoMark id="hero-mark" class="hero-mark" label="" />
+          </h1>
+          <p class="hero-ja diff" lang="ja">
+            <span class="hero-ja-name">ラウ・ヴェルト・ベグリフ</span>
+            <span class="hero-ja-rule" aria-hidden="true"></span>
+            <span class="hero-ja-meaning">荒々しい世界という概念</span>
+          </p>
+        </div>
+      </div>
       <canvas class="hero-fluid" id="hero-fluid" aria-hidden="true"></canvas>
 
       <div class="hero-tl">

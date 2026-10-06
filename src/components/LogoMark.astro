@@ -1,0 +1,27 @@
+---
+/**
+ * The brand logotype "RAUH-Welt" as outlined paths (see tools/build-logo.mjs).
+ * Same geometry feeds the WebGL ink mask in src/scripts/fluid.ts.
+ */
+import { LOGO } from '../lib/logo';
+
+interface Props {
+  id?: string;
+  class?: string;
+  /** accessible name; pass "" when the surrounding element already names it */
+  label?: string;
+}
+
+const { id, class: className = '', label = 'RAUH-Welt' } = Astro.props;
+---
+
+<svg
+  id={id}
+  class:list={['logomark', className]}
+  viewBox={`0 0 ${LOGO.width} ${LOGO.height}`}
+  role={label ? 'img' : undefined}
+  aria-label={label || undefined}
+  aria-hidden={label ? undefined : 'true'}
+>
+  {LOGO.glyphs.map((g) => <path d={g.d} data-char={g.char} />)}
+</svg>

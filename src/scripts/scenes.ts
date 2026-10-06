@@ -24,10 +24,11 @@ export function heroIntro() {
 export function heroScroll() {
   const mm = gsap.matchMedia();
   mm.add(MQ.motion, () => {
-    gsap.to('#hero-mark', {
-      yPercent: -70,
+    const mark = $('#hero-mark');
+    gsap.to(['#hero-mark', '.hero-ja'], {
+      y: () => -0.7 * mark.getBoundingClientRect().height,
       ease: 'none',
-      scrollTrigger: { trigger: '#top', start: 'top top', end: 'bottom top', scrub: 1.5 },
+      scrollTrigger: { trigger: '#top', start: 'top top', end: 'bottom top', scrub: 1.5, invalidateOnRefresh: true },
     });
   });
 }
