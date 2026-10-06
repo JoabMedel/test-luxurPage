@@ -246,10 +246,12 @@ function glyph(char: string): Glyph {
 export const GAP = 10;
 export const CAP = 100;
 
-export function layout(text: string, gap = GAP): { glyphs: PlacedGlyph[]; width: number } {
+type GlyphFn = (char: string) => Glyph;
+
+export function layout(text: string, gap = GAP, draw: GlyphFn = glyph): { glyphs: PlacedGlyph[]; width: number } {
   let x = 0;
   const glyphs = [...text].map((char, i) => {
-    const g = glyph(char);
+    const g = draw(char);
     const placed = { ...g, x };
     x += g.width + (i < text.length - 1 ? gap : 0);
     return placed;
@@ -258,4 +260,87 @@ export function layout(text: string, gap = GAP): { glyphs: PlacedGlyph[]; width:
 }
 
 export const RAUH_WELT = layout('RAUH-WELT');
-export const RWB = layout('RWB', 18);
+
+/* ------------------------------------------------------------------ RWB --
+ * The abbreviation has its own lettering, as on the cars' decals: extended,
+ * ultra-black, italic (14°), generously rounded, pill-shaped counters.
+ * Drawn upright on the same 100-unit cap height, then sheared. */
+
+const SLANT = Math.tan((14 * Math.PI) / 180);
+const shear = (pts: Pt[]): Pt[] => pts.map(([x, y, r]) => [x + (CAP - y) * SLANT, y, r]);
+const pill = (x: number, y: number, w: number, h: number): Pt[] => [
+  [x, y, h / 2],
+  [x + w, y, h / 2],
+  [x + w, y + h, h / 2],
+  [x, y + h, h / 2],
+];
+const italic = (...shapes: Pt[][]) => shapes.map((p) => round(shear(p))).join('');
+
+function rwbGlyph(char: string): Glyph {
+  switch (char) {
+    case 'R':
+      return {
+        char,
+        width: 158,
+        d: italic(
+          [
+            [0, 0, 14],
+            [150, 0, 40],
+            [150, 50, 22],
+            [134, 61, 4],
+            [160, 100, 6],
+            [112, 100, 6],
+            [90, 66, 4],
+            [36, 66, 4],
+            [36, 100, 6],
+            [0, 100, 10],
+          ],
+          pill(36, 20, 80, 22),
+        ),
+      };
+    case 'W':
+      return {
+        char,
+        width: 204,
+        d: italic([
+          [0, 0, 8],
+          [42, 0, 6],
+          [64, 64, 6],
+          [84, 0, 6],
+          [124, 0, 6],
+          [144, 64, 6],
+          [164, 0, 6],
+          [204, 0, 8],
+          [172, 100, 10],
+          [130, 100, 8],
+          [104, 36, 6],
+          [78, 100, 8],
+          [36, 100, 10],
+        ]),
+      };
+    case 'B':
+      return {
+        char,
+        width: 154,
+        d: italic(
+          [
+            [0, 0, 12],
+            [148, 0, 34],
+            [148, 40, 16],
+            [128, 50, 4],
+            [154, 58, 16],
+            [154, 100, 36],
+            [0, 100, 12],
+          ],
+          pill(36, 19, 78, 21),
+          pill(36, 60, 82, 21),
+        ),
+      };
+    default:
+      throw new Error(`RWB glyph not drawn: ${char}`);
+  }
+}
+
+const rwb = layout('RWB', 8, rwbGlyph);
+/** "RWB" abbreviation lockup; width includes the italic overhang */
+export const RWB = { glyphs: rwb.glyphs, width: rwb.width + CAP * SLANT };
