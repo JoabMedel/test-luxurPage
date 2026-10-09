@@ -45,11 +45,19 @@ in vec2 vUv, vL, vR, vT, vB;
 out vec4 o;
 `;
 
+// splats are additive, so one pass applies a whole frame's worth of them
+const MAX_SPLATS = 32;
 const SPLAT = `${HEAD}
-uniform sampler2D uTarget; uniform float aspect, radius; uniform vec3 color; uniform vec2 point;
+uniform sampler2D uTarget; uniform float aspect, radius; uniform int count;
+uniform vec2 points[${MAX_SPLATS}]; uniform vec3 colors[${MAX_SPLATS}];
 void main(){
-  vec2 p = vUv - point; p.x *= aspect;
-  o = vec4(texture(uTarget, vUv).xyz + exp(-dot(p, p) / radius) * color, 1.);
+  vec3 sum = vec3(0.);
+  for (int i = 0; i < ${MAX_SPLATS}; i++) {
+    if (i >= count) break;
+    vec2 p = vUv - points[i]; p.x *= aspect;
+    sum += exp(-dot(p, p) / radius) * colors[i];
+  }
+  o = vec4(texture(uTarget, vUv).xyz + sum, 1.);
 }`;
 
 const ADVECT = `${HEAD}
@@ -113,7 +121,7 @@ vec3 procedural(vec2 luv){
 void main(){
   float dye = texture(uDye, vUv).r;
   float m = smoothstep(.5, .51, dye);
-  if (m <= 0.) { o = vec4(0.); return; }
+  if (m <= 0.) discard; // the canvas is cleared to transparent; lets the occlusion query see "no ink"
 
   vec2 luv = (vUv - uRect.xy) / uRect.zw;
   float inside = step(0., luv.x) * step(luv.x, 1.) * step(0., luv.y) * step(luv.y, 1.);
@@ -318,23 +326,47 @@ export function initFluid(hero: HTMLElement, canvas: HTMLCanvasElement, mark: SV
   // ---------------------------------------------------------------- input
   let last: { x: number; y: number } | null = null;
   let lastInput = 0;
+  let inputs = 0; // bumps with every queued splat
+  // pointer events queue splats; the frame applies them in one pass per field
+  const queue: number[] = []; // x, y, dx, dy, …
+  const points = new Float32Array(MAX_SPLATS * 2);
+  const forces = new Float32Array(MAX_SPLATS * 3);
+  const inks = new Float32Array(MAX_SPLATS * 3);
+  for (let i = 0; i < MAX_SPLATS; i++) inks[i * 3] = CONFIG.amount;
   const splat = (x: number, y: number, dx: number, dy: number) => {
+    queue.push(x, y, dx, dy);
+    inputs++;
+  };
+  const flushSplats = () => {
+    if (!queue.length) return;
     const aspect = canvas.width / canvas.height;
     const { splat: S } = P;
     gl.useProgram(S.p);
     gl.uniform1i(S.u.uTarget, 0);
     gl.uniform1f(S.u.aspect, aspect);
-    gl.uniform2f(S.u.point, x, y);
     gl.uniform1f(S.u.radius, CONFIG.radius * (aspect > 1 ? aspect : 1) * 0.5);
     gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, velocity.read.tex);
-    gl.uniform3f(S.u.color, dx * CONFIG.force, dy * CONFIG.force, 0);
-    blit(velocity.write);
-    velocity.swap();
-    gl.bindTexture(gl.TEXTURE_2D, dye.read.tex);
-    gl.uniform3f(S.u.color, CONFIG.amount, 0, 0);
-    blit(dye.write);
-    dye.swap();
+    for (let at = 0; at < queue.length; at += MAX_SPLATS * 4) {
+      const n = Math.min(MAX_SPLATS, (queue.length - at) / 4);
+      for (let i = 0; i < n; i++) {
+        const q = at + i * 4;
+        points[i * 2] = queue[q];
+        points[i * 2 + 1] = queue[q + 1];
+        forces[i * 3] = queue[q + 2] * CONFIG.force;
+        forces[i * 3 + 1] = queue[q + 3] * CONFIG.force;
+      }
+      gl.uniform1i(S.u.count, n);
+      gl.uniform2fv(S.u['points[0]'], points);
+      gl.uniform3fv(S.u['colors[0]'], forces);
+      gl.bindTexture(gl.TEXTURE_2D, velocity.read.tex);
+      blit(velocity.write);
+      velocity.swap();
+      gl.uniform3fv(S.u['colors[0]'], inks);
+      gl.bindTexture(gl.TEXTURE_2D, dye.read.tex);
+      blit(dye.write);
+      dye.swap();
+    }
+    queue.length = 0;
   };
 
   const move = (clientX: number, clientY: number) => {
@@ -433,6 +465,29 @@ export function initFluid(hero: HTMLElement, canvas: HTMLCanvasElement, mark: SV
     dye.swap();
   };
 
+  // ------------------------------------------------------- "any ink left?"
+  // Without new splats the dye only fades and spreads (advection interpolates,
+  // dissipation < 1), so once a frame draws no pixel the ink is gone for good.
+  // The query result arrives a frame or two later without stalling the GPU;
+  // the loop then sleeps instead of simulating an empty canvas while the page
+  // scrolls away (it used to run a fixed 3.2 s after the last move).
+  const inkQuery = { q: gl.createQuery()!, pending: false, inputs: 0 };
+  const inkGone = () => {
+    if (!inkQuery.pending || !gl.getQueryParameter(inkQuery.q, gl.QUERY_RESULT_AVAILABLE)) return false;
+    inkQuery.pending = false;
+    return !gl.getQueryParameter(inkQuery.q, gl.QUERY_RESULT) && inkQuery.inputs === inputs;
+  };
+  // asleep, the fields would have kept fading: apply it on wake, in one pass each
+  const decay = (target: DoubleFBO, dissipation: number, frames: number) => {
+    gl.useProgram(P.clear.p);
+    gl.uniform1i(P.clear.u.uTexture, 0);
+    gl.uniform1f(P.clear.u.value, Math.pow(dissipation, frames));
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, target.read.tex);
+    blit(target.write);
+    target.swap();
+  };
+
   const render = (time: number) => {
     const { display: Dp } = P;
     const hr = canvas.getBoundingClientRect();
@@ -462,27 +517,45 @@ export function initFluid(hero: HTMLElement, canvas: HTMLCanvasElement, mark: SV
     gl.clearColor(0, 0, 0, 0);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.clear(gl.COLOR_BUFFER_BIT);
+    const ask = !inkQuery.pending;
+    if (ask) gl.beginQuery(gl.ANY_SAMPLES_PASSED_CONSERVATIVE, inkQuery.q);
     blit(null);
+    if (ask) {
+      gl.endQuery(gl.ANY_SAMPLES_PASSED_CONSERVATIVE);
+      inkQuery.pending = true;
+      inkQuery.inputs = inputs;
+    }
   };
 
   // ------------------------------------------------------------------ loop
   let raf = 0;
   let prev = 0;
+  let sleptAt = 0;
   let visible = true;
-  const IDLE_MS = 3200; // dye is fully gone well before this
+  const IDLE_MS = 3200; // fallback: dye is fully gone well before this
+  const sleep = () => {
+    prev = 0;
+    sleptAt = performance.now();
+    queue.length = 0;
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+  };
   const frame = (t: number) => {
     raf = 0;
+    if (!visible || inkGone() || t - lastInput >= IDLE_MS) return sleep();
+    if (sleptAt) {
+      const frames = Math.min(600, ((t - sleptAt) / 1000) * 60);
+      decay(velocity, CONFIG.velDissipation, frames);
+      decay(dye, CONFIG.dyeDissipation, frames);
+      sleptAt = 0;
+    }
     const dt = Math.min((t - (prev || t)) / 1000, 1 / 30) || 1 / 60;
     prev = t;
+    flushSplats();
     step(dt);
     render(t);
-    if (visible && t - lastInput < IDLE_MS) raf = requestAnimationFrame(frame);
-    else {
-      prev = 0;
-      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-      gl.clearColor(0, 0, 0, 0);
-      gl.clear(gl.COLOR_BUFFER_BIT);
-    }
+    raf = requestAnimationFrame(frame);
   };
   const wake = () => {
     if (!raf && visible) raf = requestAnimationFrame(frame);
