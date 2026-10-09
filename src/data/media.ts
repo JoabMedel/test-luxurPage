@@ -55,8 +55,9 @@ export const MEDIA = {
     alt: 'Reel: RWB widebody 911s — yellow, green, mint and black — at a night meet on a Japanese street, crowds and shop lights behind',
   } as null | LoopVideo,
   /**
-   * Film (generated with Higgsfield, client-authorised): 5.9 s, 24 fps, one take
-   * that loops with a hard cut. Silent: the coded engine stays the soundtrack.
+   * Film (generated with Higgsfield, client-authorised): 9.3 s, 24 fps, one take
+   * stabilised on the car and looped seamlessly. Silent: the coded engine stays
+   * the soundtrack.
    */
   film: {
     hd: [

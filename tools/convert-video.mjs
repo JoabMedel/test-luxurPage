@@ -8,8 +8,9 @@
  *
  * reel — client delivery: a macOS screen recording (3360×2100, ReplayKit,
  *        ~32 fps VFR, no audio) of a 23.976p film shown letterboxed.
- * film — Higgsfield (Minimax Hailuo 2.3, 1930×1080, 24 fps, silent), a single
- *        take that loops with a hard cut back to its first frame.
+ * film — Higgsfield (Kling 2.6, 24 fps, silent), stabilised on the car and cut
+ *        into a seamless 9.3 s loop beforehand (assets-src/film-master.mp4,
+ *        see docs/ASSETS.md #7).
  */
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, statSync } from 'node:fs';
@@ -26,10 +27,10 @@ const PRESETS = {
     crf: { av1: 42, hevc: 30, avc: 27 },
   },
   film: {
-    // 1930 wide: trim the odd 5 px each side to an exact 16:9
-    clean: 'crop=1920:1080:5:0',
-    // wet asphalt in motion is all fine detail: VMAF ≈ 91 at the reel's CRFs
-    crf: { av1: 36, hevc: 26, avc: 23 },
+    // the master is already 1920×1080 and looped
+    clean: 'null',
+    // SVT-AV1 at 42 smears this footage (VMAF 92, min 82); HEVC/H.264 hold at the reel's values
+    crf: { av1: 38, hevc: 30, avc: 27 },
   },
 };
 const P = PRESETS[PRESET];
