@@ -28,7 +28,7 @@ Material del cliente recibido: fotos de los 6 builds (2026-10-05). Todo lo que d
 | 18 | Nakai-san trabajando sobre una aleta (panorámica) | The Man | 2 · **Cliente** | Marco reservado con ficha | Persona real: nunca se genera. |
 | 19 | Línea de remaches (cuadrado pequeño) | The Man | 3 · Imagen | Recorte de #14 | Detalle sin persona. |
 | 20 | Iniciales sueltas "R", "W", "B" en el racimo | Racimo | 1 · Código | Glifos de #1b | Código antes que archivo. |
-| 21 | Detalles japoneses: kanji verticales (宣言, 一刀, 職人, 幅は個性に従う), kanji de cada build (風 黒 桜 鉄 緑 星), 千葉, bloque 空冷・手切り y katakana en el scramble | Varias | 1 · Código | Texto en Zen Old Mincho 900 (OFL), gris, `aria-hidden` | Rasgos culturales sutiles sin imágenes. |
+| 21 | Detalles japoneses: kanji verticales (宣言, 路上, 職人, 幅は個性に従う), kanji de cada build (風 黒 桜 鉄 緑 星), 千葉, bloque 空冷・手切り y katakana en el scramble | Varias | 1 · Código | Texto en Zen Old Mincho 900 (OFL), gris, `aria-hidden` | Rasgos culturales sutiles sin imágenes. |
 | 22 | Sello hanko 荒 | The Man, créditos | 1 · Código | `src/components/Hanko.astro` (SVG con borde de tinta irregular) | Firma del artesano. |
 | 23 | Sol naciente (hinomaru) | Cierre | 1 · Código | Disco CSS que sube tras el logo con el scroll | Se evita deliberadamente el sol con rayos (kyokujitsu-ki) por su carga histórica fuera de Japón. |
 | — | Modelo 3D (GLB) | — | 4 · **No se usa** | — | Ninguna interacción lo exige (no hay configurador ni pieza girable). |
