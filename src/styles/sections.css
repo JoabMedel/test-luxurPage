@@ -838,15 +838,18 @@ img.reel-shot.is-on {
 .film-grain .grain {
   mix-blend-mode: normal;
 }
+/* the screen in the polished floor (scenes.ts draws and places it): light
+   added to the photo, never a dark patch over it */
 .film-reflection {
   position: absolute;
   left: 0;
   top: 0;
-  opacity: 0.65;
-  transform-origin: 50% 0;
-  filter: blur(2px);
-  -webkit-mask-image: linear-gradient(to bottom, rgb(0 0 0 / 0.9), transparent 75%);
-  mask-image: linear-gradient(to bottom, rgb(0 0 0 / 0.9), transparent 75%);
+  opacity: 0.9;
+  /* the canvas is quarter resolution; the blur melts the upscale */
+  filter: blur(5px);
+  /* the floor starts at the wall line: nothing bleeds up the wall */
+  clip-path: inset(0 -50% -50%);
+  mix-blend-mode: screen;
   pointer-events: none;
 }
 .film-fade {

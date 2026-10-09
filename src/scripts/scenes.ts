@@ -451,6 +451,123 @@ export function builds() {
 }
 
 /* ================================================================== FILM */
+type Box = { x: number; y: number; w: number; h: number };
+
+/**
+ * The screen mirrored in the polished workshop floor. A glossy floor blurs what
+ * it reflects, more the further out and more along the line of sight than
+ * across it: the picture keeps some shape at the wall line, then dissolves into
+ * vertical streaks and a broad spill of its light. The blur is resampling
+ * through small buffers (cheap, the same in every browser), eased over a few
+ * frames so passing highlights don't shimmer. The canvas is screened onto the
+ * photo, so the film's blacks leave the floor's own sheen as it was.
+ */
+function floorReflection(out: HTMLCanvasElement) {
+  const Q = 0.25; // canvas px per CSS px: the CSS blur hides the upscale
+  const make = (w = 1, h = 1) => Object.assign(document.createElement('canvas'), { width: w, height: h });
+  const ctx2d = (c: HTMLCanvasElement) => {
+    const x = c.getContext('2d')!;
+    x.imageSmoothingQuality = 'high';
+    return x;
+  };
+  // the picture filtered down in steps of 4× at most (larger ones alias), and
+  // how much of each new frame every step takes in
+  const steps = [make(192, 108), make(96, 54), make(48, 16), make(24, 6)].map((c, i) => ({ c, x: ctx2d(c), k: [1, 0.6, 0.5, 0.35][i] }));
+  const shape = steps[1].c; // what survives near the wall line
+  const streaks = steps[3].c; // few rows, more columns: smeared down the floor
+  const detail = make();
+  const fade = make();
+  const mask = make();
+  let o = ctx2d(out);
+  let d = ctx2d(detail);
+  let L = { pad: 0, gap: 0, w: 0, h: 0 }; // in canvas px
+
+  const mirror = (x: CanvasRenderingContext2D, img: CanvasImageSource, dx: number, dy: number, dw: number, dh: number) => {
+    x.setTransform(1, 0, 0, -1, 0, 2 * dy + dh);
+    x.drawImage(img, dx, dy, dw, dh);
+    x.setTransform(1, 0, 0, 1, 0, 0);
+  };
+  // alpha = across × down; `across` is a half profile from the centre out,
+  // both as [canvas px, alpha] stops
+  const paint = (c: HTMLCanvasElement, across: number[][], down: number[][]) => {
+    const x = ctx2d(c);
+    const grad = (w: number, h: number, stops: number[][], len: number) => {
+      const g = x.createLinearGradient(0, 0, w, h);
+      for (const [at, a] of stops) g.addColorStop(gsap.utils.clamp(0, 1, at / len), `rgba(0,0,0,${a})`);
+      return g;
+    };
+    const cx = c.width / 2;
+    const row = across.flatMap(([at, a]) => [[cx - at, a], [cx + at, a]]);
+    x.fillStyle = grad(c.width, 0, row, c.width);
+    x.fillRect(0, 0, c.width, c.height);
+    x.globalCompositeOperation = 'destination-in';
+    x.fillStyle = grad(0, c.height, down, c.height);
+    x.fillRect(0, 0, c.width, c.height);
+    x.globalCompositeOperation = 'source-over';
+  };
+
+  return {
+    /** `screen` is the picture's final box, `floor` the wall line, `origin` the photo's transform origin (all viewport px) */
+    place(screen: Box, floor: number, origin: { x: number; y: number }) {
+      const pad = screen.w * 0.35;
+      const gap = Math.max(0, floor - screen.y - screen.h);
+      const left = screen.x - pad;
+      const W = screen.w + pad * 2;
+      const H = gap + screen.h * 1.5;
+      Object.assign(out.style, {
+        left: `${left}px`,
+        top: `${floor}px`,
+        width: `${W}px`,
+        height: `${H}px`,
+        // scales with the photo, so it stays on the floor through the pull-back
+        transformOrigin: `${origin.x - left}px ${origin.y - floor}px`,
+      });
+      for (const c of [out, detail, fade, mask]) Object.assign(c, { width: Math.round(W * Q), height: Math.round(H * Q) });
+      o = ctx2d(out);
+      d = ctx2d(detail);
+      L = { pad: pad * Q, gap: gap * Q, w: screen.w * Q, h: screen.h * Q };
+      const hw = L.w / 2;
+      const top = L.gap;
+      // the whole reflection: full under the middle of the screen, soft past its
+      // edges, strongest at the wall line and gone well before the viewer
+      paint(
+        mask,
+        [[0, 1], [hw * 0.7, 1], [hw, 0.55], [hw * 1.25, 0.2], [hw + L.pad, 0]],
+        [[0, 0], [top * 0.6, 1], [top + L.h * 0.25, 0.8], [top + L.h * 0.6, 0.38], [top + L.h, 0.1], [out.height, 0]],
+      );
+      // the shape only holds near the wall line, inside the screen's width
+      paint(fade, [[0, 1], [hw * 0.75, 1], [hw, 0]], [[top, 1], [top + L.h * 0.7, 0]]);
+    },
+    /** `settle` draws the picture fully at once (a still frame) */
+    draw(src: CanvasImageSource, settle = false) {
+      if (!L.w) return;
+      let prev = src;
+      for (const s of steps) {
+        s.x.globalAlpha = settle ? 1 : s.k;
+        s.x.drawImage(prev, 0, 0, s.c.width, s.c.height);
+        prev = s.c;
+      }
+      const { width: W, height: H } = out;
+      o.clearRect(0, 0, W, H);
+      // the spill: the film's light pooled wider than the screen
+      o.globalAlpha = 0.45;
+      mirror(o, streaks, 0, L.gap, W, L.h * 1.5);
+      o.globalAlpha = 1;
+      mirror(o, streaks, L.pad - L.w * 0.1, L.gap, L.w * 1.2, L.h * 1.25);
+      d.clearRect(0, 0, W, H);
+      mirror(d, shape, L.pad, L.gap, L.w, L.h);
+      d.globalCompositeOperation = 'destination-in';
+      d.drawImage(fade, 0, 0);
+      d.globalCompositeOperation = 'source-over';
+      o.drawImage(detail, 0, 0);
+      o.globalAlpha = 1;
+      o.globalCompositeOperation = 'destination-in';
+      o.drawImage(mask, 0, 0);
+      o.globalCompositeOperation = 'source-over';
+    },
+  };
+}
+
 export function film(lenis: Lenis | null) {
   const section = $('#film');
   const screen = $('#film-screen');
@@ -463,7 +580,7 @@ export function film(lenis: Lenis | null) {
   const state = $('.sound-state', btn);
 
   const hw = new Highway(canvas, env.saveData ? 800 : 1280);
-  const rctx = refl.getContext('2d')!;
+  const reflection = floorReflection(refl);
   const engine = new Engine();
 
   // where the blank wall sits in the workshop image (normalised)
@@ -482,19 +599,17 @@ export function film(lenis: Lenis | null) {
     };
   };
 
+  // the screen's size in the wall, and how strongly the floor reflects it
+  const END = 0.35;
+  const GLOSS = 0.9;
   const placeReflection = () => {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     const t = target();
-    const w = vw * 0.35;
-    const h = vh * 0.35;
-    const bottom = vh / 2 + t.y + h / 2;
-    refl.style.width = `${w}px`;
-    refl.style.height = `${h}px`;
-    refl.style.left = `${vw / 2 + t.x - w / 2}px`;
-    refl.style.top = `${t.floor * 2 - bottom}px`;
-    refl.width = Math.round(w / 2);
-    refl.height = Math.round(h / 2);
+    const w = vw * END;
+    const h = vh * END;
+    const [ox, oy] = getComputedStyle(shop).transformOrigin.split(' ').map(parseFloat);
+    reflection.place({ x: vw / 2 + t.x - w / 2, y: vh / 2 + t.y - h / 2, w, h }, t.floor, { x: ox, y: oy });
   };
 
   const mm = gsap.matchMedia();
@@ -510,17 +625,20 @@ export function film(lenis: Lenis | null) {
     // the grain holder undoes the screen's scale, so the grain keeps its size in the wall
     const keepGrain = () => grain && gsap.set(grain, { scale: 1 / (gsap.getProperty(screen, 'scale') as number) });
     tl.eventCallback('onUpdate', keepGrain);
-    tl.fromTo(screen, { scale: 1, x: 0, y: 0 }, { scale: 0.35, x: () => target().x, y: () => target().y, ease: 'power1.inOut', duration: 1 }, 0.15)
-      .fromTo(shop, { scale: 1.12 }, { scale: 1, ease: 'power1.inOut', duration: 1 }, 0.15)
-      .fromTo(refl, { scale: 1.3, opacity: 0 }, { scale: 1, opacity: 0.65, ease: 'power1.inOut', duration: 1 }, 0.15)
+    // the reflection rides with the photo and comes up as the screen settles into the wall
+    tl.fromTo(screen, { scale: 1, x: 0, y: 0 }, { scale: END, x: () => target().x, y: () => target().y, ease: 'power1.inOut', duration: 1 }, 0.15)
+      .fromTo([shop, refl], { scale: 1.12 }, { scale: 1, ease: 'power1.inOut', duration: 1 }, 0.15)
+      .fromTo(refl, { opacity: 0 }, { opacity: GLOSS, ease: 'power2.in', duration: 1 }, 0.15)
       .to({}, { duration: 0.25 });
     return () => window.removeEventListener('resize', placeReflection);
   });
   mm.add(MQ.reduced + ' and (min-width: 992px)', () => {
     placeReflection();
-    gsap.set(screen, { scale: 0.35, x: () => target().x, y: () => target().y });
-    if (grain) gsap.set(grain, { scale: 1 / 0.35 });
-    gsap.set(refl, { opacity: 0.65 });
+    window.addEventListener('resize', placeReflection);
+    gsap.set(screen, { scale: END, x: () => target().x, y: () => target().y });
+    if (grain) gsap.set(grain, { scale: 1 / END });
+    gsap.set(refl, { opacity: GLOSS });
+    return () => window.removeEventListener('resize', placeReflection);
   });
 
   const ro = new ResizeObserver(() => hw.resize());
@@ -554,13 +672,9 @@ export function film(lenis: Lenis | null) {
     if (video!.classList.contains('is-ready')) return video;
     return poster?.complete && poster.naturalWidth ? poster : null;
   };
-  // a floor reflection is upside down
-  const mirror = () => {
+  const mirror = (settle = false) => {
     const src = picture();
-    if (!src) return;
-    rctx.setTransform(1, 0, 0, -1, 0, refl.height);
-    rctx.drawImage(src, 0, 0, refl.width, refl.height);
-    rctx.setTransform(1, 0, 0, 1, 0, 0);
+    if (src) reflection.draw(src, settle);
   };
 
   const CAPTIONS = ['[ Air-cooled flat-six idling ]', '[ Sodium lamps hum overhead ]', '[ Tyres hiss on cold asphalt ]'];
@@ -573,7 +687,8 @@ export function film(lenis: Lenis | null) {
     // the picture keeps one steady speed; only the engine sound answers the scroll
     const v = lenis ? Math.min(1, Math.abs(lenis.velocity) / 45) : 0;
     if (coded) hw.render(t);
-    if (!env.mobile) mirror();
+    // nothing to reflect until the pull-back reveals the floor
+    if (!env.mobile && (gsap.getProperty(refl, 'opacity') as number) > 0.005) mirror();
     if (engine.on) {
       engine.setLoad(v);
       if (t - capT > 3800 || (engine.revving && caption.dataset.rev !== '1')) {
@@ -585,12 +700,13 @@ export function film(lenis: Lenis | null) {
   };
   const drawPoster = () => {
     if (coded) hw.render(performance.now());
-    mirror();
+    mirror(true);
   };
 
   if (env.reduced) {
-    if (coded) requestAnimationFrame(drawPoster);
-    else poster?.decode().then(() => requestAnimationFrame(drawPoster), () => {});
+    if (coded || (poster?.complete && poster.naturalWidth)) requestAnimationFrame(drawPoster);
+    // the poster is lazy: it loads only as the film comes near
+    else poster?.addEventListener('load', () => requestAnimationFrame(drawPoster), { once: true });
     window.addEventListener('resize', () => requestAnimationFrame(drawPoster));
   }
 
