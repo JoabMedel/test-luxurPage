@@ -1113,6 +1113,7 @@ img.reel-shot.is-on {
 }
 .cl-letter svg {
   overflow: visible;
+  opacity: 0.72;
 }
 .cl-letter path {
   fill: var(--white);

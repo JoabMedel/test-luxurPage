@@ -20,20 +20,20 @@ const clusterItems = [
   { key: 'fender', x: 26, y: 44, w: 36, r: -8 },
   { key: 'fan', x: 75, y: 60, w: 24, r: -6 },
   { key: 'wheel', x: 49, y: 55, w: 33, r: 0 },
-  { key: 'rivet', x: 36, y: 74, w: 17, r: 10 },
+  { key: 'rivet', x: 37, y: 77, w: 19, r: 10 },
 ] as const;
-/* the nine letters of RAUH-WELT, tucked into the gaps around the renders */
-const LETTER_CAP = 8.5; // % of the cluster side
+/* the nine letters of RAUH-WELT, small and scattered through the sphere so
+   the renders lead: centre and cap height (s) in % of the cluster side */
 const letterSpots = [
-  { x: 9, y: 61, r: 14 },
-  { x: 38, y: 10, r: 8 },
-  { x: 91, y: 64, r: -12 },
-  { x: 17, y: 26, r: -12 },
-  { x: 91, y: 38, r: -22 },
-  { x: 39, y: 92, r: 5 },
-  { x: 16, y: 84, r: -14 },
-  { x: 79, y: 82, r: 16 },
-  { x: 59, y: 90, r: -6 },
+  { x: 10, y: 57, r: 14, s: 4.2 },
+  { x: 43, y: 11, r: 8, s: 2.9 },
+  { x: 92, y: 52, r: -12, s: 3.5 },
+  { x: 30, y: 23, r: -12, s: 2.6 },
+  { x: 84, y: 38, r: -22, s: 3.5 },
+  { x: 56, y: 86, r: 5, s: 3.8 },
+  { x: 18, y: 76, r: -14, s: 2.7 },
+  { x: 83, y: 80, r: 16, s: 3.5 },
+  { x: 68, y: 78, r: -6, s: 3.0 },
 ];
 
 const builtWidth = RWB.width;
@@ -375,7 +375,7 @@ const NAV_UNFOLD = ['·AUH-', '·ELT\u00a0', '·EGRIFF'];
           RAUH_WELT.map((g, i) => (
             <div
               class="cl-item cl-letter"
-              style={`--x:${letterSpots[i].x}%;--y:${letterSpots[i].y}%;--w:${(((g.width + RWB_OVERHANG) / CAP) * LETTER_CAP).toFixed(2)};--r:${letterSpots[i].r}deg`}
+              style={`--x:${letterSpots[i].x}%;--y:${letterSpots[i].y}%;--w:${(((g.width + RWB_OVERHANG) / CAP) * letterSpots[i].s).toFixed(2)};--r:${letterSpots[i].r}deg`}
               aria-hidden="true"
             >
               <svg viewBox={`0 0 ${g.width + RWB_OVERHANG} ${CAP}`}>
