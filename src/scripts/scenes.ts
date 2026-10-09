@@ -179,6 +179,7 @@ export function reel() {
 function reelFilm(section: HTMLElement, card: HTMLElement, video: HTMLVideoElement, tc: HTMLElement, reel: Reel) {
   const btn = $<HTMLButtonElement>('#reel-toggle', card);
   const FPS = 24000 / 1001;
+  grainTile($('.reel-grain', card));
   const sm = env.mobile || env.saveData;
   // reduced motion: the poster stands still until the visitor presses play
   let held = env.reduced;
@@ -207,6 +208,7 @@ function reelFilm(section: HTMLElement, card: HTMLElement, video: HTMLVideoEleme
       });
 
   const sync = () => {
+    card.classList.toggle('is-playing', !video.paused); // runs the film grain
     btn.toggleAttribute('data-paused', video.paused);
     btn.setAttribute('aria-label', video.paused ? 'Play reel' : 'Pause reel');
   };
@@ -249,6 +251,32 @@ function reelFilm(section: HTMLElement, card: HTMLElement, video: HTMLVideoEleme
     if (held) video.pause();
     else play();
   });
+}
+
+/**
+ * Film grain tile: grey gaussian noise centred on mid-grey. Under `overlay` the
+ * grain is zero-mean, so exposure stays put; it bites in the mid-tones and
+ * leaves blacks and highlights almost clean, as stock does. i.i.d. noise tiles
+ * without seams; drawn at 1 CSS px per sample, the 2× upscale softens it into
+ * clumps instead of digital speckle.
+ */
+function grainTile(el: HTMLElement, size = 256, sigma = 40) {
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const ctx = c.getContext('2d');
+  if (!ctx) return;
+  const img = ctx.createImageData(size, size);
+  const d = img.data;
+  for (let i = 0; i < d.length; i += 8) {
+    // Box–Muller: two gaussian samples per pair of uniforms
+    const r = Math.sqrt(-2 * Math.log(1 - Math.random())) * sigma;
+    const a = 2 * Math.PI * Math.random();
+    d.fill(128 + r * Math.cos(a), i, i + 3);
+    d.fill(128 + r * Math.sin(a), i + 4, i + 7);
+    d[i + 3] = d[i + 7] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+  c.toBlob((b) => b && (el.style.backgroundImage = `url(${URL.createObjectURL(b)})`));
 }
 
 /** First source of `list` this device decodes in hardware, else the first it decodes at all. */

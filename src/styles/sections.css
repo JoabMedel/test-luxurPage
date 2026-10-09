@@ -451,6 +451,63 @@ img.reel-shot.is-on {
 .reel-video.is-ready {
   opacity: 1;
 }
+/* film grain: one gaussian noise tile (made in scenes.ts, mean grey so the
+   overlay adds texture without shifting exposure) that jumps to a new offset 24
+   times a second, like a fresh frame of stock. Transform-only, so the
+   compositor runs it; sized to the viewport, not the card, so the scroll shrink
+   never re-rasterises it. Blends with the picture only. */
+.reel-media {
+  isolation: isolate;
+}
+.reel-grain {
+  --tile: 256px;
+  position: absolute;
+  right: calc(var(--tile) * -1);
+  bottom: calc(var(--tile) * -1);
+  width: calc(100vw + var(--tile) * 2);
+  height: calc(100vh + var(--tile) * 2);
+  background: 0 0 / var(--tile) var(--tile);
+  mix-blend-mode: overlay;
+  opacity: 0.26;
+  pointer-events: none;
+  will-change: transform;
+  animation: grain 0.333s steps(1, end) infinite paused;
+}
+.reel-card.is-playing .reel-grain {
+  animation-play-state: running;
+}
+/* eight offsets per third of a second = 24 fresh grains a second (all within one 256px tile) */
+@keyframes grain {
+  0% {
+    transform: translate(0, 0);
+  }
+  12.5% {
+    transform: translate(-149px, 74px);
+  }
+  25% {
+    transform: translate(65px, -178px);
+  }
+  37.5% {
+    transform: translate(-43px, -70px);
+  }
+  50% {
+    transform: translate(170px, 134px);
+  }
+  62.5% {
+    transform: translate(-199px, -113px);
+  }
+  75% {
+    transform: translate(106px, 29px);
+  }
+  87.5% {
+    transform: translate(-86px, 199px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reel-grain {
+    animation: none;
+  }
+}
 .reel-toggle {
   display: inline-flex;
   align-items: center;
