@@ -7,7 +7,7 @@ import { Highway, Sparks } from './highway';
 import { Engine } from './engine';
 import { lineReveal } from './text';
 import { LOGO } from '../lib/logo';
-import { MEDIA, type Reel, type VideoSource } from '../data/media';
+import { MEDIA, type LoopVideo, type VideoSource } from '../data/media';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
@@ -175,47 +175,19 @@ export function reel() {
   else reelMontage(card, tc);
 }
 
-/** Client footage: fetched on approach, played only on screen, looping at the end. */
-function reelFilm(section: HTMLElement, card: HTMLElement, video: HTMLVideoElement, tc: HTMLElement, reel: Reel) {
-  const btn = $<HTMLButtonElement>('#reel-toggle', card);
+/** Client footage with film grain and a running timecode. */
+function reelFilm(section: HTMLElement, card: HTMLElement, video: HTMLVideoElement, tc: HTMLElement, reel: LoopVideo) {
   const FPS = 24000 / 1001;
   grainTile($('.reel-grain', card));
-  const sm = env.mobile || env.saveData;
-  // reduced motion: the poster stands still until the visitor presses play
-  let held = env.reduced;
-  let loading: Promise<void> | null = null;
-
-  const fail = () => {
-    btn.hidden = true;
-    video.hidden = true;
-  };
-  // desktop keeps 1080p even when only software decoding is on offer
-  const choose = async () =>
-    (sm ? undefined : await pickSource(video, reel.hd, 1920, 1080)) ?? (await pickSource(video, reel.sm, 1280, 720));
-  const load = () =>
-    (loading ??= choose().then((s) => {
-      if (!s) throw new Error('no playable reel source');
-      video.preload = 'auto';
-      video.src = s.src;
-    }));
-  const play = () =>
-    load()
-      .then(() => video.play())
-      .catch((err: Error) => {
-        // refused autoplay (Low Power Mode…) keeps the poster and offers play;
-        // an abort is just a pause() racing the start
-        if (err.name !== 'NotAllowedError' && err.name !== 'AbortError') fail();
-      });
-
-  const sync = () => {
-    card.classList.toggle('is-playing', !video.paused); // runs the film grain
-    btn.toggleAttribute('data-paused', video.paused);
-    btn.setAttribute('aria-label', video.paused ? 'Play reel' : 'Pause reel');
-  };
-  video.addEventListener('play', sync);
-  video.addEventListener('pause', sync);
-  video.addEventListener('error', fail);
-  video.addEventListener('playing', () => video.classList.add('is-ready'), { once: true });
+  loopVideo({
+    section,
+    view: card,
+    video,
+    media: reel,
+    btn: $<HTMLButtonElement>('#reel-toggle', card),
+    name: 'reel',
+    onState: (playing) => card.classList.toggle('is-playing', playing), // runs the film grain
+  });
 
   // non-drop timecode of the frame on screen; restarts with the loop
   const p2 = (n: number) => String(n).padStart(2, '0');
@@ -232,17 +204,75 @@ function reelFilm(section: HTMLElement, card: HTMLElement, video: HTMLVideoEleme
   } else {
     video.addEventListener('timeupdate', () => stamp(video.currentTime));
   }
+}
+
+/**
+ * Silent looping video (reel, film): the best source for this device, fetched
+ * on approach, played only while on screen, with a play/pause button. Reduced
+ * motion keeps the poster until the visitor presses play.
+ */
+function loopVideo(o: {
+  /** proximity to this starts the download */
+  section: HTMLElement;
+  /** visibility of this plays/pauses */
+  view: Element;
+  video: HTMLVideoElement;
+  media: LoopVideo;
+  btn: HTMLButtonElement;
+  name: string;
+  onState?: (playing: boolean) => void;
+  /** after the video and its button are hidden */
+  onFail?: () => void;
+}) {
+  const { video, btn } = o;
+  const sm = env.mobile || env.saveData;
+  let held = env.reduced;
+  let loading: Promise<void> | null = null;
+
+  const fail = () => {
+    if (video.hidden) return;
+    btn.hidden = true;
+    video.hidden = true;
+    o.onFail?.();
+  };
+  // desktop keeps 1080p even when only software decoding is on offer
+  const choose = async () =>
+    (sm ? undefined : await pickSource(video, o.media.hd, 1920, 1080)) ?? (await pickSource(video, o.media.sm, 1280, 720));
+  const load = () =>
+    (loading ??= choose().then((s) => {
+      if (!s) throw new Error(`no playable ${o.name} source`);
+      video.preload = 'auto';
+      video.src = s.src;
+    }));
+  const play = () =>
+    load()
+      .then(() => video.play())
+      .catch((err: Error) => {
+        // refused autoplay (Low Power Mode…) keeps the poster and offers play;
+        // an abort is just a pause() racing the start
+        if (err.name !== 'NotAllowedError' && err.name !== 'AbortError') fail();
+      });
+
+  const sync = () => {
+    btn.toggleAttribute('data-paused', video.paused);
+    btn.setAttribute('aria-label', `${video.paused ? 'Play' : 'Pause'} ${o.name}`);
+    o.onState?.(!video.paused);
+  };
+  video.addEventListener('play', sync);
+  video.addEventListener('pause', sync);
+  video.addEventListener('error', fail);
+  video.addEventListener('playing', () => video.classList.add('is-ready'), { once: true });
 
   // half a screen ahead: early enough to have frames on arrival, late enough
   // to stay out of the loader's way and off a visitor's data until they scroll
   whileVisible(
-    section,
+    o.section,
     (near) => {
       if (near && !held) load().catch(fail);
     },
     '0px 0px 50% 0px',
   );
-  whileVisible(card, (v) => {
+  whileVisible(o.view, (v) => {
     if (v && !held) play();
     else if (!v) video.pause();
   });
@@ -483,6 +513,41 @@ export function film(lenis: Lenis | null) {
   const ro = new ResizeObserver(() => hw.resize());
   ro.observe(screen);
 
+  // the picture: the film once it plays, its poster until then, or the coded
+  // highway when there is no film (or it fails to load)
+  const video = screen.querySelector<HTMLVideoElement>('#film-video');
+  const poster = screen.querySelector<HTMLImageElement>('.film-poster');
+  let coded = !(video && MEDIA.film);
+  if (video && MEDIA.film) {
+    loopVideo({
+      section,
+      view: section,
+      video,
+      media: MEDIA.film,
+      btn: $<HTMLButtonElement>('#film-toggle'),
+      name: 'film',
+      onFail: () => {
+        coded = true;
+        poster?.remove();
+        hw.resetClock();
+        if (env.reduced) requestAnimationFrame(drawPoster);
+      },
+    });
+  }
+  const picture = (): CanvasImageSource | null => {
+    if (coded) return canvas;
+    if (video!.classList.contains('is-ready')) return video;
+    return poster?.complete && poster.naturalWidth ? poster : null;
+  };
+  // a floor reflection is upside down
+  const mirror = () => {
+    const src = picture();
+    if (!src) return;
+    rctx.setTransform(1, 0, 0, -1, 0, refl.height);
+    rctx.drawImage(src, 0, 0, refl.width, refl.height);
+    rctx.setTransform(1, 0, 0, 1, 0, 0);
+  };
+
   const CAPTIONS = ['[ Air-cooled flat-six idling ]', '[ Sodium lamps hum overhead ]', '[ Tyres hiss on cold asphalt ]'];
   let capI = 0;
   let capT = 0;
@@ -491,9 +556,15 @@ export function film(lenis: Lenis | null) {
   const loop = (t: number) => {
     raf = requestAnimationFrame(loop);
     const v = lenis ? Math.min(1, Math.abs(lenis.velocity) / 45) : 0;
-    hw.speed = 1 + v * 2.2;
-    hw.render(t);
-    if (!env.mobile) rctx.drawImage(canvas, 0, 0, refl.width, refl.height);
+    if (coded) {
+      hw.speed = 1 + v * 2.2;
+      hw.render(t);
+    } else if (!video!.paused) {
+      // scrolling hard opens the throttle on the film too, in step with the engine
+      const rate = Math.round((1 + v * 0.8) * 20) / 20; // 0.05 steps, back to exactly 1 at rest
+      if (rate !== video!.playbackRate) video!.playbackRate = rate;
+    }
+    if (!env.mobile) mirror();
     if (engine.on) {
       engine.setLoad(v);
       if (t - capT > 3800 || (engine.revving && caption.dataset.rev !== '1')) {
@@ -504,12 +575,13 @@ export function film(lenis: Lenis | null) {
     }
   };
   const drawPoster = () => {
-    hw.render(performance.now());
-    rctx.drawImage(canvas, 0, 0, refl.width, refl.height);
+    if (coded) hw.render(performance.now());
+    mirror();
   };
 
   if (env.reduced) {
-    requestAnimationFrame(drawPoster);
+    if (coded) requestAnimationFrame(drawPoster);
+    else poster?.decode().then(() => requestAnimationFrame(drawPoster), () => {});
     window.addEventListener('resize', () => requestAnimationFrame(drawPoster));
   }
 

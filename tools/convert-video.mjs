@@ -1,0 +1,68 @@
+/**
+ * Source footage → web video (public/media/<preset>/): AV1 / HEVC in 10 bit (no
+ * banding in the night skies) plus an H.264 fallback, and first-frame posters.
+ * `-sm` = phones and Save-Data. CRFs aim at VMAF ≈ 94 against the cleaned
+ * source (AV1 ~17 % under HEVC); busier footage needs lower ones.
+ *
+ *   FFMPEG=/path/to/ffmpeg node tools/convert-video.mjs <reel|film> <source> [only: e.g. "hevc"]
+ *
+ * reel — client delivery: a macOS screen recording (3360×2100, ReplayKit,
+ *        ~32 fps VFR, no audio) of a 23.976p film shown letterboxed.
+ * film — Higgsfield (Minimax Hailuo 2.3, 1930×1080, 24 fps, silent), a single
+ *        take that loops with a hard cut back to its first frame.
+ */
+import { execFileSync } from 'node:child_process';
+import { mkdirSync, statSync } from 'node:fs';
+
+const FF = process.env.FFMPEG || 'ffmpeg';
+const [PRESET, SRC, ONLY = ''] = process.argv.slice(2);
+
+const PRESETS = {
+  reel: {
+    // rows 106–1995 of the capture are picture; above and below is screen.
+    // 23.976p seen on a 60 Hz display (3:2 repeats + stray captures):
+    // nearest-slot resampling lands back on the film's frames (3 repeats in 1807, measured)
+    clean: 'crop=3360:1890:0:106,fps=24000/1001',
+    crf: { av1: 42, hevc: 30, avc: 27 },
+  },
+  film: {
+    // 1930 wide: trim the odd 5 px each side to an exact 16:9
+    clean: 'crop=1920:1080:5:0',
+    // wet asphalt in motion is all fine detail: VMAF ≈ 91 at the reel's CRFs
+    crf: { av1: 36, hevc: 26, avc: 23 },
+  },
+};
+const P = PRESETS[PRESET];
+if (!P || !SRC) {
+  console.error('usage: node tools/convert-video.mjs <reel|film> <source> [only]');
+  process.exit(1);
+}
+const O = `public/media/${PRESET}/`;
+const vf = (w, h, pix) => `${P.clean},scale=${w}:${h}:flags=lanczos+accurate_rnd,format=${pix}`;
+
+const out = ['-an', '-sn', '-dn', '-map_metadata', '-1', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-colorspace', 'bt709', '-color_range', 'tv', '-movflags', '+faststart'];
+// SVT-AV1 builds without ARM SIMD crawl below preset 7 (~1 fps at 1080p)
+const av1 = (crf) => ['-c:v', 'libsvtav1', '-preset', '7', '-crf', String(crf), '-g', '240', '-svtav1-params', 'tune=0'];
+const hevc = (crf) => ['-c:v', 'libx265', '-preset', 'slow', '-crf', String(crf), '-tag:v', 'hvc1', '-x265-params', 'keyint=240:min-keyint=24:aq-mode=3:no-sao=1:log-level=error'];
+const avc = (crf) => ['-c:v', 'libx264', '-preset', 'slower', '-crf', String(crf), '-profile:v', 'high', '-tune', 'film', '-g', '240', '-x264-params', 'aq-mode=3'];
+
+const jobs = [
+  [`${PRESET}.hevc.mp4`, 1920, 1080, 'yuv420p10le', hevc(P.crf.hevc)],
+  [`${PRESET}-sm.hevc.mp4`, 1280, 720, 'yuv420p10le', hevc(P.crf.hevc)],
+  [`${PRESET}-sm.h264.mp4`, 1280, 720, 'yuv420p', avc(P.crf.avc)],
+  [`${PRESET}.av1.mp4`, 1920, 1080, 'yuv420p10le', av1(P.crf.av1)],
+  [`${PRESET}-sm.av1.mp4`, 1280, 720, 'yuv420p10le', av1(P.crf.av1)],
+].filter(([name]) => name.includes(ONLY));
+
+mkdirSync(O, { recursive: true });
+const run = (args) => execFileSync(FF, ['-hide_banner', '-loglevel', 'error', '-y', '-i', SRC, ...args], { stdio: 'inherit' });
+
+// posters = the first frame, so the hand-off to playback is invisible
+for (const [name, w, h] of [['poster.webp', 1920, 1080], ['poster-sm.webp', 960, 540]]) {
+  if (!ONLY) run(['-vf', vf(w, h, 'yuv420p'), '-frames:v', '1', '-c:v', 'libwebp', '-quality', '74', '-compression_level', '6', O + name]);
+}
+for (const [name, w, h, pix, codec] of jobs) {
+  const t = Date.now();
+  run(['-vf', vf(w, h, pix), ...codec, ...out, O + name]);
+  console.log(name, (statSync(O + name).size / 1e6).toFixed(1) + ' MB', Math.round((Date.now() - t) / 1000) + ' s');
+}

@@ -9,12 +9,13 @@ export interface VideoSource {
   type: string;
 }
 
-export interface Reel {
+/** A silent looping video (reel, film), encoded by tools/convert-video.mjs */
+export interface LoopVideo {
   /** 1920×1080 — desktop */
   hd: VideoSource[];
   /** 1280×720 — phones and Save-Data; its H.264 is everyone's last resort */
   sm: VideoSource[];
-  /** first frame of the film, so the hand-off to playback is invisible */
+  /** first frame, so the hand-off to playback is invisible */
   poster: string;
   posterSm: string;
   alt: string;
@@ -36,8 +37,8 @@ export const MEDIA = {
   detailRivets: { src: '/media/detail-rivets.webp', alt: 'An open palm holding a small pile of steel dome rivets' },
 
   /**
-   * Client footage. Leave null to use the coded stand-ins.
-   * Reel: 75 s, 16:9, 23.976 fps, silent loop — encoded by tools/convert-reel.mjs.
+   * Footage. Leave null to use the coded stand-ins.
+   * Reel (client): 75 s, 16:9, 23.976 fps, silent loop.
    */
   reel: {
     hd: [
@@ -52,8 +53,25 @@ export const MEDIA = {
     poster: '/media/reel/poster.webp',
     posterSm: '/media/reel/poster-sm.webp',
     alt: 'Reel: RWB widebody 911s — yellow, green, mint and black — at a night meet on a Japanese street, crowds and shop lights behind',
-  } as null | Reel,
-  film: null as null | { mp4: string; hevc?: string; poster: string; light?: string; captions: string },
+  } as null | LoopVideo,
+  /**
+   * Film (generated with Higgsfield, client-authorised): 5.9 s, 24 fps, one take
+   * that loops with a hard cut. Silent: the coded engine stays the soundtrack.
+   */
+  film: {
+    hd: [
+      { src: '/media/film/film.av1.mp4', type: 'video/mp4; codecs="av01.0.08M.10"' },
+      { src: '/media/film/film.hevc.mp4', type: 'video/mp4; codecs="hvc1.2.4.L120.90"' },
+    ],
+    sm: [
+      { src: '/media/film/film-sm.av1.mp4', type: 'video/mp4; codecs="av01.0.05M.10"' },
+      { src: '/media/film/film-sm.hevc.mp4', type: 'video/mp4; codecs="hvc1.2.4.L93.90"' },
+      { src: '/media/film/film-sm.h264.mp4', type: 'video/mp4; codecs="avc1.640028"' },
+    ],
+    poster: '/media/film/poster.webp',
+    posterSm: '/media/film/poster-sm.webp',
+    alt: 'A white RWB widebody 911 seen from behind, cruising down an empty elevated expressway at night under orange sodium lamps',
+  } as null | LoopVideo,
   /** Client photography. */
   nakai: null as null | { src: string; alt: string; credit: string },
 };

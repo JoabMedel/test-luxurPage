@@ -468,7 +468,7 @@ img.reel-shot.is-on {
   height: calc(100vh + var(--tile) * 2);
   background: 0 0 / var(--tile) var(--tile);
   mix-blend-mode: overlay;
-  opacity: 0.26;
+  opacity: 0.4;
   pointer-events: none;
   will-change: transform;
   animation: grain 0.333s steps(1, end) infinite paused;
@@ -526,13 +526,14 @@ img.reel-shot.is-on {
 .reel-toggle:focus-visible {
   outline-offset: 0;
 }
-/* two bars (pause) that fold into one triangle (play) */
-.reel-glyph {
+/* play/pause glyph (reel, film): two bars that fold into one triangle */
+.pp-glyph {
   position: relative;
+  display: inline-block;
   width: 0.7em;
   height: 0.75em;
 }
-.reel-glyph i {
+.pp-glyph i {
   position: absolute;
   top: 0;
   width: 50%;
@@ -540,18 +541,18 @@ img.reel-shot.is-on {
   background: currentColor;
   transition: clip-path 0.4s var(--ease-o3);
 }
-.reel-glyph i:first-child {
+.pp-glyph i:first-child {
   left: 0;
   clip-path: polygon(0 0, 70% 0, 70% 100%, 0 100%);
 }
-.reel-glyph i:last-child {
+.pp-glyph i:last-child {
   left: 50%;
   clip-path: polygon(30% 0, 100% 0, 100% 100%, 30% 100%);
 }
-.reel-toggle[data-paused] .reel-glyph i:first-child {
+[data-paused] .pp-glyph i:first-child {
   clip-path: polygon(0 0, 100% 25%, 100% 75%, 0 100%);
 }
-.reel-toggle[data-paused] .reel-glyph i:last-child {
+[data-paused] .pp-glyph i:last-child {
   clip-path: polygon(0 25%, 100% 50%, 100% 50%, 0 75%);
 }
 @media (max-width: 991px) {
@@ -803,6 +804,22 @@ img.reel-shot.is-on {
   width: 100%;
   height: 100%;
 }
+/* the film: poster (its first frame) underneath until playback */
+.film-poster,
+.film-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.film-video {
+  opacity: 0;
+  transition: opacity 0.6s var(--ease-o3);
+}
+.film-video.is-ready {
+  opacity: 1;
+}
 .film-reflection {
   position: absolute;
   left: 0;
@@ -821,12 +838,17 @@ img.reel-shot.is-on {
   background: linear-gradient(to bottom, transparent, var(--black));
   pointer-events: none;
 }
-.sound-pill {
+.film-controls {
   position: absolute;
   top: calc(var(--m) + 2.8vw);
   left: 50%;
   translate: -50% 0;
   z-index: 3;
+  display: flex;
+  gap: 0.6vw;
+}
+.sound-pill,
+.film-toggle {
   background: rgb(0 0 0 / 0.25);
   backdrop-filter: blur(6px);
 }
@@ -897,9 +919,10 @@ img.reel-shot.is-on {
     box-shadow: none;
     transform: none !important;
   }
-  .sound-pill {
+  .film-controls {
     top: auto;
     bottom: calc(100% + 3vw);
+    gap: 2vw;
   }
   .film-caption {
     bottom: auto;
