@@ -626,17 +626,13 @@ export function cluster(lenis: Lenis | null) {
 
   type Home = { el: HTMLElement; cx: number; cy: number; inside: boolean };
   let homes: Home[] = [];
+  // items are zero-size anchors at each piece's centre (the child carries size
+  // and base rotation, so tweening rotation here never wipes the composition)
   const measure = () => {
-    homes = items.map((el) => ({
-      el,
-      cx: el.offsetLeft + el.offsetWidth / 2,
-      cy: el.offsetTop + el.offsetHeight / 2,
-      inside: false,
-    }));
+    homes = items.map((el) => ({ el, cx: el.offsetLeft, cy: el.offsetTop, inside: false }));
   };
   measure();
   new ResizeObserver(measure).observe(box);
-  items.forEach((el) => el.querySelector('img')?.addEventListener('load', measure, { once: true }));
 
   let pointer: { x: number; y: number } | null = null;
   let queued = false;

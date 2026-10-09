@@ -6,26 +6,34 @@ import CarPlate from '../components/CarPlate.astro';
 import { BUILDS } from '../data/builds';
 import { MEDIA } from '../data/media';
 import { SITE } from '../data/site';
-import { RWB, RWB_OVERHANG, CAP } from '../lib/wordmark';
+import { RAUH_WELT, RWB, RWB_OVERHANG, CAP } from '../lib/wordmark';
 import '../styles/sections.css';
 
 const R = MEDIA.renders;
 const REEL = MEDIA.reel;
 const FILM = MEDIA.film;
 
-/* cluster composition: % of the cluster box, width in vw, base rotation */
+/* cluster composition, packed into a sphere: centre in % of the square
+   cluster box, width in % of its side, base rotation (DOM order = stacking) */
 const clusterItems = [
-  { kind: 'img', key: 'fender', x: 5, y: 12, w: 27, r: -6 },
-  { kind: 'img', key: 'wheel', x: 37, y: 20, w: 23, r: 0 },
-  { kind: 'img', key: 'wing', x: 62, y: 0, w: 30, r: 4 },
-  { kind: 'img', key: 'fan', x: 22, y: 56, w: 15, r: -4 },
-  { kind: 'img', key: 'rivet', x: 74, y: 52, w: 12, r: 8 },
+  { key: 'wing', x: 64, y: 26, w: 44, r: 6 },
+  { key: 'fender', x: 26, y: 44, w: 36, r: -8 },
+  { key: 'fan', x: 75, y: 60, w: 24, r: -6 },
+  { key: 'wheel', x: 49, y: 55, w: 33, r: 0 },
+  { key: 'rivet', x: 36, y: 74, w: 17, r: 10 },
 ] as const;
-/* the RWB initials, exploded into the gaps between the renders */
+/* the nine letters of RAUH-WELT, tucked into the gaps around the renders */
+const LETTER_CAP = 8.5; // % of the cluster side
 const letterSpots = [
-  { x: 3, y: 66, r: -14 },
-  { x: 47, y: 52, r: 9 },
-  { x: 88, y: 46, r: 18 },
+  { x: 9, y: 61, r: 14 },
+  { x: 38, y: 10, r: 8 },
+  { x: 91, y: 64, r: -12 },
+  { x: 17, y: 26, r: -12 },
+  { x: 91, y: 38, r: -22 },
+  { x: 39, y: 92, r: 5 },
+  { x: 16, y: 84, r: -14 },
+  { x: 79, y: 82, r: 16 },
+  { x: 59, y: 90, r: -6 },
 ];
 
 const builtWidth = RWB.width;
@@ -358,16 +366,16 @@ const NAV_UNFOLD = ['·AUH-', '·ELT\u00a0', '·EGRIFF'];
       <div class="cluster" id="cluster">
         {
           clusterItems.map((it) => (
-            <div class="cl-item cl-img" style={`--x:${it.x}%;--y:${it.y}%;--w:${it.w}vw;--r:${it.r}deg`}>
+            <div class="cl-item cl-img" style={`--x:${it.x}%;--y:${it.y}%;--w:${it.w};--r:${it.r}deg`}>
               <img src={R[it.key].src} alt={R[it.key].alt} loading="lazy" decoding="async" draggable="false" />
             </div>
           ))
         }
         {
-          RWB.glyphs.map((g, i) => (
+          RAUH_WELT.map((g, i) => (
             <div
               class="cl-item cl-letter"
-              style={`--x:${letterSpots[i].x}%;--y:${letterSpots[i].y}%;--w:${((g.width + RWB_OVERHANG) / 100) * 6.2}vw;--r:${letterSpots[i].r}deg`}
+              style={`--x:${letterSpots[i].x}%;--y:${letterSpots[i].y}%;--w:${(((g.width + RWB_OVERHANG) / CAP) * LETTER_CAP).toFixed(2)};--r:${letterSpots[i].r}deg`}
               aria-hidden="true"
             >
               <svg viewBox={`0 0 ${g.width + RWB_OVERHANG} ${CAP}`}>

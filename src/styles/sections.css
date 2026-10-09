@@ -1083,27 +1083,35 @@ img.reel-shot.is-on {
 }
 .cluster {
   position: relative;
-  height: 50vw;
-  margin: 7vw var(--m) 0;
+  width: 54vw;
+  aspect-ratio: 1;
+  margin: 7vw auto 0;
+  container-type: inline-size;
   touch-action: pan-y;
 }
+/* each item is a zero-size anchor at the piece's centre: the script moves the
+   anchor, the child carries the size and the base rotation */
 .cl-item {
   position: absolute;
   left: var(--x);
   top: var(--y);
-  width: var(--w);
-  rotate: var(--r);
   will-change: transform;
   user-select: none;
   -webkit-user-select: none;
 }
-.cl-item img {
-  width: 100%;
+.cl-item > * {
+  position: absolute;
+  display: block;
+  width: calc(var(--w) * 1cqw);
+  max-width: none;
   height: auto;
+  translate: -50% -50%;
+  rotate: var(--r);
+}
+.cl-item img {
   pointer-events: none;
 }
 .cl-letter svg {
-  width: 100%;
   overflow: visible;
 }
 .cl-letter path {
@@ -1122,7 +1130,7 @@ img.reel-shot.is-on {
     grid-column: 1 / 13;
   }
   .cluster {
-    height: 120vw;
+    width: calc(100vw - 2 * var(--m));
     margin-top: 12vw;
   }
 }

@@ -1,9 +1,11 @@
 /**
- * "RWB" abbreviation lettering (loader + services cluster).
+ * "RWB" abbreviation lettering (loader, nav) and the loose "RAUH-WELT" letters
+ * of the services cluster, drawn in the same hand.
  *
  * Drawn to match the client's reference decal: extended, ultra-black, italic
  * (14°), generously rounded, pill-shaped counters. Glyphs are designed upright
- * on a 100-unit cap height, corners rounded with cubic arcs, then sheared.
+ * on a 100-unit cap height (36u stems, ~20u bars, big radii on the leading
+ * right-hand corners), corners rounded with cubic arcs, then sheared.
  * The paths feed inline SVGs, including the loader's stroke drawing.
  */
 
@@ -134,6 +136,116 @@ function rwbGlyph(char: string): Glyph {
           pill(36, 60, 82, 21),
         ),
       };
+    case 'A':
+      return {
+        char,
+        width: 154,
+        d: italic(
+          [
+            [0, 0, 14],
+            [154, 0, 40],
+            [154, 100, 6],
+            [118, 100, 6],
+            [118, 66, 4],
+            [36, 66, 4],
+            [36, 100, 6],
+            [0, 100, 10],
+          ],
+          pill(36, 20, 82, 22),
+        ),
+      };
+    case 'U':
+      return {
+        char,
+        width: 154,
+        d: italic([
+          [0, 0, 8],
+          [36, 0, 6],
+          [36, 80, 10],
+          [118, 80, 10],
+          [118, 0, 6],
+          [154, 0, 8],
+          [154, 100, 36],
+          [0, 100, 12],
+        ]),
+      };
+    case 'H':
+      return {
+        char,
+        width: 154,
+        d: italic([
+          [0, 0, 8],
+          [36, 0, 6],
+          [36, 40, 6],
+          [118, 40, 6],
+          [118, 0, 6],
+          [154, 0, 8],
+          [154, 100, 8],
+          [118, 100, 6],
+          [118, 60, 6],
+          [36, 60, 6],
+          [36, 100, 6],
+          [0, 100, 10],
+        ]),
+      };
+    case '-':
+      return {
+        char,
+        width: 72,
+        d: italic([
+          [0, 39, 6],
+          [72, 39, 6],
+          [72, 61, 6],
+          [0, 61, 6],
+        ]),
+      };
+    case 'E':
+      return {
+        char,
+        width: 146,
+        d: italic([
+          [0, 0, 12],
+          [146, 0, 8],
+          [146, 19, 4],
+          [36, 19, 8],
+          [36, 40, 8],
+          [128, 40, 4],
+          [128, 60, 4],
+          [36, 60, 8],
+          [36, 81, 8],
+          [146, 81, 4],
+          [146, 100, 8],
+          [0, 100, 12],
+        ]),
+      };
+    case 'L':
+      return {
+        char,
+        width: 138,
+        d: italic([
+          [0, 0, 8],
+          [36, 0, 6],
+          [36, 81, 8],
+          [138, 81, 4],
+          [138, 100, 8],
+          [0, 100, 12],
+        ]),
+      };
+    case 'T':
+      return {
+        char,
+        width: 150,
+        d: italic([
+          [0, 0, 8],
+          [150, 0, 8],
+          [150, 20, 4],
+          [93, 20, 8],
+          [93, 100, 6],
+          [57, 100, 6],
+          [57, 20, 8],
+          [0, 20, 4],
+        ]),
+      };
     default:
       throw new Error(`RWB glyph not drawn: ${char}`);
   }
@@ -145,3 +257,6 @@ export const RWB_OVERHANG = CAP * SLANT;
 const rwb = layout('RWB', 8, rwbGlyph);
 /** "RWB" lockup; width includes the italic overhang */
 export const RWB = { glyphs: rwb.glyphs, width: rwb.width + RWB_OVERHANG };
+
+/** the nine loose letters of "RAUH-WELT" for the services cluster */
+export const RAUH_WELT = layout('RAUH-WELT', 8, rwbGlyph).glyphs;
