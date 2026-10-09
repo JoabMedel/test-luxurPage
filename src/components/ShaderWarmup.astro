@@ -1,0 +1,88 @@
+---
+/**
+ * GPU warm-up, drawn under the loader's intro.
+ *
+ * Chrome compiles a GPU pipeline the first time it draws a new kind of effect
+ * (a blend mode, a colour filter, a blur, a gradient, a noise filter, a
+ * YUV-decoded photo) and draws nothing else meanwhile: 150–600 ms each on a
+ * cold shader cache. With smooth scrolling every frame needs the GPU, so each
+ * section froze the scroll for a moment as it came into view. Each tile here
+ * draws one of the page's effects, black on the loader's black (it shows
+ * nothing), so they all compile together while the intro plays. It goes away
+ * with the loader.
+ *
+ * A pipeline is keyed by the effect and by how it is drawn, so the tiles copy
+ * the real elements' structure and state (or use the page's own classes): a
+ * textured layer (a flat colour is drawn differently), scaled or not, with or
+ * without opacity, painted in place or as its own layer. Tiles sit side by
+ * side, as one hidden under another opaque tile is never drawn; blended, fading
+ * or see-through ones hide nothing and stack. Tiles are 128 px or more: a
+ * smaller layer is sampled differently from the page's large ones.
+ *
+ * Keep in step with the page: a new blend mode, filter or SVG filter below the
+ * fold gets its tiles here.
+ */
+import { SCRAMBLE_CHARS } from '../lib/scramble';
+
+// 64 px black lossy WebP: lossy photos are decoded to YUV on the GPU, which has pipelines of its own
+const PHOTO = 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACQAwCdASpAAEAAPtFor1KoJiQioggBABoJaQAAEDdTUAV4hbkAAP7znYAAAAAA';
+---
+
+<div class="warmup" aria-hidden="true">
+  <!-- opaque tiles, side by side -->
+  <div class="wu-strip">
+    <!-- the film screen as the page builds it: shrunk, its grain holder counter-scaled -->
+    <div class="film-screen" style="scale: 0.35"><div class="film-grain" style="scale: 2.857"><div class="grain"></div></div></div>
+    <!-- builds' night grade: colour matrix on a layer, radial vignette -->
+    <i class="wu wu-layer wu-grade"><i class="wu-fill"></i></i>
+    <!-- the hanko's rough-ink filter (no paths in this row: see .wu-paths) -->
+    <svg class="wu" viewBox="0 0 10 10">
+      <filter id="wu-rough" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="n"></feTurbulence>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="5"></feDisplacementMap>
+      </filter>
+      <rect x="1" y="1" width="8" height="8" rx="1" fill="#000" filter="url(#wu-rough)"></rect>
+    </svg>
+    <!-- photos (no backdrop: opacity must reach the photo itself): plain, fading, moved by parallax -->
+    <img class="wu wu-bare" src={PHOTO} alt="" width="64" height="64" />
+    <img class="wu wu-bare wu-faded" src={PHOTO} alt="" width="64" height="64" />
+    <img class="wu wu-layer wu-ridden" src={PHOTO} alt="" width="64" height="64" />
+    <!-- video (warmup.ts loads a black clip in this device's codec): as is, fading in, inside a shrinking layer -->
+    <video class="wu wu-bare" muted playsinline loop preload="none" disablepictureinpicture disableremoteplayback></video>
+    <video class="wu wu-bare wu-faded" muted playsinline loop preload="none" disablepictureinpicture disableremoteplayback></video>
+    <i class="wu wu-bare wu-layer wu-ridden"><video muted playsinline loop preload="none" disablepictureinpicture disableremoteplayback></video></i>
+    <!-- the scramble's katakana and kanji fall back to a system font: resolve it now -->
+    <span class="t-label wu-glyphs">{SCRAMBLE_CHARS}</span>
+  </div>
+  <!-- a path makes its whole GPU tile draw multisampled, so paths live down in a corner of their own:
+       a backdrop, then curves, then the hanko's filter and a photo over them (the kanji and seal in The Man);
+       and curves first with a flat fill over them (the reel) -->
+  <div class="wu-paths">
+    <i class="wu">
+      <svg viewBox="0 0 10 10"><path d="M1 1C4 0 6 9 9 9L1 9Z" fill="#000"></path></svg>
+      <svg viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" rx="1" fill="#000" filter="url(#wu-rough)"></rect></svg>
+      <img src={PHOTO} alt="" width="64" height="64" />
+    </i>
+    <i class="wu wu-bare wu-layer">
+      <svg viewBox="0 0 10 10"><path d="M1 1C4 0 6 9 9 9L1 9Z" fill="#000"></path></svg>
+      <i class="wu-flat"></i>
+    </i>
+  </div>
+  <!-- blended, fading or see-through layers hide nothing, so they stack, page-sized where size matters -->
+  <!-- film grain: overlay with opacity (reel), plain, and redrawn at a new scale (the film's pull-back) -->
+  <i class="wu wu-over wu-layer wu-overlay wu-faded"></i>
+  <i class="wu wu-over wu-layer wu-overlay"></i>
+  <i class="wu wu-over wu-layer wu-overlay wu-rescaled"></i>
+  <!-- difference: titles over photos; the nav (a fractional-height group over a fading layer) -->
+  <i class="wu wu-over wu-layer wu-difference"></i>
+  <i class="wu wu-over wu-difference wu-navlike"><i class="wu-layer wu-faded wu-fill"></i></i>
+  <!-- the film's wall halo, scaled with the photo: as a fading layer and painted -->
+  <i class="wu wu-over wu-layer wu-halo wu-faded wu-ridden"></i>
+  <i class="wu wu-over wu-halo wu-ridden"></i>
+  <!-- rotated solid layers (cluster, hanko); the screen's frosted pills -->
+  <i class="wu wu-over wu-tilted"></i>
+  <span class="pill pill--line sound-pill">Sound</span>
+  <!-- the floor reflection at its own size, shrinking like the photo (warmup.ts draws video into it and
+       scales it); screened black changes nothing -->
+  <canvas class="film-reflection wu-rescaled" width="192" height="108"></canvas>
+</div>

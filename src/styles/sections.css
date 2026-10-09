@@ -51,6 +51,134 @@
 .loader.is-done {
   display: none;
 }
+/* ShaderWarmup: one tile per GPU effect, black on the loader's black, clear of
+   the loader's centred mark. Opaque tiles sit side by side (one covered by
+   another is never drawn, so it would compile nothing); blended or fading ones
+   hide nothing and stack. 128px at least: a smaller layer is sampled
+   differently from the page's large ones */
+.warmup {
+  position: absolute;
+  inset: 0 0 auto;
+  pointer-events: none;
+}
+.wu-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+.wu {
+  position: relative;
+  flex: none;
+  display: block;
+  width: 128px;
+  height: 128px;
+  /* a texture, not a flat colour (flat layers take another pipeline) */
+  background: linear-gradient(#000, #010101);
+}
+.wu-fill {
+  background: linear-gradient(#000, #010101);
+}
+.wu > * {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.wu-bare {
+  background: none;
+}
+.wu-paths {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  display: flex;
+}
+.wu-flat {
+  background: #000;
+  opacity: 0.99;
+}
+.wu-over {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 320px;
+  height: 320px;
+}
+.wu-layer {
+  will-change: transform;
+}
+.wu-faded {
+  opacity: 0.4;
+}
+.wu-ridden {
+  scale: 1.06; /* the film photo's scale mid pull-back */
+}
+.wu-overlay {
+  mix-blend-mode: overlay;
+}
+.wu-difference {
+  mix-blend-mode: difference;
+}
+.wu-navlike {
+  height: 17.39px;
+}
+.wu-halo {
+  background: radial-gradient(closest-side, rgb(0 0 0 / 0.16) 50%, rgb(0 0 0 / 0.05) 78%, transparent);
+}
+.wu-grade > * {
+  filter: brightness(0.68) contrast(1.12) saturate(0.88);
+}
+.wu-grade::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 90% at 55% 55%, rgb(0 0 0 / 0) 55%, rgb(0 0 0 / 0.45));
+}
+.wu-tilted {
+  background: #000;
+  rotate: 4deg;
+  will-change: transform;
+}
+/* real page classes, inked black and boxed into the warm-up */
+.warmup .film-screen {
+  position: relative;
+  flex: none;
+  width: 128px;
+  height: 128px;
+  box-shadow:
+    0 0 0 1.4vw #000,
+    0 0 0 1.55vw #000;
+  margin: 1.6vw;
+}
+.warmup .grain {
+  background: linear-gradient(#000, #010101);
+}
+.warmup .film-reflection {
+  left: auto;
+  right: 0;
+  width: 63vw;
+  height: 52vh;
+}
+.warmup .pill {
+  position: absolute;
+  right: 0;
+  left: auto;
+  top: 0;
+  color: #000;
+  border-color: rgb(0 0 0 / 0.4); /* see-through like the real one: an opaque ring draws differently */
+}
+.wu-glyphs {
+  color: #000;
+  white-space: nowrap;
+}
+@media (max-width: 991px) {
+  /* one row, clear of the mark; what doesn't fit is simply not warmed */
+  .wu-strip {
+    flex-wrap: nowrap;
+    overflow: clip;
+  }
+}
+
 html:not(.js) .loader {
   display: none;
 }
@@ -795,10 +923,11 @@ img.reel-shot.is-on {
   height: 100vh;
   background: var(--black);
   transform-origin: 50% 50%;
+  /* the bezel; its light on the wall is .film-glow (a 14vw blurred shadow here
+     cost a GPU blur pass and froze the first scroll into the film) */
   box-shadow:
     0 0 0 1.4vw #070707,
-    0 0 0 1.55vw #1a1a1a,
-    0 0 14vw 3vw rgb(232 137 43 / 0.16);
+    0 0 0 1.55vw #1a1a1a;
   will-change: transform;
 }
 .film-canvas {
@@ -837,6 +966,14 @@ img.reel-shot.is-on {
 }
 .film-grain .grain {
   mix-blend-mode: normal;
+}
+/* the screen's sodium light on the wall, round its resting place (scenes.ts) */
+.film-glow {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: radial-gradient(closest-side, rgb(232 137 43 / 0.16) 50%, rgb(232 137 43 / 0.05) 78%, transparent);
+  pointer-events: none;
 }
 /* the screen in the polished floor (scenes.ts draws and places it): light
    added to the photo, never a dark patch over it */
@@ -929,6 +1066,7 @@ img.reel-shot.is-on {
     overflow: visible;
   }
   .film-workshop,
+  .film-glow,
   .film-reflection,
   .film-fade {
     display: none;

@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import LogoMark from '../components/LogoMark.astro';
 import Hanko from '../components/Hanko.astro';
+import ShaderWarmup from '../components/ShaderWarmup.astro';
 import CarPlate from '../components/CarPlate.astro';
 import { BUILDS } from '../data/builds';
 import { MEDIA } from '../data/media';
@@ -61,6 +62,7 @@ const NAV_UNFOLD = ['·AUH-', '·ELT\u00a0', '·EGRIFF'];
       <img class="loader-wheel" src={MEDIA.loaderWheel.src} alt="" width="720" height="730" decoding="async" />
     </div>
     <p class="loader-count"><span id="loader-num">000</span></p>
+    <ShaderWarmup />
   </div>
   <p class="sr-only" role="status" id="load-status">Loading RAUH-Welt BEGRIFF</p>
 
@@ -273,6 +275,7 @@ const NAV_UNFOLD = ['·AUH-', '·ELT\u00a0', '·EGRIFF'];
           loading="lazy"
           decoding="async"
         />
+        <div class="film-glow" id="film-glow" aria-hidden="true"></div>
         <canvas class="film-reflection" id="film-reflection" aria-hidden="true"></canvas>
         {
           FILM ? (

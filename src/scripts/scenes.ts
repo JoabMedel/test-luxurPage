@@ -7,6 +7,7 @@ import { Highway, Sparks } from './highway';
 import { Engine } from './engine';
 import { lineReveal } from './text';
 import { LOGO } from '../lib/logo';
+import { SCRAMBLE_CHARS } from '../lib/scramble';
 import { MEDIA, type LoopVideo, type VideoSource } from '../data/media';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
@@ -225,7 +226,6 @@ function loopVideo(o: {
   onFail?: () => void;
 }) {
   const { video, btn } = o;
-  const sm = env.mobile || env.saveData;
   let held = env.reduced;
   let loading: Promise<void> | null = null;
 
@@ -235,11 +235,8 @@ function loopVideo(o: {
     video.hidden = true;
     o.onFail?.();
   };
-  // desktop keeps 1080p even when only software decoding is on offer
-  const choose = async () =>
-    (sm ? undefined : await pickSource(video, o.media.hd, 1920, 1080)) ?? (await pickSource(video, o.media.sm, 1280, 720));
   const load = () =>
-    (loading ??= choose().then((s) => {
+    (loading ??= chooseSource(video, o.media).then((s) => {
       if (!s) throw new Error(`no playable ${o.name} source`);
       video.preload = 'auto';
       video.src = s.src;
@@ -312,6 +309,12 @@ function grainTile(el: HTMLElement, size = 256, sigma = 40) {
   });
   // one tile, shared by every grain layer
   grainURL.then((url) => url && (el.style.backgroundImage = `url(${url})`));
+}
+
+/** The source a loop video plays on this device; desktop keeps 1080p even when only software decoding is on offer. */
+export async function chooseSource(video: HTMLVideoElement, media: LoopVideo) {
+  const sm = env.mobile || env.saveData;
+  return (sm ? undefined : await pickSource(video, media.hd, 1920, 1080)) ?? (await pickSource(video, media.sm, 1280, 720));
 }
 
 /** First source of `list` this device decodes in hardware, else the first it decodes at all. */
@@ -467,7 +470,7 @@ function floorReflection(out: HTMLCanvasElement) {
   const make = (w = 1, h = 1) => Object.assign(document.createElement('canvas'), { width: w, height: h });
   const ctx2d = (c: HTMLCanvasElement) => {
     const x = c.getContext('2d')!;
-    x.imageSmoothingQuality = 'high';
+    x.imageSmoothingQuality = 'medium'; // mipmapped; 'high' adds a bicubic GPU pipeline
     return x;
   };
   // the picture filtered down in steps of 4× at most (larger ones alias), and
@@ -573,6 +576,7 @@ export function film(lenis: Lenis | null) {
   const screen = $('#film-screen');
   const canvas = $<HTMLCanvasElement>('#film-canvas');
   const refl = $<HTMLCanvasElement>('#film-reflection');
+  const glow = $('#film-glow');
   const shop = $<HTMLImageElement>('#film-workshop');
   const grain = screen.querySelector<HTMLElement>('#film-grain');
   const btn = $<HTMLButtonElement>('#sound-btn');
@@ -609,7 +613,17 @@ export function film(lenis: Lenis | null) {
     const w = vw * END;
     const h = vh * END;
     const [ox, oy] = getComputedStyle(shop).transformOrigin.split(' ').map(parseFloat);
-    reflection.place({ x: vw / 2 + t.x - w / 2, y: vh / 2 + t.y - h / 2, w, h }, t.floor, { x: ox, y: oy });
+    const box = { x: vw / 2 + t.x - w / 2, y: vh / 2 + t.y - h / 2, w, h };
+    reflection.place(box, t.floor, { x: ox, y: oy });
+    // the halo reaches ~9vw past the screen, like the light it stands for
+    const r = vw * 0.09;
+    Object.assign(glow.style, {
+      left: `${box.x - r}px`,
+      top: `${box.y - r}px`,
+      width: `${w + r * 2}px`,
+      height: `${h + r * 2}px`,
+      transformOrigin: `${ox - box.x + r}px ${oy - box.y + r}px`,
+    });
   };
 
   const mm = gsap.matchMedia();
@@ -625,9 +639,10 @@ export function film(lenis: Lenis | null) {
     // the grain holder undoes the screen's scale, so the grain keeps its size in the wall
     const keepGrain = () => grain && gsap.set(grain, { scale: 1 / (gsap.getProperty(screen, 'scale') as number) });
     tl.eventCallback('onUpdate', keepGrain);
-    // the reflection rides with the photo and comes up as the screen settles into the wall
+    // the halo and the reflection ride with the photo and come up as the screen settles into the wall
     tl.fromTo(screen, { scale: 1, x: 0, y: 0 }, { scale: END, x: () => target().x, y: () => target().y, ease: 'power1.inOut', duration: 1 }, 0.15)
-      .fromTo([shop, refl], { scale: 1.12 }, { scale: 1, ease: 'power1.inOut', duration: 1 }, 0.15)
+      .fromTo([shop, glow, refl], { scale: 1.12 }, { scale: 1, ease: 'power1.inOut', duration: 1 }, 0.15)
+      .fromTo(glow, { opacity: 0 }, { opacity: 1, ease: 'power2.in', duration: 1 }, 0.15)
       .fromTo(refl, { opacity: 0 }, { opacity: GLOSS, ease: 'power2.in', duration: 1 }, 0.15)
       .to({}, { duration: 0.25 });
     return () => window.removeEventListener('resize', placeReflection);
@@ -828,7 +843,7 @@ export function glitch() {
   const blocks = $$('[data-scramble]', section);
 
   // scramble window travelling through each block
-  const CHARS = '!<>-_\\/[]{}=+*^?#·:01アウラヴェルト荒車幅';
+  const CHARS = SCRAMBLE_CHARS;
   const states = blocks.map((el) => ({ el, text: el.textContent ?? '', pos: -Math.floor(rand(0, 14)), win: el.hasAttribute('data-garbage') ? 12 : 5 }));
   let scr = 0;
   const tick = () => {
@@ -914,21 +929,21 @@ export function closing() {
   const groups = $$<SVGGElement>('.wm-l', mark);
   const inners = groups.map((g) => g.querySelector<SVGGElement>('.wm-l-inner')!);
   const hyphenI = groups.findIndex((g) => g.dataset.char === '-');
-  const letters = inners.filter((_, i) => i !== hyphenI);
-  const hyphen = inners[hyphenI];
-
-  gsap.set(inners, { transformOrigin: '50% 50%' });
-
-  // hovers only start once every letter has landed: a hover during the rise
-  // would otherwise interrupt it and leave letters stranded out of line
-  let introDone = env.reduced;
+  // the rise moves each glyph's outer group and the hover reshapes the inner
+  // one, so the two never fight over a transform and the hover answers at once,
+  // even while the letters are still coming up
+  const letters = groups.filter((_, i) => i !== hyphenI);
+  const hyphen = groups[hyphenI];
 
   if (env.reduced) {
     gsap.from(mark, { opacity: 0, duration: 0.8, ease: 'power3.out', scrollTrigger: { trigger: mark, start: 'top 95%', once: true } });
   } else {
+    // the outer group's box is the full-height hit column: grow the dash from its own centre
+    const hb = inners[hyphenI].getBBox();
+    gsap.set(hyphen, { svgOrigin: `${hb.x + hb.width / 2} ${hb.y + hb.height / 2}` });
     gsap.set(letters, { y: LOGO.height * 1.2 }); // 120 % of the letter height, in SVG units
     gsap.set(hyphen, { scale: 0 });
-    const tl = gsap.timeline({ paused: true, onComplete: () => (introDone = true) });
+    const tl = gsap.timeline({ paused: true });
     tl.to(letters, { y: 0, duration: 1.2, ease: 'power4.inOut', stagger: { each: 0.03, from: 'random' } }, 0).to(
       hyphen,
       { scale: 1, duration: 0.9, ease: 'back.out(0.9)' },
@@ -966,15 +981,11 @@ export function closing() {
 
   let pointerU: number | null = null;
   let queued = false;
-  let originSet = false;
+  gsap.set(inners, { transformOrigin: '0% 100%' }); // grow rightwards from the baseline
 
   const apply = () => {
     queued = false;
-    if (!introDone || pointerU === null) return;
-    if (!originSet) {
-      gsap.set(inners, { transformOrigin: '0% 100%' }); // grow rightwards from the baseline
-      originSet = true;
-    }
+    if (pointerU === null) return;
     const f = boxes.map((b) => Math.exp(-(((pointerU! - (b.x + b.w / 2)) / SIGMA) ** 2)));
     const k = (WIDEN * boxes.reduce((a, b, i) => a + b.w * f[i], 0)) / total;
     let cursor = boxes[0].x;
@@ -998,14 +1009,16 @@ export function closing() {
     }
   };
 
-  mark.addEventListener('pointermove', (e) => {
+  const track = (e: PointerEvent) => {
     const r = mark.getBoundingClientRect();
     pointerU = ((e.clientX - r.left) / r.width) * LOGO.width;
     queue();
-  });
+  };
+  // enter too: a pointer resting where the logo scrolls in gets no move event
+  mark.addEventListener('pointerenter', track);
+  mark.addEventListener('pointermove', track);
   mark.addEventListener('pointerleave', () => {
     pointerU = null;
-    if (!introDone) return;
     gsap.to(inners, { x: 0, scaleX: 1, scaleY: 1, duration: 1.2, ease: 'elastic.out(1, 0.45)', overwrite: 'auto' });
   });
 }

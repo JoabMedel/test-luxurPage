@@ -6,6 +6,7 @@ import { runLoader } from './loader';
 import { initFluid } from './fluid';
 import { initTextReveals } from './text';
 import { builds, closing, cluster, film, glitch, heroIntro, heroScroll, nav, reel } from './scenes';
+import { endWarmup, warmVideo } from './warmup';
 
 gsap.registerPlugin(ScrollTrigger);
 gsap.defaults({ ease: 'power4.inOut' });
@@ -31,6 +32,7 @@ const safe = (name: string, fn: () => void) => {
   }
 };
 
+safe('warmup', warmVideo);
 safe('nav', () => nav(lenis));
 safe('text', initTextReveals);
 safe('hero', heroScroll);
@@ -44,6 +46,7 @@ safe('closing', closing);
 if (!env.reduced) gsap.set('#hero-cta', { scale: 0 });
 
 runLoader().then(() => {
+  endWarmup();
   document.body.classList.remove('is-loading');
   lenis?.start();
   safe('hero intro', heroIntro);
@@ -71,4 +74,4 @@ runLoader().then(() => {
 document.fonts?.ready.then(() => ScrollTrigger.refresh());
 window.addEventListener('load', () => ScrollTrigger.refresh());
 
-if (import.meta.env.DEV) Object.assign(window, { ScrollTrigger, gsap });
+if (import.meta.env.DEV) Object.assign(window, { ScrollTrigger, gsap, lenis });

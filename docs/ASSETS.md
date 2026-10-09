@@ -32,6 +32,7 @@ Material del cliente recibido: fotos de los 6 builds (2026-10-05). Todo lo que d
 | 21 | Detalles japoneses: kanji verticales (宣言, 路上, 職人, 幅は個性に従う), kanji de cada build (風 黒 桜 鉄 緑 星), 千葉, bloque 空冷・手切り y katakana en el scramble | Varias | 1 · Código | Texto en Zen Old Mincho 900 (OFL), gris, `aria-hidden` | Rasgos culturales sutiles sin imágenes. |
 | 22 | Sello hanko 荒 | The Man, créditos | 1 · Código | `src/components/Hanko.astro` (SVG con borde de tinta irregular) | Firma del artesano. |
 | 23 | Sol naciente (hinomaru) | Cierre | 1 · Código | Disco CSS que sube tras el logo con el scroll | Se evita deliberadamente el sol con rayos (kyokujitsu-ki) por su carga histórica fuera de Japón. |
+| 24 | Clips de calentamiento de GPU (negro, 256×144, ~1–3 KB: AV1 y HEVC de 10 bits, H.264 de 8 bits, BT.709) | Loader | 1 · Código | `tools/convert-video.mjs warmup` → `public/media/warmup/`. Bajo el loader, `src/scripts/warmup.ts` reproduce el del códec que elegirán el reel y el film y `src/components/ShaderWarmup.astro` dibuja una tesela negra por cada efecto de GPU de la página, para que Chrome compile sus pipelines durante la intro y no congele el scroll al entrar en cada sección | Sin contenido: solo el formato importa. |
 | — | Modelo 3D (GLB) | — | 4 · **No se usa** | — | Ninguna interacción lo exige (no hay configurador ni pieza girable). |
 
 **Color:** además de las carrocerías y el naranja sodio, se reserva un único bermellón 朱 (`--shu`, #D23B2A) para el sol y el sello.
