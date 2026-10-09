@@ -7,6 +7,7 @@ import { Highway, Sparks } from './highway';
 import { Engine } from './engine';
 import { lineReveal } from './text';
 import { LOGO } from '../lib/logo';
+import { MEDIA, type Reel, type VideoSource } from '../data/media';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
@@ -136,7 +137,6 @@ export function reel() {
   const section = $('#reel');
   const card = $('#reel-card');
   const copy = $('.reel-text');
-  const shots = $$('.reel-shot', card);
   const tc = $('#reel-tc');
 
   const mm = gsap.matchMedia();
@@ -170,7 +170,105 @@ export function reel() {
   });
   lineReveal(copy, { trigger: section, start: env.reduced ? 'top 60%' : 'top+=38% top' });
 
-  // fast-cut montage (coded stand-in for the client reel)
+  const video = card.querySelector<HTMLVideoElement>('#reel-video');
+  if (video && MEDIA.reel) reelFilm(section, card, video, tc, MEDIA.reel);
+  else reelMontage(card, tc);
+}
+
+/** Client footage: fetched on approach, played only on screen, looping at the end. */
+function reelFilm(section: HTMLElement, card: HTMLElement, video: HTMLVideoElement, tc: HTMLElement, reel: Reel) {
+  const btn = $<HTMLButtonElement>('#reel-toggle', card);
+  const FPS = 24000 / 1001;
+  const sm = env.mobile || env.saveData;
+  // reduced motion: the poster stands still until the visitor presses play
+  let held = env.reduced;
+  let loading: Promise<void> | null = null;
+
+  const fail = () => {
+    btn.hidden = true;
+    video.hidden = true;
+  };
+  // desktop keeps 1080p even when only software decoding is on offer
+  const choose = async () =>
+    (sm ? undefined : await pickSource(video, reel.hd, 1920, 1080)) ?? (await pickSource(video, reel.sm, 1280, 720));
+  const load = () =>
+    (loading ??= choose().then((s) => {
+      if (!s) throw new Error('no playable reel source');
+      video.preload = 'auto';
+      video.src = s.src;
+    }));
+  const play = () =>
+    load()
+      .then(() => video.play())
+      .catch((err: Error) => {
+        // refused autoplay (Low Power Mode…) keeps the poster and offers play;
+        // an abort is just a pause() racing the start
+        if (err.name !== 'NotAllowedError' && err.name !== 'AbortError') fail();
+      });
+
+  const sync = () => {
+    btn.toggleAttribute('data-paused', video.paused);
+    btn.setAttribute('aria-label', video.paused ? 'Play reel' : 'Pause reel');
+  };
+  video.addEventListener('play', sync);
+  video.addEventListener('pause', sync);
+  video.addEventListener('error', fail);
+  video.addEventListener('playing', () => video.classList.add('is-ready'), { once: true });
+
+  // non-drop timecode of the frame on screen; restarts with the loop
+  const p2 = (n: number) => String(n).padStart(2, '0');
+  const stamp = (t: number) => {
+    const f = Math.round(t * FPS);
+    tc.textContent = `00:${p2(Math.floor(f / 1440) % 60)}:${p2(Math.floor(f / 24) % 60)}:${p2(f % 24)}`;
+  };
+  if ('requestVideoFrameCallback' in HTMLVideoElement.prototype) {
+    const onFrame = (_: number, meta: { mediaTime: number }) => {
+      stamp(meta.mediaTime);
+      video.requestVideoFrameCallback(onFrame);
+    };
+    video.requestVideoFrameCallback(onFrame);
+  } else {
+    video.addEventListener('timeupdate', () => stamp(video.currentTime));
+  }
+
+  // half a screen ahead: early enough to have frames on arrival, late enough
+  // to stay out of the loader's way and off a visitor's data until they scroll
+  whileVisible(
+    section,
+    (near) => {
+      if (near && !held) load().catch(fail);
+    },
+    '0px 0px 50% 0px',
+  );
+  whileVisible(card, (v) => {
+    if (v && !held) play();
+    else if (!v) video.pause();
+  });
+  btn.addEventListener('click', () => {
+    held = !video.paused;
+    if (held) video.pause();
+    else play();
+  });
+}
+
+/** First source of `list` this device decodes in hardware, else the first it decodes at all. */
+async function pickSource(video: HTMLVideoElement, list: VideoSource[], width: number, height: number) {
+  const playable = list.filter((s) => video.canPlayType(s.type));
+  const mc = navigator.mediaCapabilities;
+  if (mc) {
+    for (const s of playable) {
+      const info = await mc
+        .decodingInfo({ type: 'file', video: { contentType: s.type, width, height, bitrate: 2_000_000, framerate: 24 } })
+        .catch(() => null);
+      if (info?.supported && info.powerEfficient) return s;
+    }
+  }
+  return playable[0];
+}
+
+/** Fast-cut montage: coded stand-in while there is no client reel. */
+function reelMontage(card: HTMLElement, tc: HTMLElement) {
+  const shots = $$('.reel-shot', card);
   const road = new Highway($<HTMLCanvasElement>('.reel-road', card), 900);
   const sparks = new Sparks($<HTMLCanvasElement>('.reel-sparks', card));
   const renderers: Record<string, Highway | Sparks> = { road, sparks };

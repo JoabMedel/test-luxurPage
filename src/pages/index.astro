@@ -10,6 +10,7 @@ import { RWB, RWB_OVERHANG, CAP } from '../lib/wordmark';
 import '../styles/sections.css';
 
 const R = MEDIA.renders;
+const REEL = MEDIA.reel;
 
 /* cluster composition: % of the cluster box, width in vw, base rotation */
 const clusterItems = [
@@ -139,14 +140,43 @@ const NAV_UNFOLD = ['·AUH-', '·ELT\u00a0', '·EGRIFF'];
           </p>
         </div>
         <div class="reel-card" id="reel-card">
-          <div class="reel-media" id="reel-media" role="img" aria-label="Montage: a fender edge fresh from the saw, sparks, rivets in a palm, a wide car on a night highway, a covered car in the workshop">
-            <img class="reel-shot is-on" src={MEDIA.detailCut.src} alt="" loading="lazy" decoding="async" />
-            <canvas class="reel-shot reel-sparks" data-shot="sparks"></canvas>
-            <img class="reel-shot" src={MEDIA.detailRivets.src} alt="" loading="lazy" decoding="async" />
-            <canvas class="reel-shot reel-road" data-shot="road"></canvas>
-            <img class="reel-shot" src={MEDIA.tarp.src} alt="" loading="lazy" decoding="async" />
-          </div>
-          <p class="reel-tc t-label" aria-hidden="true"><span>REEL</span><span id="reel-tc">00:00:00:00</span></p>
+          {
+            REEL ? (
+              <Fragment>
+                <div class="reel-media" id="reel-media" role="img" aria-label={REEL.alt}>
+                  <img
+                    class="reel-poster"
+                    src={REEL.poster}
+                    srcset={`${REEL.posterSm} 960w, ${REEL.poster} 1920w`}
+                    sizes="100vw"
+                    alt=""
+                    width="1920"
+                    height="1080"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <video class="reel-video" id="reel-video" muted playsinline loop preload="none" disablepictureinpicture disableremoteplayback></video>
+                </div>
+                <div class="reel-tc t-label">
+                  <button class="reel-toggle" id="reel-toggle" aria-label="Play reel" data-paused>
+                    REEL <span class="reel-glyph" aria-hidden="true"><i></i><i></i></span>
+                  </button>
+                  <span id="reel-tc" aria-hidden="true">00:00:00:00</span>
+                </div>
+              </Fragment>
+            ) : (
+              <Fragment>
+                <div class="reel-media" id="reel-media" role="img" aria-label="Montage: a fender edge fresh from the saw, sparks, rivets in a palm, a wide car on a night highway, a covered car in the workshop">
+                  <img class="reel-shot is-on" src={MEDIA.detailCut.src} alt="" loading="lazy" decoding="async" />
+                  <canvas class="reel-shot reel-sparks" data-shot="sparks"></canvas>
+                  <img class="reel-shot" src={MEDIA.detailRivets.src} alt="" loading="lazy" decoding="async" />
+                  <canvas class="reel-shot reel-road" data-shot="road"></canvas>
+                  <img class="reel-shot" src={MEDIA.tarp.src} alt="" loading="lazy" decoding="async" />
+                </div>
+                <p class="reel-tc t-label" aria-hidden="true"><span>REEL</span><span id="reel-tc">00:00:00:00</span></p>
+              </Fragment>
+            )
+          }
         </div>
       </div>
     </section>

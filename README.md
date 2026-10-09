@@ -26,7 +26,8 @@ pnpm build && pnpm preview
 | `src/data/*.ts` | Builds, media registry, contact links (placeholders) |
 | `docs/ASSETS.md` | Asset inventory: where each visual comes from and why |
 | `tools/convert-media.mjs` | Re-encodes generated PNG originals (`assets-src/`, git-ignored) to WebP |
+| `tools/convert-reel.mjs` | Crops the client reel (a screen capture) back to 16:9 23.976p and encodes AV1/HEVC/H.264 + posters |
 
 ## Client deliverables still needed
 
-Photos of the six builds and of Akira Nakai, reel and night-film footage (MP4/HEVC + captions), confirmed contact/social URLs and credits. Slots are in `src/data/builds.ts`, `src/data/media.ts` and `src/data/site.ts`; see `docs/ASSETS.md`.
+Photos of the six builds and of Akira Nakai, night-film footage (MP4/HEVC + captions), confirmed contact/social URLs and credits. Slots are in `src/data/builds.ts`, `src/data/media.ts` and `src/data/site.ts`; see `docs/ASSETS.md`.
