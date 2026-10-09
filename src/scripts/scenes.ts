@@ -178,7 +178,7 @@ export function reel() {
 /** Client footage with film grain and a running timecode. */
 function reelFilm(section: HTMLElement, card: HTMLElement, video: HTMLVideoElement, tc: HTMLElement, reel: LoopVideo) {
   const FPS = 24000 / 1001;
-  grainTile($('.reel-grain', card));
+  grainTile($('.grain', card));
   loopVideo({
     section,
     view: card,
@@ -290,23 +290,28 @@ function loopVideo(o: {
  * without seams; drawn at 1 CSS px per sample, the 2× upscale softens it into
  * clumps instead of digital speckle.
  */
+let grainURL: Promise<string | null> | null = null;
 function grainTile(el: HTMLElement, size = 256, sigma = 40) {
-  const c = document.createElement('canvas');
-  c.width = c.height = size;
-  const ctx = c.getContext('2d');
-  if (!ctx) return;
-  const img = ctx.createImageData(size, size);
-  const d = img.data;
-  for (let i = 0; i < d.length; i += 8) {
-    // Box–Muller: two gaussian samples per pair of uniforms
-    const r = Math.sqrt(-2 * Math.log(1 - Math.random())) * sigma;
-    const a = 2 * Math.PI * Math.random();
-    d.fill(128 + r * Math.cos(a), i, i + 3);
-    d.fill(128 + r * Math.sin(a), i + 4, i + 7);
-    d[i + 3] = d[i + 7] = 255;
-  }
-  ctx.putImageData(img, 0, 0);
-  c.toBlob((b) => b && (el.style.backgroundImage = `url(${URL.createObjectURL(b)})`));
+  grainURL ??= new Promise((resolve) => {
+    const c = document.createElement('canvas');
+    c.width = c.height = size;
+    const ctx = c.getContext('2d');
+    if (!ctx) return resolve(null);
+    const img = ctx.createImageData(size, size);
+    const d = img.data;
+    for (let i = 0; i < d.length; i += 8) {
+      // Box–Muller: two gaussian samples per pair of uniforms
+      const r = Math.sqrt(-2 * Math.log(1 - Math.random())) * sigma;
+      const a = 2 * Math.PI * Math.random();
+      d.fill(128 + r * Math.cos(a), i, i + 3);
+      d.fill(128 + r * Math.sin(a), i + 4, i + 7);
+      d[i + 3] = d[i + 7] = 255;
+    }
+    ctx.putImageData(img, 0, 0);
+    c.toBlob((b) => resolve(b && URL.createObjectURL(b)));
+  });
+  // one tile, shared by every grain layer
+  grainURL.then((url) => url && (el.style.backgroundImage = `url(${url})`));
 }
 
 /** First source of `list` this device decodes in hardware, else the first it decodes at all. */
@@ -452,6 +457,7 @@ export function film(lenis: Lenis | null) {
   const canvas = $<HTMLCanvasElement>('#film-canvas');
   const refl = $<HTMLCanvasElement>('#film-reflection');
   const shop = $<HTMLImageElement>('#film-workshop');
+  const grain = screen.querySelector<HTMLElement>('#film-grain');
   const btn = $<HTMLButtonElement>('#sound-btn');
   const caption = $('#film-caption');
   const state = $('.sound-state', btn);
@@ -501,6 +507,9 @@ export function film(lenis: Lenis | null) {
     const tl = gsap.timeline({
       scrollTrigger: { trigger: section, start: 'top top', end: 'bottom bottom', scrub: 0.5, invalidateOnRefresh: true },
     });
+    // the grain holder undoes the screen's scale, so the grain keeps its size in the wall
+    const keepGrain = () => grain && gsap.set(grain, { scale: 1 / (gsap.getProperty(screen, 'scale') as number) });
+    tl.eventCallback('onUpdate', keepGrain);
     tl.fromTo(screen, { scale: 1, x: 0, y: 0 }, { scale: 0.35, x: () => target().x, y: () => target().y, ease: 'power1.inOut', duration: 1 }, 0.15)
       .fromTo(shop, { scale: 1.12 }, { scale: 1, ease: 'power1.inOut', duration: 1 }, 0.15)
       .fromTo(refl, { scale: 1.3, opacity: 0 }, { scale: 1, opacity: 0.65, ease: 'power1.inOut', duration: 1 }, 0.15)
@@ -510,6 +519,7 @@ export function film(lenis: Lenis | null) {
   mm.add(MQ.reduced + ' and (min-width: 992px)', () => {
     placeReflection();
     gsap.set(screen, { scale: 0.35, x: () => target().x, y: () => target().y });
+    if (grain) gsap.set(grain, { scale: 1 / 0.35 });
     gsap.set(refl, { opacity: 0.65 });
   });
 
@@ -522,6 +532,7 @@ export function film(lenis: Lenis | null) {
   const poster = screen.querySelector<HTMLImageElement>('.film-poster');
   let coded = !(video && MEDIA.film);
   if (video && MEDIA.film) {
+    grainTile($('.grain', screen));
     loopVideo({
       section,
       view: section,
@@ -529,6 +540,7 @@ export function film(lenis: Lenis | null) {
       media: MEDIA.film,
       btn: $<HTMLButtonElement>('#film-toggle'),
       name: 'film',
+      onState: (playing) => screen.classList.toggle('is-playing', playing), // runs the film grain
       onFail: () => {
         coded = true;
         poster?.remove();

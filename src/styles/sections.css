@@ -451,15 +451,16 @@ img.reel-shot.is-on {
 .reel-video.is-ready {
   opacity: 1;
 }
-/* film grain: one gaussian noise tile (made in scenes.ts, mean grey so the
-   overlay adds texture without shifting exposure) that jumps to a new offset 24
-   times a second, like a fresh frame of stock. Transform-only, so the
-   compositor runs it; sized to the viewport, not the card, so the scroll shrink
-   never re-rasterises it. Blends with the picture only. */
+/* film grain (reel, film): one gaussian noise tile (made in scenes.ts, mean
+   grey so the overlay adds texture without shifting exposure) that jumps to a
+   new offset 24 times a second, like a fresh frame of stock. Transform-only, so
+   the compositor runs it; sized to the viewport, not the card, so the scroll
+   shrink never re-rasterises it. Blends with the picture only; runs while an
+   ancestor is .is-playing. */
 .reel-media {
   isolation: isolate;
 }
-.reel-grain {
+.grain {
   --tile: 256px;
   position: absolute;
   right: calc(var(--tile) * -1);
@@ -473,7 +474,7 @@ img.reel-shot.is-on {
   will-change: transform;
   animation: grain 0.333s steps(1, end) infinite paused;
 }
-.reel-card.is-playing .reel-grain {
+.is-playing .grain {
   animation-play-state: running;
 }
 /* eight offsets per third of a second = 24 fresh grains a second (all within one 256px tile) */
@@ -504,7 +505,7 @@ img.reel-shot.is-on {
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .reel-grain {
+  .grain {
     animation: none;
   }
 }
@@ -819,6 +820,23 @@ img.reel-shot.is-on {
 }
 .film-video.is-ready {
   opacity: 1;
+}
+/* the screen clips and isolates its grain; the holder is counter-scaled
+   (scenes.ts) so the grain keeps its size while the screen shrinks into the wall */
+.film-screen:has(.grain) {
+  overflow: clip;
+  isolation: isolate;
+}
+.film-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* the holder's transform makes it its own group, so the blend has to live
+     here (against the film) rather than on the grain inside it */
+  mix-blend-mode: overlay;
+}
+.film-grain .grain {
+  mix-blend-mode: normal;
 }
 .film-reflection {
   position: absolute;
