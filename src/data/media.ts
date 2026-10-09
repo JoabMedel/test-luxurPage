@@ -73,6 +73,20 @@ export const MEDIA = {
     posterSm: '/media/film/poster-sm.webp',
     alt: 'A white RWB widebody 911 seen from behind, cruising down an empty elevated expressway at night under orange sodium lamps',
   } as null | LoopVideo,
-  /** Client photography. */
-  nakai: null as null | { src: string; alt: string; credit: string },
+  /** Client photography: event shot graded into the night key by tools/grade-nakai.mjs. */
+  nakai: {
+    src: '/media/nakai.webp',
+    srcSm: '/media/nakai-sm.webp',
+    width: 1920,
+    height: 972,
+    alt: 'Akira Nakai, eyes on the line, cutting into an orange fender with an air tool as smoke curls off the cut',
+  } as null | {
+    src: string;
+    srcSm: string;
+    width: number;
+    height: number;
+    alt: string;
+    /** photographer credit shown on the frame; omit until confirmed */
+    credit?: string;
+  },
 };

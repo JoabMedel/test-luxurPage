@@ -844,7 +844,7 @@ img.reel-shot.is-on {
   position: absolute;
   left: 0;
   top: 0;
-  opacity: 0.9;
+  opacity: 0.6;
   /* the canvas is quarter resolution; the blur melts the upscale */
   filter: blur(5px);
   /* the floor starts at the wall line: nothing bleeds up the wall */
@@ -977,6 +977,8 @@ img.reel-shot.is-on {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* 21:9 out of a ~2:1 photo: keep his hair and the hands on the tool */
+  object-position: 50% 60%;
 }
 .man-square {
   grid-column: 10 / 13;
@@ -1042,6 +1044,10 @@ img.reel-shot.is-on {
   .man-pano {
     margin-top: 12vw;
     aspect-ratio: 4 / 3;
+  }
+  /* 4:3: his face on the left third, the cut on the right */
+  .man-pano > img {
+    object-position: 48% 50%;
   }
   .man-square {
     grid-column: 6 / 13;

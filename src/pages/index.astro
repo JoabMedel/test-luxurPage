@@ -327,7 +327,19 @@ const NAV_UNFOLD = ['·AUH-', '·ELT\u00a0', '·EGRIFF'];
       <figure class="man-pano" data-clip>
         {
           MEDIA.nakai ? (
-            <img src={MEDIA.nakai.src} alt={MEDIA.nakai.alt} loading="lazy" decoding="async" />
+            <>
+              <img
+                src={MEDIA.nakai.src}
+                srcset={`${MEDIA.nakai.srcSm} 1280w, ${MEDIA.nakai.src} ${MEDIA.nakai.width}w`}
+                sizes="(max-width: 991px) 92vw, 75vw"
+                alt={MEDIA.nakai.alt}
+                width={MEDIA.nakai.width}
+                height={MEDIA.nakai.height}
+                loading="lazy"
+                decoding="async"
+              />
+              {MEDIA.nakai.credit && <span class="pending pending--credit t-label">Photo · {MEDIA.nakai.credit}</span>}
+            </>
           ) : (
             <div class="frame-pending" role="img" aria-label="Reserved for the client photograph of Akira Nakai at work on a fender">
               <span class="fp-cross" aria-hidden="true" />

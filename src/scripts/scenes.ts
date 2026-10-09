@@ -601,7 +601,7 @@ export function film(lenis: Lenis | null) {
 
   // the screen's size in the wall, and how strongly the floor reflects it
   const END = 0.35;
-  const GLOSS = 0.9;
+  const GLOSS = 0.6;
   const placeReflection = () => {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
