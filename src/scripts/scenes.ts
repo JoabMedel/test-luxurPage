@@ -495,12 +495,15 @@ export function film(lenis: Lenis | null) {
   mm.add(MQ.desktop, () => {
     placeReflection();
     window.addEventListener('resize', placeReflection);
+    // a calm pull-back that stays attached to the scroll: the screen starts
+    // exactly filling the view, eases evenly (power1, not a mid-scroll lunge)
+    // and stops when the scroll stops (short scrub on top of Lenis)
     const tl = gsap.timeline({
-      scrollTrigger: { trigger: section, start: 'top top', end: 'bottom bottom', scrub: 1.5, invalidateOnRefresh: true },
+      scrollTrigger: { trigger: section, start: 'top top', end: 'bottom bottom', scrub: 0.5, invalidateOnRefresh: true },
     });
-    tl.fromTo(screen, { scale: 1.4, x: 0, y: 0 }, { scale: 0.35, x: () => target().x, y: () => target().y, ease: 'power4.inOut', duration: 1 }, 0.15)
-      .fromTo(shop, { scale: 1.12 }, { scale: 1, ease: 'power4.inOut', duration: 1 }, 0.15)
-      .fromTo(refl, { scale: 1.8, opacity: 0 }, { scale: 1, opacity: 0.65, ease: 'power4.inOut', duration: 1 }, 0.15)
+    tl.fromTo(screen, { scale: 1, x: 0, y: 0 }, { scale: 0.35, x: () => target().x, y: () => target().y, ease: 'power1.inOut', duration: 1 }, 0.15)
+      .fromTo(shop, { scale: 1.12 }, { scale: 1, ease: 'power1.inOut', duration: 1 }, 0.15)
+      .fromTo(refl, { scale: 1.3, opacity: 0 }, { scale: 1, opacity: 0.65, ease: 'power1.inOut', duration: 1 }, 0.15)
       .to({}, { duration: 0.25 });
     return () => window.removeEventListener('resize', placeReflection);
   });
@@ -555,15 +558,9 @@ export function film(lenis: Lenis | null) {
   let visible = false;
   const loop = (t: number) => {
     raf = requestAnimationFrame(loop);
+    // the picture keeps one steady speed; only the engine sound answers the scroll
     const v = lenis ? Math.min(1, Math.abs(lenis.velocity) / 45) : 0;
-    if (coded) {
-      hw.speed = 1 + v * 2.2;
-      hw.render(t);
-    } else if (!video!.paused) {
-      // scrolling hard opens the throttle on the film too, in step with the engine
-      const rate = Math.round((1 + v * 0.8) * 20) / 20; // 0.05 steps, back to exactly 1 at rest
-      if (rate !== video!.playbackRate) video!.playbackRate = rate;
-    }
+    if (coded) hw.render(t);
     if (!env.mobile) mirror();
     if (engine.on) {
       engine.setLoad(v);

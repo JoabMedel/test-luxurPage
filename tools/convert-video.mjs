@@ -8,9 +8,9 @@
  *
  * reel — client delivery: a macOS screen recording (3360×2100, ReplayKit,
  *        ~32 fps VFR, no audio) of a 23.976p film shown letterboxed.
- * film — Higgsfield (Kling 2.6, 24 fps, silent), stabilised on the car and cut
- *        into a seamless 9.3 s loop beforehand (assets-src/film-master.mp4,
- *        see docs/ASSETS.md #7).
+ * film — Higgsfield (Kling 2.6, 24 fps, silent), untouched apart from the cut
+ *        into a 6.9 s loop and a 1920×1080 resize (assets-src/film-master.mp4,
+ *        see docs/ASSETS.md #7). No software stabilisation: it added judder.
  */
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, statSync } from 'node:fs';
