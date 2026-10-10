@@ -518,6 +518,24 @@ html:not(.js) .loader {
 .reel-text {
   margin: 0;
 }
+/* Fuji backdrop: ink straight on the page's white (the file's paper is #fff
+   and its edges feather out, so there is no box), set in the space the shrunk
+   card leaves: from column 2, under the nav, clear of the copy, its misty
+   lower right running behind the card so the card reads as in front of the
+   landscape. Width-led and capped by height, so short screens keep the copy
+   clear too. */
+.reel-fuji {
+  position: absolute;
+  left: calc(var(--col) + var(--m) * 2);
+  top: calc(var(--m) * 4 + 5vh);
+  width: min(72vw, 115vh);
+  pointer-events: none;
+}
+.reel-fuji img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
 .reel-card {
   position: absolute;
   right: 0;
@@ -696,6 +714,17 @@ img.reel-shot.is-on {
   }
   .reel-copy .t-label {
     margin-bottom: 3vw;
+  }
+  /* between the copy (ends ≈ 56vw down) and the card (42vh + margin tall), centred;
+     its feathered foot (≈ 5.5% of its height) tucks under the card's top edge */
+  .reel-fuji {
+    --fw: min(100vw - var(--m) * 2, (58vh - 56vw) * 2.15);
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: calc(42vh + var(--m) - var(--fw) * 0.055);
+    width: var(--fw);
+    margin-inline: auto;
   }
 }
 

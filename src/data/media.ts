@@ -35,6 +35,8 @@ export const MEDIA = {
   tarp: { src: '/media/tarp.webp', alt: 'A low, wide car under a fitted grey cover, lit by a single fluorescent tube in a dark workshop' },
   detailCut: { src: '/media/detail-cut.webp', alt: 'Macro of a freshly cut fender edge: bare metal burr beside a pencil guide line' },
   detailRivets: { src: '/media/detail-rivets.webp', alt: 'An open palm holding a small pile of steel dome rivets' },
+  /** Reel backdrop: sumi-e Fuji, cleaned onto the page's white by tools/clean-fuji.mjs. Decorative. */
+  fuji: { src: '/media/fuji.webp', srcSm: '/media/fuji-sm.webp', width: 2048, height: 1120 },
 
   /**
    * Footage. Leave null to use the coded stand-ins.

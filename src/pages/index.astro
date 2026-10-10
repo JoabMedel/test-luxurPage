@@ -144,6 +144,20 @@ const NAV_UNFOLD = ['·AUH-', '·ELT\u00a0', '·EGRIFF'];
     <section class="reel" id="reel" aria-labelledby="reel-title">
       <div class="reel-sticky">
         <span class="kanji-v reel-kanji" lang="ja" aria-hidden="true">路上</span>
+        <!-- Fuji at sunrise in ink, drawn on the page's own white: the card uncovers it as it shrinks -->
+        <div class="reel-fuji" aria-hidden="true">
+          <img
+            id="reel-fuji"
+            src={MEDIA.fuji.src}
+            srcset={`${MEDIA.fuji.srcSm} 1024w, ${MEDIA.fuji.src} 2048w`}
+            sizes="(max-width: 991px) 92vw, 72vw"
+            alt=""
+            width={MEDIA.fuji.width}
+            height={MEDIA.fuji.height}
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
         <div class="reel-copy">
           <p class="t-label" id="reel-title">( After dark )</p>
           <p class="t-q reel-text" data-lines-auto>

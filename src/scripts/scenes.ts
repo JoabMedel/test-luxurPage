@@ -169,6 +169,15 @@ export function reel() {
       bottom: margin,
     });
   });
+  // the Fuji the card uncovers rises a little as the card sinks: two planes
+  // moving apart on the card's own curve and scrub, settling together
+  mm.add(MQ.motion, () => {
+    gsap.fromTo(
+      '#reel-fuji',
+      { yPercent: 8 },
+      { yPercent: 0, ease: 'power4.inOut', scrollTrigger: { trigger: section, start: 'top top', end: 'bottom bottom', scrub: 3 } },
+    );
+  });
   lineReveal(copy, { trigger: section, start: env.reduced ? 'top 60%' : 'top+=38% top' });
 
   const video = card.querySelector<HTMLVideoElement>('#reel-video');
