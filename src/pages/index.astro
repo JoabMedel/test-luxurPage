@@ -143,21 +143,22 @@ const NAV_UNFOLD = ['·AUH-', '·ELT\u00a0', '·EGRIFF'];
     <!-- 3 · REEL -------------------------------------------------------- -->
     <section class="reel" id="reel" aria-labelledby="reel-title">
       <div class="reel-sticky">
-        <span class="kanji-v reel-kanji" lang="ja" aria-hidden="true">路上</span>
-        <!-- Fuji at sunrise in ink, drawn on the page's own white: the card uncovers it as it shrinks -->
-        <div class="reel-fuji" aria-hidden="true">
+        <!-- JDM sticker bomb on the page's own white, shadows and all: the card uncovers it as it
+             shrinks and lands on it. First, so the kanji paints over its (opaque white) paper -->
+        <div class="reel-decals" aria-hidden="true">
           <img
-            id="reel-fuji"
-            src={MEDIA.fuji.src}
-            srcset={`${MEDIA.fuji.srcSm} 1024w, ${MEDIA.fuji.src} 2048w`}
-            sizes="(max-width: 991px) 92vw, 72vw"
+            id="reel-decals"
+            src={MEDIA.decals.src}
+            srcset={`${MEDIA.decals.srcSm} 1400w, ${MEDIA.decals.src} 2800w`}
+            sizes="(max-width: 991px) 112vw, 98vw"
             alt=""
-            width={MEDIA.fuji.width}
-            height={MEDIA.fuji.height}
+            width={MEDIA.decals.width}
+            height={MEDIA.decals.height}
             loading="lazy"
             decoding="async"
           />
         </div>
+        <span class="kanji-v reel-kanji" lang="ja" aria-hidden="true">路上</span>
         <div class="reel-copy">
           <p class="t-label" id="reel-title">( After dark )</p>
           <p class="t-q reel-text" data-lines-auto>

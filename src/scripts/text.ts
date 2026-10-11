@@ -7,7 +7,7 @@ gsap.registerPlugin(SplitText);
 const LINE = { duration: 1, stagger: 0.05, ease: 'power4.inOut' };
 
 /** Masked line reveal: yPercent 100→0, 1 s, 0.05 s stagger, at 95 %, once. */
-export function lineReveal(el: Element, opts: { trigger?: Element; start?: string } = {}) {
+export function lineReveal(el: Element, opts: { trigger?: Element; start?: string | (() => string) } = {}) {
   const scrollTrigger = { trigger: opts.trigger ?? el, start: opts.start ?? 'top 95%', once: true };
 
   if (env.reduced) {

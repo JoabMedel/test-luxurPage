@@ -169,16 +169,22 @@ export function reel() {
       bottom: margin,
     });
   });
-  // the Fuji the card uncovers rises a little as the card sinks: two planes
+  // the stickers the card uncovers rise a little as the card sinks: two planes
   // moving apart on the card's own curve and scrub, settling together
   mm.add(MQ.motion, () => {
     gsap.fromTo(
-      '#reel-fuji',
+      '#reel-decals',
       { yPercent: 8 },
       { yPercent: 0, ease: 'power4.inOut', scrollTrigger: { trigger: section, start: 'top top', end: 'bottom bottom', scrub: 3 } },
     );
   });
-  lineReveal(copy, { trigger: section, start: env.reduced ? 'top 60%' : 'top+=38% top' });
+  // the copy rises once the card has cleared it, as a share of the pinned stretch
+  // (70vh on desktop, 50vh on phones): late on desktop, where the card leaves the
+  // bottom-left copy last; earlier on phones, where the copy sits at the top and
+  // is uncovered about halfway (the margin covers the scrub's lag). Re-read on refresh.
+  const pinned = () => section.offsetHeight - window.innerHeight;
+  const share = () => (matchMedia('(max-width: 991px)').matches ? 0.7 : 0.92);
+  lineReveal(copy, { trigger: section, start: env.reduced ? 'top 60%' : () => `top+=${pinned() * share()} top` });
 
   const video = card.querySelector<HTMLVideoElement>('#reel-video');
   if (video && MEDIA.reel) reelFilm(section, card, video, tc, MEDIA.reel);

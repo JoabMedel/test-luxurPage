@@ -518,20 +518,21 @@ html:not(.js) .loader {
 .reel-text {
   margin: 0;
 }
-/* Fuji backdrop: ink straight on the page's white (the file's paper is #fff
-   and its edges feather out, so there is no box), set in the space the shrunk
-   card leaves: from column 2, under the nav, clear of the copy, its misty
-   lower right running behind the card so the card reads as in front of the
-   landscape. Width-led and capped by height, so short screens keep the copy
-   clear too. */
-.reel-fuji {
+/* Sticker-bomb backdrop: stickers straight on the page's white (the file's
+   wall is #fff and only their shadows show it, so there is no box), margin to
+   margin under the nav, the shrunk card landing on its lower right like one
+   more thing stuck to the wall. Width-led, capped so its foot stays clear of
+   the copy on wide, short screens (13vw ≈ the top offset plus the copy). */
+.reel-decals {
   position: absolute;
-  left: calc(var(--col) + var(--m) * 2);
-  top: calc(var(--m) * 4 + 5vh);
-  width: min(72vw, 115vh);
+  top: 4vw;
+  left: 0;
+  right: 0;
+  width: min(100vw - var(--m) * 2, (100vh - 13vw) * 2800 / 1142);
+  margin-inline: auto;
   pointer-events: none;
 }
-.reel-fuji img {
+.reel-decals img {
   display: block;
   width: 100%;
   height: auto;
@@ -715,16 +716,18 @@ img.reel-shot.is-on {
   .reel-copy .t-label {
     margin-bottom: 3vw;
   }
-  /* between the copy (ends ≈ 56vw down) and the card (42vh + margin tall), centred;
-     its feathered foot (≈ 5.5% of its height) tucks under the card's top edge */
-  .reel-fuji {
-    --fw: min(100vw - var(--m) * 2, (58vh - 56vw) * 2.15);
+  /* between the copy (ends ≈ 46vw down, plus a gap) and the card (42vh + margin
+     tall), a little wider than the screen so the outer stickers run off its
+     edges like the rest of the wall; its foot (≈ 4% of its height) tucks under
+     the card. Collapses to nothing where there is no room (landscape phones). */
+  .reel-decals {
+    --fw: min(112vw, (58vh - 54vw) * 2.55);
     top: auto;
-    left: 0;
-    right: 0;
-    bottom: calc(42vh + var(--m) - var(--fw) * 0.055);
+    left: calc(50% - var(--fw) / 2);
+    right: auto;
+    bottom: calc(42vh + var(--m) - var(--fw) * 0.017);
     width: var(--fw);
-    margin-inline: auto;
+    margin-inline: 0;
   }
 }
 
