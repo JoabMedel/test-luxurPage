@@ -930,7 +930,8 @@ img.reel-shot.is-on {
 /* ================================================================== FILM */
 .film {
   position: relative;
-  height: 300vh;
+  /* 120vh of pin: ~105vh of pull-back, then a short beat on the settled wall */
+  height: 220vh;
 }
 .film-sticky {
   position: sticky;

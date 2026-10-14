@@ -645,21 +645,22 @@ export function film(lenis: Lenis | null) {
   mm.add(MQ.desktop, () => {
     placeReflection();
     window.addEventListener('resize', placeReflection);
-    // a calm pull-back that stays attached to the scroll: the screen starts
-    // exactly filling the view, eases evenly (power1, not a mid-scroll lunge)
-    // and stops when the scroll stops (short scrub on top of Lenis)
+    // a pull-back that answers the first notch of scroll: the screen starts
+    // exactly filling the view and shrinks from the moment the section pins
+    // (no lead-in, an out-ease so the first scroll already shows), settling
+    // gently into the wall; a short scrub on top of Lenis, not a second lag
     const tl = gsap.timeline({
-      scrollTrigger: { trigger: section, start: 'top top', end: 'bottom bottom', scrub: 0.5, invalidateOnRefresh: true },
+      scrollTrigger: { trigger: section, start: 'top top', end: 'bottom bottom', scrub: 0.3, invalidateOnRefresh: true },
     });
     // the grain holder undoes the screen's scale, so the grain keeps its size in the wall
     const keepGrain = () => grain && gsap.set(grain, { scale: 1 / (gsap.getProperty(screen, 'scale') as number) });
     tl.eventCallback('onUpdate', keepGrain);
     // the halo and the reflection ride with the photo and come up as the screen settles into the wall
-    tl.fromTo(screen, { scale: 1, x: 0, y: 0 }, { scale: END, x: () => target().x, y: () => target().y, ease: 'power1.inOut', duration: 1 }, 0.15)
-      .fromTo([shop, glow, refl], { scale: 1.12 }, { scale: 1, ease: 'power1.inOut', duration: 1 }, 0.15)
-      .fromTo(glow, { opacity: 0 }, { opacity: 1, ease: 'power2.in', duration: 1 }, 0.15)
-      .fromTo(refl, { opacity: 0 }, { opacity: GLOSS, ease: 'power2.in', duration: 1 }, 0.15)
-      .to({}, { duration: 0.25 });
+    tl.fromTo(screen, { scale: 1, x: 0, y: 0 }, { scale: END, x: () => target().x, y: () => target().y, ease: 'power1.out', duration: 1 }, 0)
+      .fromTo([shop, glow, refl], { scale: 1.12 }, { scale: 1, ease: 'power1.out', duration: 1 }, 0)
+      .fromTo(glow, { opacity: 0 }, { opacity: 1, ease: 'power1.in', duration: 1 }, 0)
+      .fromTo(refl, { opacity: 0 }, { opacity: GLOSS, ease: 'power1.in', duration: 1 }, 0)
+      .to({}, { duration: 0.15 });
     return () => window.removeEventListener('resize', placeReflection);
   });
   mm.add(MQ.reduced + ' and (min-width: 992px)', () => {
