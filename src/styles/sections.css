@@ -217,14 +217,6 @@
   width: 63vw;
   height: 52vh;
 }
-.warmup .pill {
-  position: absolute;
-  right: 0;
-  left: auto;
-  top: 0;
-  color: #000;
-  border-color: rgb(0 0 0 / 0.4); /* see-through like the real one: an opaque ring draws differently */
-}
 /* neon glows: the page's own elements, inked black (colour never changes a pipeline) */
 .wu-glows {
   position: relative;
@@ -256,17 +248,21 @@
 .warmup .gb {
   text-shadow: 0 0 0.6em rgb(0 0 0 / 0.55);
 }
-.warmup .pill--solid,
+/* the neon glass pills and chip keep their own geometry; only their colours
+   (registered custom properties, global.css) are inked black */
+.warmup .pill,
 .warmup .chip {
-  background: linear-gradient(#000, #010101);
-  box-shadow: 0 0 1.1em rgb(0 0 0 / 0.6);
+  --b-glass: #000;
+  --b-sheen: rgb(0 0 0 / 0.14);
+  --b-swirl: rgb(0 0 0 / 0.3);
+  --b-swirl-2: rgb(0 0 0 / 0.3);
+  --b-rim: rgb(0 0 0 / 0.12);
+  --b-edge-a: #000;
+  --b-edge-b: #010101;
+  --b-edge-c: #000;
+  --b-glow: rgb(0 0 0 / 0.6);
+  --b-under: rgb(0 0 0 / 0.35);
   text-shadow: none;
-}
-.warmup .wu-glows .pill--line {
-  text-shadow: none;
-  box-shadow:
-    0 0 0.9em rgb(0 0 0 / 0.3),
-    inset 0 0 0.9em rgb(0 0 0 / 0.16);
 }
 .wu-rule {
   width: 30vw;
@@ -296,8 +292,24 @@
   background: #000;
   box-shadow: 0 0 5vw 0.6vw rgb(0 0 0 / 0.5);
 }
+/* pills over a path: their tile draws multisampled, as the hero's and the
+   closing's do (the neon edge's gradient takes a pipeline of its own there) */
+.wu-pills-on-path {
+  position: relative;
+  display: flex;
+  gap: 1vw;
+}
+.wu-pills-on-path > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.wu-glow-paths > * {
+  flex: none; /* nothing shrinks: a layer under 64px samples differently */
+}
 .wu-glow-paths {
-  width: 40vw;
+  width: max-content;
   height: auto;
   display: flex;
   align-items: center;
@@ -597,14 +609,11 @@ html:not(.js) .loader {
   text-decoration: underline;
   text-underline-offset: 0.2em;
 }
+/* the language chip: a small primary in the same neon glass as the pills (global.css) */
 .chip {
   display: inline-grid;
   place-items: center;
-  background: var(--violet);
-  color: var(--white);
-  box-shadow: 0 0 1em var(--glow-violet);
-  border-radius: 999px;
-  padding: 0.35vw 0.7vw;
+  padding: 0.35vw 0.75vw;
   font-family: var(--mono);
   font-size: var(--fs-ui);
   letter-spacing: 0.06em;
@@ -1239,74 +1248,6 @@ img.reel-shot.is-on {
   background: linear-gradient(to bottom, transparent, var(--black));
   pointer-events: none;
 }
-.film-controls {
-  position: absolute;
-  top: calc(var(--m) + 2.8vw);
-  left: 50%;
-  translate: -50% 0;
-  z-index: 3;
-  display: flex;
-  gap: 0.6vw;
-}
-/* frosted glass over the film, which is light enough: no glow of their own
-   (a halo on a backdrop-filtered pill takes GPU pipelines of its own) */
-.sound-pill,
-.film-toggle,
-.sound-pill:hover,
-.film-toggle:hover,
-.sound-pill:focus-visible,
-.film-toggle:focus-visible {
-  box-shadow: none;
-}
-.sound-pill,
-.film-toggle {
-  background: rgb(0 0 0 / 0.25);
-  backdrop-filter: blur(6px);
-}
-.sound-bars {
-  display: inline-flex;
-  align-items: flex-end;
-  gap: 2px;
-  height: 0.8em;
-}
-.sound-bars i {
-  display: block;
-  width: 2px;
-  height: 30%;
-  background: currentColor;
-  transition: height 0.3s var(--ease-o3);
-}
-.sound-pill[aria-pressed="true"] {
-  border-color: var(--magenta);
-}
-.sound-pill[aria-pressed="true"] .sound-bars i {
-  animation: eq 0.9s ease-in-out infinite alternate;
-}
-.sound-pill[aria-pressed="true"] .sound-bars i:nth-child(2) {
-  animation-delay: -0.3s;
-}
-.sound-pill[aria-pressed="true"] .sound-bars i:nth-child(3) {
-  animation-delay: -0.6s;
-}
-@keyframes eq {
-  from {
-    height: 25%;
-  }
-  to {
-    height: 100%;
-  }
-}
-.film-caption {
-  position: absolute;
-  left: 50%;
-  bottom: calc(var(--m) * 2);
-  translate: -50% 0;
-  margin: 0;
-  z-index: 3;
-  color: var(--white);
-  text-align: center;
-  min-height: 1.3em;
-}
 @media (max-width: 991px) {
   .film {
     height: auto;
@@ -1330,15 +1271,6 @@ img.reel-shot.is-on {
     height: 100%;
     box-shadow: none;
     transform: none !important;
-  }
-  .film-controls {
-    top: auto;
-    bottom: calc(100% + 3vw);
-    gap: 2vw;
-  }
-  .film-caption {
-    bottom: auto;
-    top: calc(100% + 3vw);
   }
 }
 

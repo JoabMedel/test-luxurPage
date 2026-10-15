@@ -4,7 +4,6 @@ import { SplitText } from 'gsap/SplitText';
 import type Lenis from 'lenis';
 import { env, MQ, rand, whileVisible } from './env';
 import { Highway, Sparks } from './highway';
-import { Engine } from './engine';
 import { lineReveal } from './text';
 import { LOGO } from '../lib/logo';
 import { SCRAMBLE_CHARS } from '../lib/scramble';
@@ -224,8 +223,9 @@ function reelFilm(section: HTMLElement, card: HTMLElement, video: HTMLVideoEleme
 
 /**
  * Silent looping video (reel, film): the best source for this device, fetched
- * on approach, played only while on screen, with a play/pause button. Reduced
- * motion keeps the poster until the visitor presses play.
+ * on approach, played only while on screen. With a play/pause button (the
+ * reel), reduced motion keeps the poster until the visitor presses play;
+ * without one (the film), reduced motion keeps the poster for good.
  */
 function loopVideo(o: {
   /** proximity to this starts the download */
@@ -234,7 +234,7 @@ function loopVideo(o: {
   view: Element;
   video: HTMLVideoElement;
   media: LoopVideo;
-  btn: HTMLButtonElement;
+  btn?: HTMLButtonElement;
   name: string;
   onState?: (playing: boolean) => void;
   /** after the video and its button are hidden */
@@ -246,7 +246,7 @@ function loopVideo(o: {
 
   const fail = () => {
     if (video.hidden) return;
-    btn.hidden = true;
+    if (btn) btn.hidden = true;
     video.hidden = true;
     o.onFail?.();
   };
@@ -266,8 +266,8 @@ function loopVideo(o: {
       });
 
   const sync = () => {
-    btn.toggleAttribute('data-paused', video.paused);
-    btn.setAttribute('aria-label', `${video.paused ? 'Play' : 'Pause'} ${o.name}`);
+    btn?.toggleAttribute('data-paused', video.paused);
+    btn?.setAttribute('aria-label', `${video.paused ? 'Play' : 'Pause'} ${o.name}`);
     o.onState?.(!video.paused);
   };
   video.addEventListener('play', sync);
@@ -288,7 +288,7 @@ function loopVideo(o: {
     if (v && !held) play();
     else if (!v) video.pause();
   });
-  btn.addEventListener('click', () => {
+  btn?.addEventListener('click', () => {
     held = !video.paused;
     if (held) video.pause();
     else play();
@@ -586,7 +586,7 @@ function floorReflection(out: HTMLCanvasElement) {
   };
 }
 
-export function film(lenis: Lenis | null) {
+export function film() {
   const section = $('#film');
   const screen = $('#film-screen');
   const canvas = $<HTMLCanvasElement>('#film-canvas');
@@ -594,13 +594,9 @@ export function film(lenis: Lenis | null) {
   const glow = $('#film-glow');
   const shop = $<HTMLImageElement>('#film-workshop');
   const grain = screen.querySelector<HTMLElement>('#film-grain');
-  const btn = $<HTMLButtonElement>('#sound-btn');
-  const caption = $('#film-caption');
-  const state = $('.sound-state', btn);
 
   const hw = new Highway(canvas, env.saveData ? 800 : 1280);
   const reflection = floorReflection(refl);
-  const engine = new Engine();
 
   // where the blank wall sits in the workshop image (normalised)
   const WALL = { x: 0.497, y: 0.405, floor: 0.6 };
@@ -691,7 +687,6 @@ export function film(lenis: Lenis | null) {
       view: section,
       video,
       media: MEDIA.film,
-      btn: $<HTMLButtonElement>('#film-toggle'),
       name: 'film',
       onState: (playing) => screen.classList.toggle('is-playing', playing), // runs the film grain
       onFail: () => {
@@ -712,26 +707,12 @@ export function film(lenis: Lenis | null) {
     if (src) reflection.draw(src, settle);
   };
 
-  const CAPTIONS = ['[ Air-cooled flat-six idling ]', '[ Neon hums overhead ]', '[ Tyres hiss on cold asphalt ]'];
-  let capI = 0;
-  let capT = 0;
   let raf = 0;
-  let visible = false;
   const loop = (t: number) => {
     raf = requestAnimationFrame(loop);
-    // the picture keeps one steady speed; only the engine sound answers the scroll
-    const v = lenis ? Math.min(1, Math.abs(lenis.velocity) / 45) : 0;
     if (coded) hw.render(t);
     // nothing to reflect until the pull-back reveals the floor
     if (!env.mobile && (gsap.getProperty(refl, 'opacity') as number) > 0.005) mirror();
-    if (engine.on) {
-      engine.setLoad(v);
-      if (t - capT > 3800 || (engine.revving && caption.dataset.rev !== '1')) {
-        capT = t;
-        caption.dataset.rev = engine.revving ? '1' : '0';
-        caption.textContent = engine.revving ? '[ Engine revs — exhaust crackles ]' : CAPTIONS[capI++ % CAPTIONS.length];
-      }
-    }
   };
   const drawPoster = () => {
     if (coded) hw.render(performance.now());
@@ -746,8 +727,6 @@ export function film(lenis: Lenis | null) {
   }
 
   whileVisible(section, (v) => {
-    visible = v;
-    engine.setAudible(v);
     if (env.reduced) return;
     if (v && !raf) {
       hw.resetClock();
@@ -756,15 +735,6 @@ export function film(lenis: Lenis | null) {
       cancelAnimationFrame(raf);
       raf = 0;
     }
-  });
-
-  btn.addEventListener('click', async () => {
-    const on = btn.getAttribute('aria-pressed') !== 'true';
-    btn.setAttribute('aria-pressed', String(on));
-    state.textContent = on ? 'on' : 'off';
-    await engine.setOn(on, visible);
-    caption.textContent = on ? CAPTIONS[0] : '';
-    capT = performance.now();
   });
 }
 

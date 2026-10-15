@@ -38,7 +38,7 @@ safe('text', initTextReveals);
 safe('hero', heroScroll);
 safe('reel', reel);
 safe('builds', builds);
-safe('film', () => film(lenis));
+safe('film', film);
 safe('cluster', () => cluster(lenis));
 safe('glitch', glitch);
 safe('closing', closing);

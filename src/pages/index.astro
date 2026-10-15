@@ -328,21 +328,6 @@ const NAV_UNFOLD = ['·AUH-', '·ELT\u00a0', '·EGRIFF'];
           )
         }
         <div class="film-fade" aria-hidden="true"></div>
-        <div class="film-controls">
-          {
-            FILM && (
-              <button class="pill pill--line film-toggle" id="film-toggle" aria-label="Play film" data-paused>
-                <span class="pp-glyph" aria-hidden="true"><i></i><i></i></span>
-                Film
-              </button>
-            )
-          }
-          <button class="pill pill--line sound-pill" id="sound-btn" aria-pressed="false">
-            <span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i></span>
-            Sound <span class="sound-state">off</span>
-          </button>
-        </div>
-        <p class="film-caption t-label" id="film-caption" aria-live="polite"></p>
       </div>
     </section>
 
@@ -486,7 +471,7 @@ const NAV_UNFOLD = ['·AUH-', '·ELT\u00a0', '·EGRIFF'];
         <li><a href={SITE.facebook} rel="noopener" target="_blank">Facebook</a></li>
       </ul>
       <div class="closing-ctas">
-        <a class="pill pill--line" href={SITE.book}>Book a build <span class="arrow" aria-hidden="true">→</span></a>
+        <a class="pill pill--solid" href={SITE.book}>Book a build <span class="arrow" aria-hidden="true">→</span></a>
         <a class="pill pill--line" href={SITE.write}>Write to Chiba <span aria-hidden="true">@</span></a>
       </div>
     </div>

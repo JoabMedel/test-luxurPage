@@ -59,7 +59,7 @@ export const MEDIA = {
   /**
    * Film (generated with Higgsfield, client-authorised): 6.9 s, 24 fps, the take
    * exactly as generated, looped with a hard cut where it almost repeats.
-   * Silent: the coded engine stays the soundtrack.
+   * Silent, and always playing while in view (no play/pause or sound control).
    */
   film: {
     hd: [

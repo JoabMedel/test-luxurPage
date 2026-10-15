@@ -62,7 +62,7 @@ const PHOTO = 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACQAwCdASpAAEAAPt
       <span class="kanji-v" lang="ja">職人</span>
       <span class="t-label gb">every car has a name</span>
       <span class="pill pill--solid">Book a build</span>
-      <span class="pill pill--line">Sound off</span>
+      <span class="pill pill--line">Write to Chiba</span>
       <span class="chip">EN</span>
       <span class="wu-rule"></span>
       <span class="t-h wu-caret-line">e<span class="gl-caret"></span></span>
@@ -88,7 +88,12 @@ const PHOTO = 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACQAwCdASpAAEAAPt
     <i class="wu wu-bare wu-glow-paths">
       <LogoMark class="hero-mark wu-logo" label="" />
       <span class="wu-letter"><svg viewBox={`0 0 ${RAUH_WELT[0].width + RWB_OVERHANG} ${CAP}`}><path d={RAUH_WELT[0].d} fill-rule="evenodd" /></svg></span>
-      <span class="pill pill--solid">Book</span>
+      <span class="wu-pills-on-path">
+        <svg viewBox="0 0 10 10" preserveAspectRatio="none"><path d="M1 1C4 0 6 9 9 9L1 9Z" fill="#000"></path></svg>
+        <span class="pill pill--solid">Book a build</span>
+        <span class="pill pill--line">Write</span>
+        <span class="chip">EN</span>
+      </span>
       <!-- an even-odd curved fill repainted frame after frame in this multisampled tile: a partial
            repaint resumes the tile's MSAA pass ("msaa load"), as the film section's does on the way
            down (the old white-filled loader used to warm this by chance) -->
@@ -106,9 +111,8 @@ const PHOTO = 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACQAwCdASpAAEAAPt
   <!-- the film's wall halo, scaled with the photo: as a fading layer and painted -->
   <i class="wu wu-over wu-layer wu-halo wu-faded wu-ridden"></i>
   <i class="wu wu-over wu-halo wu-ridden"></i>
-  <!-- rotated solid layers (cluster, hanko); the screen's frosted pills -->
+  <!-- rotated solid layers (cluster, hanko) -->
   <i class="wu wu-over wu-tilted"></i>
-  <span class="pill pill--line sound-pill">Sound</span>
   <!-- the floor reflection at its own size, shrinking like the photo (warmup.ts draws video into it and
        scales it); screened black changes nothing -->
   <canvas class="film-reflection wu-rescaled" width="192" height="108"></canvas>

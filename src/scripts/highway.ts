@@ -13,7 +13,7 @@ export class Highway {
   private h = 1;
   private z = 0; // distance travelled
   private last = 0;
-  speed = 1; // multiplier, scroll/engine can push it
+  speed = 1; // multiplier
   private grain: HTMLCanvasElement;
 
   constructor(

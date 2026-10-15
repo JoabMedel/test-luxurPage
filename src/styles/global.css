@@ -17,8 +17,6 @@
   --hot: #ffc2ec; /* a magenta tube's white-hot core */
   /* neon glow: only what would be a light source glows (tubes, signs, the sun);
      everything stays static, so each halo is painted once */
-  --glow-violet: rgb(157 60 255 / 0.6);
-  --glow-magenta: rgb(255 62 201 / 0.6);
   --glow-sign: 0 0 0.2em var(--magenta), 0 0 0.7em rgb(255 62 201 / 0.55);
   --shu: #d23b2a; /* 朱 vermilion: reserved for the sun disc and the hanko seal */
 
@@ -39,6 +37,7 @@
   --ease-io: cubic-bezier(0.76, 0, 0.24, 1); /* ≈ power4.inOut */
   --ease-o: cubic-bezier(0.165, 0.84, 0.44, 1); /* ≈ power4.out */
   --ease-o3: cubic-bezier(0.215, 0.61, 0.355, 1); /* ≈ power3.out */
+  --ease-btn: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @media (max-width: 991px) {
@@ -177,50 +176,152 @@ button {
 }
 
 /* ------------------------------------------------------------------ pills */
+/* Neon glass, after the RWB button guide: dark violet glass with a neon edge
+   (lilac → violet → magenta), a highlight along the top, light welling up from
+   below, an outer glow and a glow cast underneath. No backdrop blur: over the
+   page's blacks it would not show, only cost (the film's ghost pills keep
+   theirs). Every colour is a registered custom property: hover and press
+   interpolate (a gradient alone would snap), the GPU warm-up inks the very
+   same geometry black (ShaderWarmup.astro), and no state ever changes a blur's
+   radius (a new radius is a new GPU blur to compile, a stall on first hover) */
+@property --b-glass {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #170822;
+}
+@property --b-sheen {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: rgb(255 255 255 / 0.14);
+}
+@property --b-swirl {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: rgb(255 67 208 / 0.3);
+}
+@property --b-swirl-2 {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: rgb(168 85 255 / 0.3);
+}
+@property --b-rim {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: rgb(255 255 255 / 0.12);
+}
+@property --b-edge-a {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #d6aaff;
+}
+@property --b-edge-b {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #a855ff;
+}
+@property --b-edge-c {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #ff43d0;
+}
+@property --b-glow {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: rgb(168 85 255 / 0.6);
+}
+@property --b-under {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: rgb(168 85 255 / 0.35);
+}
+.pill,
+.chip {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: #f3e8ff;
+  background:
+    /* highlight along the top of the glass */
+    linear-gradient(to bottom, var(--b-sheen), rgb(255 255 255 / 0) 52%) padding-box,
+    /* neon welling up from below, inside the glass: magenta at the left, violet at the right */
+    radial-gradient(65% 130% at 18% 115%, var(--b-swirl), rgb(255 67 208 / 0) 70%) padding-box,
+    radial-gradient(55% 120% at 88% 110%, var(--b-swirl-2), rgb(168 85 255 / 0) 70%) padding-box,
+    linear-gradient(var(--b-glass), var(--b-glass)) padding-box,
+    /* the neon edge */
+    linear-gradient(115deg, var(--b-edge-a), var(--b-edge-b) 45%, var(--b-edge-c)) border-box;
+  box-shadow:
+    inset 0 1px 0 var(--b-rim),
+    0 0 1.1em var(--b-glow),
+    0 0.7em 1.8em -0.4em var(--b-under);
+  transition:
+    --b-glass 0.3s var(--ease-btn),
+    --b-sheen 0.3s var(--ease-btn),
+    --b-swirl 0.3s var(--ease-btn),
+    --b-swirl-2 0.3s var(--ease-btn),
+    --b-edge-a 0.3s var(--ease-btn),
+    --b-edge-b 0.3s var(--ease-btn),
+    --b-glow 0.3s var(--ease-btn),
+    --b-under 0.3s var(--ease-btn),
+    color 0.3s var(--ease-btn),
+    border-color 0.3s var(--ease-btn),
+    translate 0.3s var(--ease-btn);
+}
 .pill {
-  --pill-h: 2.6vw;
+  --pill-h: 2.8vw;
   display: inline-flex;
   align-items: center;
-  gap: 0.6em;
+  gap: 0.75em;
   height: var(--pill-h);
-  padding-inline: 1.25vw;
-  border-radius: 999px;
+  padding-inline: 1.5vw;
   font-size: var(--fs-btn);
   font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   white-space: nowrap;
-  transition:
-    background-color 0.4s var(--ease-o3),
-    color 0.4s var(--ease-o3),
-    border-color 0.4s var(--ease-o3);
 }
-/* solid: a lit neon tube; on hover it flicks to magenta. Hover changes the
-   glow's colour, never its radius: a new radius is a new GPU blur to compile */
+/* primary: neon glass, the most light in the glass */
 .pill--solid {
-  background: var(--violet);
-  color: var(--white);
-  box-shadow: 0 0 1.1em var(--glow-violet);
+  --b-glass: #1d0a33;
+  --b-swirl: rgb(255 67 208 / 0.42);
+  --b-swirl-2: rgb(168 85 255 / 0.38);
 }
-.pill--solid:hover {
-  background: var(--magenta);
-  color: var(--black);
-  box-shadow: 0 0 1.1em var(--glow-magenta);
-}
-/* line: an unlit tube that still glows faintly, inside and out */
+/* secondary: an outline, the glass near black, the neon held to its edge */
 .pill--line {
-  border: 1px solid rgb(205 184 255 / 0.45);
+  --b-glass: #0b0514;
+  --b-sheen: rgb(255 255 255 / 0.06);
+  --b-swirl: rgb(255 67 208 / 0);
+  --b-swirl-2: rgb(168 85 255 / 0);
+  --b-glow: rgb(168 85 255 / 0.22);
+  --b-under: rgb(168 85 255 / 0.12);
+}
+/* hover: the glass fills with light and lifts; colours only, same radii */
+.pill:hover,
+.pill:focus-visible {
+  --b-sheen: rgb(255 255 255 / 0.2);
+  --b-edge-a: #f1e0ff;
+  --b-edge-b: #c88dff;
+  --b-glow: rgb(214 170 255 / 0.75);
+  --b-under: rgb(214 170 255 / 0.45);
   color: var(--white);
-  box-shadow:
-    0 0 0.9em rgb(157 60 255 / 0.3),
-    inset 0 0 0.9em rgb(157 60 255 / 0.16);
+  translate: 0 -2px;
+}
+.pill--solid:hover,
+.pill--solid:focus-visible {
+  --b-glass: #2a1046;
 }
 .pill--line:hover,
 .pill--line:focus-visible {
-  border-color: var(--magenta);
-  box-shadow:
-    0 0 0.9em rgb(255 62 201 / 0.45),
-    inset 0 0 0.9em rgb(255 62 201 / 0.2);
+  --b-glass: #140a24;
+  --b-glow: rgb(168 85 255 / 0.45);
+  --b-under: rgb(168 85 255 / 0.25);
+}
+.pill:active {
+  --b-glow: rgb(168 85 255 / 0.5);
+  --b-under: rgb(168 85 255 / 0.25);
+  translate: 0 0;
+}
+.pill:focus-visible {
+  outline: 2px solid #d6aaff;
+  outline-offset: 3px;
 }
 .pill .arrow {
   display: inline-block;
@@ -229,13 +330,10 @@ button {
 .pill:hover .arrow {
   transform: translateX(0.3em);
 }
-.pill:focus-visible {
-  outline-offset: 3px;
-}
 @media (max-width: 991px) {
   .pill {
-    --pill-h: 10vw;
-    padding-inline: 5vw;
+    --pill-h: 10.5vw;
+    padding-inline: 5.5vw;
   }
 }
 
