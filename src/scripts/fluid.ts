@@ -10,6 +10,12 @@
  * path data as the DOM logo (src/lib/logo.ts) and is sampled in logo-local
  * UVs, so both layers stay aligned while the page scrolls.
  *
+ * The canvas covers the ink's field (the hero and the manifesto below it), so
+ * the ink flows on past the hero's edge. Every setting is still the hero's:
+ * the field gets the hero's resolution per pixel, splat size, push and splat
+ * spacing, so the ink feels the same anywhere in it. Below the hero, the ink
+ * fades out before the field's foot instead of stopping at a straight edge.
+ *
  * Settings from the brief: sim 256 (128 on mobile), dye 512, dissipation
  * 0.962 (dye) / 0.988 (velocity), force 5900, curl 0.
  */
@@ -106,6 +112,7 @@ uniform vec4 uRect;      // wordmark rect in canvas uv (x, y-bottom, w, h)
 uniform float uAspect;   // wordmark w/h
 uniform float uTexAspect;
 uniform float uHasAlu, uTime;
+uniform float uFade;     // the field's foot, in uv: the ink fades out over it
 
 float hash(vec2 p){ return fract(sin(dot(p, vec2(41.3, 289.1))) * 43758.5453); }
 
@@ -155,13 +162,14 @@ void main(){
   vec3 ink = neon * (.14 + .55 * rim);
 
   vec3 col = mix(ink, metal, letter);
-  o = vec4(col * m, m);
+  float a = m * smoothstep(0., uFade, vUv.y);
+  o = vec4(col * a, a);
 }`;
 
 type FBO = { tex: WebGLTexture; fbo: WebGLFramebuffer; w: number; h: number };
 type DoubleFBO = { read: FBO; write: FBO; swap(): void; w: number; h: number };
 
-export function initFluid(hero: HTMLElement, canvas: HTMLCanvasElement, mark: SVGSVGElement) {
+export function initFluid(field: HTMLElement, hero: HTMLElement, canvas: HTMLCanvasElement, mark: SVGSVGElement) {
   const gl = canvas.getContext('webgl2', { alpha: true, premultipliedAlpha: true, antialias: false, depth: false, stencil: false, preserveDrawingBuffer: false });
   if (!gl || !gl.getExtension('EXT_color_buffer_float')) {
     canvas.remove();
@@ -257,12 +265,10 @@ export function initFluid(hero: HTMLElement, canvas: HTMLCanvasElement, mark: SV
       },
     };
   };
+  // r texels across the hero's short side; the rest of the field at the same density
   const res = (r: number) => {
-    let a = gl.drawingBufferWidth / gl.drawingBufferHeight;
-    if (a < 1) a = 1 / a;
-    const min = Math.round(r);
-    const max = Math.round(r * a);
-    return gl.drawingBufferWidth > gl.drawingBufferHeight ? { w: max, h: min } : { w: min, h: max };
+    const k = r / Math.min(heroW, heroH);
+    return { w: Math.round(cssW * k), h: Math.round(cssH * k) };
   };
 
   let velocity: DoubleFBO, dye: DoubleFBO, pressure: DoubleFBO, divergence: FBO;
@@ -324,17 +330,22 @@ export function initFluid(hero: HTMLElement, canvas: HTMLCanvasElement, mark: SV
   };
 
   // --------------------------------------------------------------- sizing
-  let cssW = 1;
+  let cssW = 1; // the field
   let cssH = 1;
+  let heroW = 1; // the hero, which the settings are for
+  let heroH = 1;
   const resize = () => {
-    const r = hero.getBoundingClientRect();
+    const r = field.getBoundingClientRect();
+    const h = hero.getBoundingClientRect();
     cssW = r.width;
     cssH = r.height;
+    heroW = h.width;
+    heroH = h.height;
     const w = Math.round(cssW * env.dpr);
-    const h = Math.round(cssH * env.dpr);
-    if (canvas.width === w && canvas.height === h && velocity) return;
+    const hh = Math.round(cssH * env.dpr);
+    if (canvas.width === w && canvas.height === hh && velocity) return;
     canvas.width = w;
-    canvas.height = h;
+    canvas.height = hh;
     buildFBOs();
     buildMask();
   };
@@ -356,11 +367,15 @@ export function initFluid(hero: HTMLElement, canvas: HTMLCanvasElement, mark: SV
   const flushSplats = () => {
     if (!queue.length) return;
     const aspect = canvas.width / canvas.height;
+    const heroAspect = heroW / heroH;
+    // the field's uv are taller than the hero's: rescale so a splat and its
+    // push measure what they do in the hero (radius in field-height² units)
+    const tall = cssH / heroH;
     const { splat: S } = P;
     gl.useProgram(S.p);
     gl.uniform1i(S.u.uTarget, 0);
     gl.uniform1f(S.u.aspect, aspect);
-    gl.uniform1f(S.u.radius, CONFIG.radius * (aspect > 1 ? aspect : 1) * 0.5);
+    gl.uniform1f(S.u.radius, (CONFIG.radius * (heroAspect > 1 ? heroAspect : 1) * 0.5) / (tall * tall));
     gl.activeTexture(gl.TEXTURE0);
     for (let at = 0; at < queue.length; at += MAX_SPLATS * 4) {
       const n = Math.min(MAX_SPLATS, (queue.length - at) / 4);
@@ -369,7 +384,7 @@ export function initFluid(hero: HTMLElement, canvas: HTMLCanvasElement, mark: SV
         points[i * 2] = queue[q];
         points[i * 2 + 1] = queue[q + 1];
         forces[i * 3] = queue[q + 2] * CONFIG.force;
-        forces[i * 3 + 1] = queue[q + 3] * CONFIG.force;
+        forces[i * 3 + 1] = queue[q + 3] * CONFIG.force * tall;
       }
       gl.uniform1i(S.u.count, n);
       gl.uniform2fv(S.u['points[0]'], points);
@@ -396,8 +411,10 @@ export function initFluid(hero: HTMLElement, canvas: HTMLCanvasElement, mark: SV
     if (last) {
       const dx = x - last.x;
       const dy = y - last.y;
-      const dist = Math.hypot(dx * (r.width / r.height), dy);
-      const steps = Math.min(24, Math.max(1, Math.ceil(dist / 0.012)));
+      // splats as close together, in pixels, as in the hero alone
+      const tall = r.height / heroH;
+      const dist = Math.hypot(dx * (r.width / r.height), dy) * tall;
+      const steps = Math.min(Math.ceil(24 * tall), Math.max(1, Math.ceil(dist / 0.012)));
       for (let i = 1; i <= steps; i++) {
         const t = i / steps;
         splat(last.x + dx * t, last.y + dy * t, dx / steps, dy / steps);
@@ -521,6 +538,8 @@ export function initFluid(hero: HTMLElement, canvas: HTMLCanvasElement, mark: SV
     gl.uniform1f(Dp.u.uTexAspect, texAspect);
     gl.uniform1f(Dp.u.uHasAlu, hasAlu);
     gl.uniform1f(Dp.u.uTime, time / 1000);
+    // over the last 30 % of what lies below the hero (none when the field is the hero)
+    gl.uniform1f(Dp.u.uFade, Math.max(1e-4, (0.3 * Math.max(0, cssH - heroH)) / cssH));
     gl.uniform1i(Dp.u.uDye, 0);
     gl.uniform1i(Dp.u.uMask, 1);
     gl.uniform1i(Dp.u.uAlu, 2);
@@ -579,16 +598,17 @@ export function initFluid(hero: HTMLElement, canvas: HTMLCanvasElement, mark: SV
 
   resize();
   const ro = new ResizeObserver(() => resize());
+  ro.observe(field);
   ro.observe(hero);
   const io = new IntersectionObserver(([e]) => {
     visible = e.isIntersecting;
     if (!visible) last = null;
   });
-  io.observe(hero);
+  io.observe(field);
 
   window.addEventListener('pointermove', onPointer, { passive: true });
   window.addEventListener('touchmove', onTouch, { passive: true });
-  hero.addEventListener('pointerleave', onLeave);
+  field.addEventListener('pointerleave', onLeave);
   window.addEventListener('touchend', onLeave, { passive: true });
 
   return {
@@ -598,7 +618,7 @@ export function initFluid(hero: HTMLElement, canvas: HTMLCanvasElement, mark: SV
       io.disconnect();
       window.removeEventListener('pointermove', onPointer);
       window.removeEventListener('touchmove', onTouch);
-      hero.removeEventListener('pointerleave', onLeave);
+      field.removeEventListener('pointerleave', onLeave);
       window.removeEventListener('touchend', onLeave);
       gl.getExtension('WEBGL_lose_context')?.loseContext();
     },

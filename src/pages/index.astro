@@ -98,47 +98,51 @@ const NAV_UNFOLD = ['·AUH-', '·ELT\u00a0', '·EGRIFF'];
   </header>
 
   <main>
-    <!-- 1 · HERO ------------------------------------------------------- -->
-    <section class="hero" id="top" aria-labelledby="hero-title">
-      <div class="hero-center">
-        <div class="hero-lockup" id="hero-lockup">
-          <h1 id="hero-title" class="hero-title">
-            <span class="sr-only">RAUH-Welt BEGRIFF</span>
-            <LogoMark id="hero-mark" class="hero-mark" label="" />
-          </h1>
-          <p class="hero-ja hero-over" lang="ja">
-            <span class="hero-ja-name">ラウ・ヴェルト・ベグリフ</span>
-            <span class="hero-ja-rule" aria-hidden="true"></span>
-            <span class="hero-ja-meaning">荒々しい世界という概念</span>
-          </p>
+    <!-- the liquid ink's field: the hero and the manifesto under one canvas -->
+    <div class="ink-field" id="ink-field">
+      <!-- 1 · HERO ------------------------------------------------------- -->
+      <section class="hero" id="top" aria-labelledby="hero-title">
+        <div class="hero-center">
+          <div class="hero-lockup" id="hero-lockup">
+            <h1 id="hero-title" class="hero-title">
+              <span class="sr-only">RAUH-Welt BEGRIFF</span>
+              <LogoMark id="hero-mark" class="hero-mark" label="" />
+            </h1>
+            <p class="hero-ja hero-over" lang="ja">
+              <span class="hero-ja-name">ラウ・ヴェルト・ベグリフ</span>
+              <span class="hero-ja-rule" aria-hidden="true"></span>
+              <span class="hero-ja-meaning">荒々しい世界という概念</span>
+            </p>
+          </div>
         </div>
-      </div>
+
+        <div class="hero-tl">
+          <p class="t-p hero-intro hero-over">One man. One saw.<br />Every car gets a name.</p>
+          <a class="pill pill--solid hero-cta" id="hero-cta" href={SITE.book}>Book a build <span class="arrow" aria-hidden="true">→</span></a>
+        </div>
+        <p class="hero-bl t-ui hero-over">Hand-built in Chiba, Japan</p>
+        <div class="hero-br">
+          <p class="t-ui hero-over hero-social">
+            <a href={SITE.instagram} rel="noopener" target="_blank"><span class="d-only">Instagram</span><span class="m-only">IG</span></a>
+            <span aria-hidden="true">/</span>
+            <a href={SITE.youtube} rel="noopener" target="_blank"><span class="d-only">YouTube</span><span class="m-only">YT</span></a>
+          </p>
+          <span class="chip" aria-label="Language: English">EN</span>
+        </div>
+      </section>
+
+      <!-- 2 · MANIFESTO ------------------------------------------------- -->
+      <section class="manifesto grid12" id="manifesto" aria-labelledby="manifesto-title">
+        <p class="t-label m-label" data-fade>( Manifesto ) — <span class="m-n">(01)</span></p>
+        <span class="kanji-v m-kanji" lang="ja" aria-hidden="true">宣言</span>
+        <h2 class="t-h m-title" id="manifesto-title" data-lines>
+          <span class="line-mask"><span class="line-inner">Factories build cars.</span></span>
+          <span class="line-mask"><span class="line-inner">Nakai-san builds characters.</span></span>
+        </h2>
+      </section>
+
       <canvas class="hero-fluid" id="hero-fluid" aria-hidden="true"></canvas>
-
-      <div class="hero-tl">
-        <p class="t-p hero-intro hero-over">One man. One saw.<br />Every car gets a name.</p>
-        <a class="pill pill--solid hero-cta" id="hero-cta" href={SITE.book}>Book a build <span class="arrow" aria-hidden="true">→</span></a>
-      </div>
-      <p class="hero-bl t-ui hero-over">Hand-built in Chiba, Japan</p>
-      <div class="hero-br">
-        <p class="t-ui hero-over hero-social">
-          <a href={SITE.instagram} rel="noopener" target="_blank"><span class="d-only">Instagram</span><span class="m-only">IG</span></a>
-          <span aria-hidden="true">/</span>
-          <a href={SITE.youtube} rel="noopener" target="_blank"><span class="d-only">YouTube</span><span class="m-only">YT</span></a>
-        </p>
-        <span class="chip" aria-label="Language: English">EN</span>
-      </div>
-    </section>
-
-    <!-- 2 · MANIFESTO ------------------------------------------------- -->
-    <section class="manifesto grid12" id="manifesto" aria-labelledby="manifesto-title">
-      <p class="t-label m-label" data-fade>( Manifesto ) — <span class="m-n">(01)</span></p>
-      <span class="kanji-v m-kanji" lang="ja" aria-hidden="true">宣言</span>
-      <h2 class="t-h m-title" id="manifesto-title" data-lines>
-        <span class="line-mask"><span class="line-inner">Factories build cars.</span></span>
-        <span class="line-mask"><span class="line-inner">Nakai-san builds characters.</span></span>
-      </h2>
-    </section>
+    </div>
 
     <!-- 3 · REEL -------------------------------------------------------- -->
     <section class="reel" id="reel" aria-labelledby="reel-title">

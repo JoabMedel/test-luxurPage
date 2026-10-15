@@ -416,7 +416,6 @@ html:not(.js) .loader {
     radial-gradient(70% calc(var(--hero-h) * 0.6) at 12% calc(var(--hero-h) * 1.05), rgb(157 60 255 / 0.32), rgb(157 60 255 / 0)),
     radial-gradient(55% 50% at 92% -5%, rgb(255 62 201 / 0.22), rgb(255 62 201 / 0)),
     var(--black);
-  isolation: isolate;
   touch-action: pan-y;
 }
 .hero-center {
@@ -461,6 +460,12 @@ html:not(.js) .loader {
   height: 1px;
   background: linear-gradient(90deg, var(--magenta), var(--violet), var(--cyan));
   box-shadow: 0 0 0.6vw rgb(190 90 255 / 0.85);
+}
+/* the ink's field: one canvas over the hero and the manifesto, between their
+   backgrounds (and the logo) and their copy (z-index 2) */
+.ink-field {
+  position: relative;
+  isolation: isolate;
 }
 .hero-fluid {
   position: absolute;
@@ -592,6 +597,12 @@ html:not(.js) .loader {
   color: var(--hot);
   text-shadow: var(--glow-sign);
 }
+/* the manifesto's copy rides above the ink, as the hero's does */
+.m-label,
+.m-title {
+  position: relative;
+  z-index: 2;
+}
 .m-label {
   grid-column: 1 / 4;
   margin: 0.9vw 0 0;
@@ -603,6 +614,7 @@ html:not(.js) .loader {
 .m-kanji {
   right: var(--m);
   top: 16.2vw;
+  z-index: 2;
 }
 @media (max-width: 991px) {
   .manifesto {

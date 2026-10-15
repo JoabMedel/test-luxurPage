@@ -53,6 +53,7 @@ runLoader().then(() => {
   if (!env.reduced) {
     safe('fluid', () => {
       initFluid(
+        document.getElementById('ink-field')!,
         document.getElementById('top')!,
         document.getElementById('hero-fluid') as HTMLCanvasElement,
         document.getElementById('hero-mark') as unknown as SVGSVGElement,
