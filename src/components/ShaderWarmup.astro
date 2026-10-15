@@ -89,6 +89,10 @@ const PHOTO = 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACQAwCdASpAAEAAPt
       <LogoMark class="hero-mark wu-logo" label="" />
       <span class="wu-letter"><svg viewBox={`0 0 ${RAUH_WELT[0].width + RWB_OVERHANG} ${CAP}`}><path d={RAUH_WELT[0].d} fill-rule="evenodd" /></svg></span>
       <span class="pill pill--solid">Book</span>
+      <!-- an even-odd curved fill repainted frame after frame in this multisampled tile: a partial
+           repaint resumes the tile's MSAA pass ("msaa load"), as the film section's does on the way
+           down (the old white-filled loader used to warm this by chance) -->
+      <svg class="wu-repaint" viewBox={`0 0 ${RAUH_WELT[0].width + RWB_OVERHANG} ${CAP}`}><path d={RAUH_WELT[0].d} fill-rule="evenodd" /></svg>
     </i>
   </div>
   <!-- blended, fading or see-through layers hide nothing, so they stack, page-sized where size matters -->

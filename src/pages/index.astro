@@ -54,7 +54,14 @@ const NAV_UNFOLD = ['·AUH-', '·ELT\u00a0', '·EGRIFF'];
         {
           RWB.glyphs.map((g) => (
             <g class="loader-l" data-char={g.char} transform={`translate(${g.x} 0)`}>
-              <path d={g.d} fill-rule="evenodd" pathLength="1" />
+              {/* a neon sign, back to front: the glass, the light falling off in four widening veils, the tube, its white-hot core */}
+              <path class="ln-glass" d={g.d} fill-rule="evenodd" />
+              <path class="ln-d ln-halo" d={g.d} pathLength="1" />
+              <path class="ln-d ln-glow ln-glow-3" d={g.d} pathLength="1" />
+              <path class="ln-d ln-glow ln-glow-2" d={g.d} pathLength="1" />
+              <path class="ln-d ln-glow ln-glow-1" d={g.d} pathLength="1" />
+              <path class="ln-d ln-tube" d={g.d} pathLength="1" />
+              <path class="ln-d ln-core" d={g.d} pathLength="1" />
             </g>
           ))
         }
