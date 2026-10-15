@@ -9,20 +9,30 @@
   place-items: center;
 }
 .loader-stage {
+  --lit: 0; /* the sign's power, 0 → 1 (loader.ts) */
   position: relative;
   width: 26vw;
   display: grid;
   place-items: center;
 }
+/* the sign's light washing the wall behind it: it comes up with the power and
+   shows the letters' dark faces as silhouettes against it */
+.loader-stage::before {
+  content: "";
+  position: absolute;
+  inset: -70% -32%;
+  background: radial-gradient(closest-side, rgb(157 60 255 / calc(var(--lit) * 0.34)), rgb(157 60 255 / 0));
+  pointer-events: none;
+}
 .loader-rwb {
-  --lit: 0; /* the sign's power, 0 → 1 (loader.ts) */
+  position: relative;
   width: 100%;
   overflow: visible;
 }
-/* RWB as a neon sign (loader.ts lights it): layered strokes, no blur filter,
-   so the glow costs no GPU pipelines of its own. The tubes draw on with a
-   dash whose gap (2) outlasts the path (1): at offset 1 nothing shows, not
-   even a sliver where the path starts; once drawn the dash is dropped, so
+/* RWB as a neon sign (loader.ts lights it), all strokes and fills, no blur
+   filter, so the glow costs no GPU pipelines of its own. The tubes draw on
+   with a dash whose gap (2) outlasts the path (1): at offset 1 nothing shows,
+   not even a sliver where the path starts; once drawn the dash is dropped, so
    each outline closes with a real join instead of a seam */
 .loader-rwb path {
   fill: none;
@@ -33,44 +43,49 @@
   stroke-dasharray: 1 2;
   stroke-dashoffset: 1;
 }
-/* lit, the veils stack to a soft falloff (≈ .6 at the tube, .4, .2, then a
-   breath of magenta), not the hard rings of one wide stroke */
-.ln-glass {
-  fill: #2b0a47;
-  fill-opacity: calc(var(--lit) * 0.75);
+/* the letter faces the tubes are mounted on: dark, a little wider than the
+   tube's line, so the tube sits inside the face's edge */
+.loader-rwb .ln-glass {
+  fill: #12061d;
+  stroke: #12061d;
+  stroke-width: 10;
 }
+/* lit, four veils of light stack to a soft falloff (≈ .7 at the tube, then
+   .45, .25 and a breath of magenta), not the hard ring of one wide stroke */
 .ln-halo {
   stroke: var(--magenta);
-  stroke-width: 18;
-  stroke-opacity: calc(var(--lit) * 0.06);
+  stroke-width: 26;
+  stroke-opacity: calc(var(--lit) * 0.08);
 }
 .ln-glow {
   stroke: var(--violet);
 }
 .ln-glow-3 {
-  stroke-width: 13;
-  stroke-opacity: calc(0.04 + var(--lit) * 0.1);
+  stroke-width: 17;
+  stroke-opacity: calc(0.03 + var(--lit) * 0.15);
 }
 .ln-glow-2 {
-  stroke-width: 9;
-  stroke-opacity: calc(0.06 + var(--lit) * 0.16);
+  stroke-width: 11;
+  stroke-opacity: calc(0.05 + var(--lit) * 0.27);
 }
 .ln-glow-1 {
-  stroke-width: 5.5;
-  stroke-opacity: calc(0.08 + var(--lit) * 0.3);
+  stroke-width: 6.5;
+  stroke-opacity: calc(0.07 + var(--lit) * 0.45);
 }
+/* the glass tube: dull violet unlit, saturated violet lit, with a thin
+   white-hot core that only shows once it carries current */
 .ln-tube {
-  /* unlit glass (#6d28b8) brightening to lit violet */
-  stroke: color-mix(in srgb, #b46bff calc(var(--lit) * 100%), #6d28b8);
-  stroke-width: 3.2;
+  stroke: color-mix(in srgb, #b44dff calc(var(--lit) * 100%), #4a1a7e);
+  stroke-width: 4.2;
 }
 .ln-core {
-  stroke: #f4ecff;
-  stroke-width: 1.3;
-  stroke-opacity: var(--lit);
+  stroke: #fbeaff;
+  stroke-width: 1.5;
+  stroke-opacity: calc(var(--lit) * 0.92);
 }
 .loader-wheel {
   position: absolute;
+  z-index: 1;
   left: 50%;
   top: 50%;
   width: 10.5vw;

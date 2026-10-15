@@ -3,9 +3,10 @@ import { env } from './env';
 
 /**
  * ≈5 s intro on black: counter 0→100, "RWB" is bent in neon (the unlit tubes
- * draw themselves) and the sign flickers alight, then R and B part, the W
- * fades and the deep-dish wheel spins in the gap. Ends with a dry cut (no
- * fade) to the hero.
+ * draw themselves on their dark letter faces) and the sign flickers alight,
+ * washing the wall behind it violet; then R and B part, the W fades, the
+ * deep-dish wheel spins in the gap and the B's tube stutters once. Ends with
+ * a dry cut (no fade) to the hero.
  */
 
 export function runLoader(): Promise<void> {
@@ -14,8 +15,8 @@ export function runLoader(): Promise<void> {
 
   const num = document.getElementById('loader-num')!;
   const status = document.getElementById('load-status');
-  // the sign: its power (--lit) sets every layer's light (sections.css)
-  const sign = loader.querySelector<SVGSVGElement>('.loader-rwb')!;
+  // the sign: its power (--lit) sets every layer's light and the wall's (sections.css)
+  const sign = loader.querySelector<HTMLElement>('.loader-stage')!;
   const glyphs = [...loader.querySelectorAll<SVGGElement>('.loader-l')];
   const [r, w, b] = glyphs;
   const dashes = loader.querySelectorAll<SVGPathElement>('.ln-d');
@@ -72,6 +73,8 @@ export function runLoader(): Promise<void> {
       .to(w, { opacity: 0, duration: 0.45, ease: 'power3.out' }, 2.65)
       .add(() => spin.play(), 2.85)
       .to(wheel, { opacity: 1, scale: 1, duration: 1, ease: 'power3.out' }, 2.95)
+      // a tired electrode: the B's tube stutters once, then holds
+      .to(b, { keyframes: { '--lit': [1, 0.2, 0.85, 0.08, 1], easeEach: 'none' }, duration: 0.32, ease: 'none' }, 3.7)
       .to({}, { duration: 0.15 });
   });
 }
