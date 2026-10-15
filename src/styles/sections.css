@@ -213,12 +213,6 @@
   background: linear-gradient(90deg, #000, #010101, #000);
   box-shadow: 0 0 0.6vw rgb(0 0 0 / 0.85);
 }
-.wu-owners {
-  width: 30vw;
-  height: 1px;
-  background: #000;
-  box-shadow: 0 0 0.8vw 0.1vw rgb(0 0 0 / 0.8);
-}
 .wu-caret-line {
   color: #000;
 }
@@ -1142,12 +1136,13 @@ img.reel-shot.is-on {
 .film-grain .grain {
   mix-blend-mode: normal;
 }
-/* the screen's magenta light on the wall, round its resting place (scenes.ts) */
+/* the screen's light on the wall, round its resting place (scenes.ts): the
+   film's lilac white fading into violet */
 .film-glow {
   position: absolute;
   left: 0;
   top: 0;
-  background: radial-gradient(closest-side, rgb(255 62 201 / 0.26) 50%, rgb(157 60 255 / 0.1) 78%, transparent);
+  background: radial-gradient(closest-side, rgb(205 184 255 / 0.2) 50%, rgb(157 60 255 / 0.1) 78%, transparent);
   pointer-events: none;
 }
 /* the screen in the polished floor (scenes.ts draws and places it): light
@@ -1486,21 +1481,9 @@ img.reel-shot.is-on {
 
 /* ================================================================ OWNERS */
 .owners {
-  position: relative;
   padding-block: 8vw 12vw;
   align-items: start;
-  border-top: 1px solid rgb(157 60 255 / 0.4);
   margin-inline: 0;
-}
-/* the rule lit as a thin violet tube */
-.owners::before {
-  content: "";
-  position: absolute;
-  inset: -1px 0 auto;
-  height: 1px;
-  background: var(--lilac);
-  box-shadow: 0 0 0.8vw 0.1vw rgb(157 60 255 / 0.8);
-  pointer-events: none;
 }
 .owners-title {
   grid-column: 1 / 5;

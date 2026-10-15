@@ -46,9 +46,10 @@ const PRESETS = {
     clean: 'null',
     // SVT-AV1 at 42 smears this footage (VMAF 92, min 82); HEVC/H.264 hold at the reel's values
     crf: { av1: 38, hevc: 30, avc: 27 },
-    // the sodium lamps burn magenta, held back (sat, light) so the road and the
-    // white car read as lit by neon rather than drowned in it
-    grade: (r, g, b) => scene(r, g, b, { contrast: 1.1, sat: 0.6, light: 0.22 }),
+    // the sodium lamps turn a lilac white over a violet night: the swing's
+    // colour held right back (sat, light) so the white car stays white and the
+    // road isn't washed pink; a touch more contrast keeps it from going flat
+    grade: (r, g, b) => scene(r, g, b, { contrast: 1.25, sat: 0.22, light: 0.04, shadow: 0.6 }),
   },
   warmup: {
     source: ['-f', 'lavfi', '-i', 'color=black:s=256x144:r=24:d=0.125'],
