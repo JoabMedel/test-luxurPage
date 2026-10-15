@@ -601,46 +601,56 @@ export function film() {
   // where the blank wall sits in the workshop image (normalised)
   const WALL = { x: 0.497, y: 0.405, floor: 0.6 };
   const IMG = { w: 2688, h: 1520 };
-  const target = () => {
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const s = Math.max(vw / IMG.w, vh / IMG.h);
-    const ox = (vw - IMG.w * s) / 2;
-    const oy = (vh - IMG.h * s) / 2;
+  // the screen's size as the film arrives (full view, slightly pushed in) and
+  // in the wall, and how strongly the floor reflects it. On a desktop the
+  // screen fills the view and ends at 35 % of it; on a phone it is the film's
+  // own 16:9 covering the view, and ends as wide in the photo as on a desktop
+  // (31.7 % of the photo's width: sections.css sizes the photo round that)
+  const START = 1.1;
+  const END_DESKTOP = 0.35;
+  const TV_IN_PHOTO = 0.317;
+  const GLOSS = 0.6;
+  // where things sit, from the layout boxes (untransformed; the sticky box is
+  // the view while pinned): the photo is drawn "cover" in its box, the screen
+  // scales and moves about its own centre
+  const geometry = () => {
+    const bw = shop.offsetWidth;
+    const bh = shop.offsetHeight;
+    const s = Math.max(bw / IMG.w, bh / IMG.h);
+    const ix = shop.offsetLeft + (bw - IMG.w * s) / 2;
+    const iy = shop.offsetTop + (bh - IMG.h * s) / 2;
+    const wall = { x: ix + IMG.w * s * WALL.x, y: iy + IMG.h * s * WALL.y };
+    const sw = screen.offsetWidth;
+    const sh = screen.offsetHeight;
+    const end = env.mobile ? (TV_IN_PHOTO * IMG.w * s) / sw : END_DESKTOP;
     return {
-      x: ox + IMG.w * s * WALL.x - vw / 2,
-      y: oy + IMG.h * s * WALL.y - vh / 2,
-      floor: oy + IMG.h * s * WALL.floor,
+      x: wall.x - (screen.offsetLeft + sw / 2),
+      y: wall.y - (screen.offsetTop + sh / 2),
+      floor: iy + IMG.h * s * WALL.floor,
+      end,
+      // the screen at rest in the wall
+      box: { x: wall.x - (sw * end) / 2, y: wall.y - (sh * end) / 2, w: sw * end, h: sh * end },
     };
   };
-
-  // the screen's size as the film arrives (full view, slightly pushed in) and
-  // in the wall, and how strongly the floor reflects it
-  const START = 1.1;
-  const END = 0.35;
-  const GLOSS = 0.6;
   const placeReflection = () => {
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const t = target();
-    const w = vw * END;
-    const h = vh * END;
+    const g = geometry();
     const [ox, oy] = getComputedStyle(shop).transformOrigin.split(' ').map(parseFloat);
-    const box = { x: vw / 2 + t.x - w / 2, y: vh / 2 + t.y - h / 2, w, h };
-    reflection.place(box, t.floor, { x: ox, y: oy });
-    // the halo reaches ~9vw past the screen, like the light it stands for
-    const r = vw * 0.09;
+    const origin = { x: shop.offsetLeft + ox, y: shop.offsetTop + oy };
+    reflection.place(g.box, g.floor, origin);
+    // the halo reaches about a quarter of the screen's width past it, like the light it stands for
+    const r = g.box.w * 0.257;
     Object.assign(glow.style, {
-      left: `${box.x - r}px`,
-      top: `${box.y - r}px`,
-      width: `${w + r * 2}px`,
-      height: `${h + r * 2}px`,
-      transformOrigin: `${ox - box.x + r}px ${oy - box.y + r}px`,
+      left: `${g.box.x - r}px`,
+      top: `${g.box.y - r}px`,
+      width: `${g.box.w + r * 2}px`,
+      height: `${g.box.h + r * 2}px`,
+      transformOrigin: `${origin.x - g.box.x + r}px ${origin.y - g.box.y + r}px`,
     });
   };
 
+  // the pull-back, on desktops and phones alike (sections.css lays each out)
   const mm = gsap.matchMedia();
-  mm.add(MQ.desktop, () => {
+  mm.add(`${MQ.desktop}, ${MQ.mobile}`, () => {
     placeReflection();
     window.addEventListener('resize', placeReflection);
     // a pull-back that answers the first notch of scroll: the screen arrives
@@ -655,7 +665,12 @@ export function film() {
     const keepGrain = () => grain && gsap.set(grain, { scale: 1 / (gsap.getProperty(screen, 'scale') as number) });
     tl.eventCallback('onUpdate', keepGrain);
     // the halo and the reflection ride with the photo and come up as the screen settles into the wall
-    tl.fromTo(screen, { scale: START, x: 0, y: 0 }, { scale: END, x: () => target().x, y: () => target().y, ease: 'power1.out', duration: 1 }, 0)
+    tl.fromTo(
+      screen,
+      { scale: START, x: 0, y: 0 },
+      { scale: () => geometry().end, x: () => geometry().x, y: () => geometry().y, ease: 'power1.out', duration: 1 },
+      0,
+    )
       .fromTo([shop, glow, refl], { scale: 1.12 }, { scale: 1, ease: 'power1.out', duration: 1 }, 0)
       .fromTo(glow, { opacity: 0 }, { opacity: 1, ease: 'power1.in', duration: 1 }, 0)
       .fromTo(refl, { opacity: 0 }, { opacity: GLOSS, ease: 'power1.in', duration: 1 }, 0)
@@ -663,11 +678,14 @@ export function film() {
     keepGrain(); // the screen arrives pushed in, before the first scroll update
     return () => window.removeEventListener('resize', placeReflection);
   });
+  // reduced motion: desktops show the screen at rest in the wall; phones keep
+  // the plain 16:9 frame (sections.css), with nothing to place
   mm.add(MQ.reduced + ' and (min-width: 992px)', () => {
     placeReflection();
     window.addEventListener('resize', placeReflection);
-    gsap.set(screen, { scale: END, x: () => target().x, y: () => target().y });
-    if (grain) gsap.set(grain, { scale: 1 / END });
+    const g = geometry();
+    gsap.set(screen, { scale: g.end, x: g.x, y: g.y });
+    if (grain) gsap.set(grain, { scale: 1 / g.end });
     gsap.set(refl, { opacity: GLOSS });
     return () => window.removeEventListener('resize', placeReflection);
   });
@@ -712,7 +730,7 @@ export function film() {
     raf = requestAnimationFrame(loop);
     if (coded) hw.render(t);
     // nothing to reflect until the pull-back reveals the floor
-    if (!env.mobile && (gsap.getProperty(refl, 'opacity') as number) > 0.005) mirror();
+    if ((gsap.getProperty(refl, 'opacity') as number) > 0.005) mirror();
   };
   const drawPoster = () => {
     if (coded) hw.render(performance.now());

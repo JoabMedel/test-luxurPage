@@ -1233,6 +1233,9 @@ img.reel-shot.is-on {
   position: absolute;
   left: 0;
   top: 0;
+  /* sized by scenes.ts and wider than a phone: never squeezed to the view
+     (global.css caps canvases at 100 %, which pulled the reflection off the screen's axis) */
+  max-width: none;
   opacity: 0.6;
   /* the canvas is quarter resolution; the blur melts the upscale */
   filter: blur(5px);
@@ -1248,7 +1251,69 @@ img.reel-shot.is-on {
   background: linear-gradient(to bottom, transparent, var(--black));
   pointer-events: none;
 }
-@media (max-width: 991px) {
+/* phones: the same pull-back as on a desktop (scenes.ts reads these boxes).
+   The screen is the film's own 16:9 covering the view (a portrait box would
+   end as a tall TV), and the workshop photo is sized round where the screen
+   ends, 80 % of the width (52 % of the height in landscape): 31.7 % of the
+   photo's width, as on a desktop, framed between the lifts' posts */
+@media (max-width: 991px) and (prefers-reduced-motion: no-preference) {
+  .film {
+    height: 200vh;
+    height: 200svh;
+  }
+  .film-sticky {
+    --tvw: min(80vw, 52svh * 16 / 9);
+    --imw: calc(var(--tvw) / 0.317);
+    --imh: calc(var(--imw) * 1520 / 2688);
+    height: 100vh;
+    height: 100svh;
+  }
+  /* the photo's top and bottom edges melt into the black. Solid from where the
+     edge sits at the pull-back's 1.12 start (origin 50% 41%: 5 % of its height
+     above, 7 % below), fading in over the photo's first and last 12 % */
+  .film-sticky::before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    inset: 0 0 auto;
+    height: calc(50% - var(--imh) * 0.5 + var(--imh) * 0.12);
+    background: linear-gradient(to top, rgb(0 0 0 / 0), var(--black) calc(var(--imh) * 0.12));
+    pointer-events: none;
+  }
+  .film-fade {
+    top: calc(50% + var(--imh) * 0.5 - var(--imh) * 0.12);
+    height: auto;
+    background: linear-gradient(to bottom, rgb(0 0 0 / 0), var(--black) calc(var(--imh) * 0.12));
+  }
+  .film-workshop {
+    inset: auto;
+    left: calc(50% - var(--imw) / 2);
+    top: calc(50% - var(--imh) / 2);
+    width: var(--imw);
+    max-width: none;
+    height: var(--imh);
+  }
+  .film-screen {
+    --sw: max(100vw, 100svh * 16 / 9);
+    --sh: max(100vw * 9 / 16, 100svh);
+    left: calc(50% - var(--sw) / 2);
+    top: calc(50% - var(--sh) / 2);
+    z-index: 2;
+    width: var(--sw);
+    height: var(--sh);
+    /* the bezel in px: it ends as thin in the wall as on a desktop */
+    box-shadow:
+      0 0 0 20px #070509,
+      0 0 0 22px #1d1229;
+  }
+  /* the screen is wider than the view: the grain covers all of it */
+  .film-sticky .film-grain .grain {
+    width: calc(100% + var(--tile) * 2);
+    height: calc(100% + var(--tile) * 2);
+  }
+}
+/* phones without motion: the film as a plain 16:9 frame */
+@media (max-width: 991px) and (prefers-reduced-motion: reduce) {
   .film {
     height: auto;
     padding-block: 18vw 6vw;
