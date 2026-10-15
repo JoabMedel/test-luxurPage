@@ -313,6 +313,22 @@
 .wu-glow-paths > * {
   flex: none; /* nothing shrinks: a layer under 64px samples differently */
 }
+.wu-repaint--corner {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+}
+@media (max-width: 991px) {
+  /* a phone's view is narrower than these rows: wrap them, so every piece is drawn */
+  .wu-paths {
+    flex-wrap: wrap;
+    width: 100vw;
+  }
+  .wu-glow-paths {
+    flex-wrap: wrap;
+    width: 100vw;
+  }
+}
 .wu-glow-paths {
   width: max-content;
   height: auto;
