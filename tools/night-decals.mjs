@@ -1,7 +1,8 @@
 /**
  * The reel's sticker bomb for the night page: the stickers cut off their wall
  * (assets-src/decals.png, generated with Higgsfield) onto transparency, so they
- * sit straight on the page's black, then lit by the neon (tools/neon.mjs).
+ * sit straight on the page's black, in their own printed colours (no grade:
+ * a neon tint over them read as a pink filter).
  *
  * The wall and the stickers' white differ by only 1–5 %, so tone alone leaks
  * into the stickers. What separates them is the die-cut edge: a sharp step all
@@ -21,7 +22,7 @@
  *   node tools/night-decals.mjs
  */
 import { createRequire } from 'module';
-import { scene, clamp } from './neon.mjs';
+import { clamp } from './neon.mjs';
 const require = createRequire(new URL('../node_modules/.pnpm/node_modules/', import.meta.url).href);
 const sharp = require('sharp');
 
@@ -190,7 +191,7 @@ for (let s = 0; s < N; s++) {
   if (qt < SPECK) for (let k = 0; k < qt; k++) grown[queue[k]] = 1;
 }
 
-// ---------------------------------------------- 4 · neon light, alpha, crop
+// -------------------------------------------------------- 4 · alpha, crop
 let x0 = W;
 let y0 = H;
 let x1 = 0;
@@ -204,12 +205,9 @@ for (let i = 0; i < N; i++) {
   if (x > x1) x1 = x;
   if (y < y0) y0 = y;
   if (y > y1) y1 = y;
-  // printed vinyl under the night's light: the white paper dims a touch towards
-  // lilac, inks keep their hue (swing 0: the sun stays vermilion)
-  const [r, g, b] = scene(rgb[i * 3] / 255, rgb[i * 3 + 1] / 255, rgb[i * 3 + 2] / 255, { swing: 0, shadow: 0.4, light: 0.25, core: 0.35, gain: 0.82 });
-  rgba[i * 4] = Math.round(r * 255);
-  rgba[i * 4 + 1] = Math.round(g * 255);
-  rgba[i * 4 + 2] = Math.round(b * 255);
+  rgba[i * 4] = rgb[i * 3];
+  rgba[i * 4 + 1] = rgb[i * 3 + 1];
+  rgba[i * 4 + 2] = rgb[i * 3 + 2];
   rgba[i * 4 + 3] = 255;
 }
 const left = Math.max(0, x0 - MARGIN);
