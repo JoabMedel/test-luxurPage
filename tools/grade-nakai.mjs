@@ -2,8 +2,9 @@
  * Grades the client's photo of Akira Nakai (assets-src/nakai.jpg, a bright
  * event shot) into the page's night key: one pool of light on the man, the tool
  * and the cut; the crowd and banner behind fall into the dark. Only the
- * oranges keep their colour (skin, the fender, echoing the film's sodium);
- * purples and teals go grey. Writes public/media/nakai.webp and nakai-sm.webp.
+ * oranges keep their colour (skin, the fender); purples and teals go grey, and
+ * the night's neon (tools/neon.mjs) colours the light: violet in the shadows, a
+ * faint magenta in the highlights. Writes public/media/nakai.webp and nakai-sm.webp.
  *
  *   node tools/grade-nakai.mjs
  */
@@ -89,12 +90,14 @@ for (let y = 0; y < H; y++) {
     g = contrast(toSrgb(shoulder(g)));
     b = contrast(toSrgb(shoulder(b)));
 
-    // split tone: highlights lean sodium, shadows a cold neutral
+    // split tone in the page's neon: shadows violet, highlights a faint
+    // magenta that leaves the skin's warmth alone
     const l = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-    const hi = smooth(0.25, 0.85, l);
-    r *= mix(0.97, 1.03, hi);
-    g *= mix(0.99, 0.99, hi);
-    b *= mix(1.03, 0.93, hi);
+    const lo = 1 - smooth(0.02, 0.4, l);
+    const hi = smooth(0.3, 0.85, l) * (1 - 0.8 * warm);
+    r *= 1 + 0.1 * lo + 0.04 * hi;
+    g *= 1 - 0.1 * lo - 0.05 * hi;
+    b *= 1 + 0.3 * lo + 0.02 * hi;
 
     out[i] = Math.round(clamp(r) * 255);
     out[i + 1] = Math.round(clamp(g) * 255);

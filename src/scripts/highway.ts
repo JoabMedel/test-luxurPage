@@ -1,10 +1,10 @@
 /**
  * Coded stand-in for the night film until the client delivers footage:
- * chase-cam on an empty highway under sodium lamps, with a drawn rear
+ * chase-cam on an empty highway under magenta neon lamps, with a drawn rear
  * silhouette of a wide, low air-cooled 911 (full-width red light bar, ducktail).
  * It is an illustration, never presented as a photograph of a real build.
  */
-const SODIUM = [232, 137, 43] as const;
+const NEON = [255, 62, 201] as const; // --magenta
 const rgba = (c: readonly number[], a: number) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
 
 export class Highway {
@@ -64,14 +64,14 @@ export class Highway {
     // sky / haze
     const sky = ctx.createLinearGradient(0, 0, 0, vy);
     sky.addColorStop(0, '#000');
-    sky.addColorStop(1, '#1b0f05');
+    sky.addColorStop(1, '#14061f');
     ctx.fillStyle = sky;
     ctx.fillRect(0, 0, w, vy + 1);
 
     // asphalt
     const road = ctx.createLinearGradient(0, vy, 0, h);
-    road.addColorStop(0, '#120a04');
-    road.addColorStop(1, '#050403');
+    road.addColorStop(0, '#0d0616');
+    road.addColorStop(1, '#040208');
     ctx.fillStyle = road;
     ctx.fillRect(0, vy, w, h - vy);
 
@@ -109,8 +109,8 @@ export class Highway {
         const rx = p.s * 7;
         const ry = rx * 0.28;
         const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, rx);
-        g.addColorStop(0, rgba(SODIUM, 0.28));
-        g.addColorStop(1, rgba(SODIUM, 0));
+        g.addColorStop(0, rgba(NEON, 0.28));
+        g.addColorStop(1, rgba(NEON, 0));
         ctx.save();
         ctx.translate(p.x, p.y);
         ctx.scale(1, ry / rx);
@@ -126,17 +126,17 @@ export class Highway {
       const len = Math.min(h - foot.y, foot.s * 6);
       const sw = Math.max(1, l.s * 0.5);
       const g = ctx.createLinearGradient(0, foot.y, 0, foot.y + len);
-      g.addColorStop(0, rgba(SODIUM, 0.32));
-      g.addColorStop(1, rgba(SODIUM, 0));
+      g.addColorStop(0, rgba(NEON, 0.32));
+      g.addColorStop(1, rgba(NEON, 0));
       ctx.fillStyle = g;
       ctx.fillRect(foot.x - sw / 2, foot.y, sw, len);
     }
 
     // the car's own headlights washing the road ahead
     const hl = ctx.createRadialGradient(vx, h * 0.66, 0, vx, h * 0.66, w * 0.32);
-    hl.addColorStop(0, 'rgba(255,236,205,0.22)');
-    hl.addColorStop(0.6, 'rgba(255,236,205,0.05)');
-    hl.addColorStop(1, 'rgba(255,236,205,0)');
+    hl.addColorStop(0, 'rgba(240,222,255,0.22)');
+    hl.addColorStop(0.6, 'rgba(240,222,255,0.05)');
+    hl.addColorStop(1, 'rgba(240,222,255,0)');
     ctx.save();
     ctx.translate(vx, h * 0.66);
     ctx.scale(1, 0.32);
@@ -147,7 +147,7 @@ export class Highway {
     ctx.globalCompositeOperation = 'source-over';
 
     // lane dashes
-    ctx.fillStyle = 'rgba(255,238,210,0.55)';
+    ctx.fillStyle = 'rgba(240,224,255,0.55)';
     const dash = 6;
     const gap = 9;
     const period = dash + gap;
@@ -172,7 +172,7 @@ export class Highway {
     // posts + lamp heads
     for (const l of lamps) {
       const base = proj(Math.sign(l.x - vx) * 9.6, 0, l.z);
-      ctx.strokeStyle = 'rgba(30,22,16,1)';
+      ctx.strokeStyle = 'rgba(22,14,30,1)';
       ctx.lineWidth = Math.max(1, l.s * 0.18);
       ctx.beginPath();
       ctx.moveTo(base.x, base.y);
@@ -184,9 +184,9 @@ export class Highway {
     for (const l of lamps) {
       const r = l.s * 2.6;
       const g = ctx.createRadialGradient(l.x, l.y, 0, l.x, l.y, r);
-      g.addColorStop(0, 'rgba(255,236,200,0.95)');
-      g.addColorStop(0.12, rgba(SODIUM, 0.65));
-      g.addColorStop(1, rgba(SODIUM, 0));
+      g.addColorStop(0, 'rgba(255,226,246,0.95)');
+      g.addColorStop(0.12, rgba(NEON, 0.65));
+      g.addColorStop(1, rgba(NEON, 0));
       ctx.fillStyle = g;
       ctx.fillRect(l.x - r, l.y - r, r * 2, r * 2);
     }
@@ -264,23 +264,23 @@ export class Highway {
     ctx.restore();
     ctx.globalCompositeOperation = 'source-over';
 
-    ctx.fillStyle = '#0a0806';
+    ctx.fillStyle = '#08060c';
     ctx.fill(body);
-    ctx.strokeStyle = rgba(SODIUM, 0.22 + light * 0.35);
+    ctx.strokeStyle = rgba(NEON, 0.22 + light * 0.35);
     ctx.lineWidth = Math.max(1, W * 0.003);
     ctx.stroke(body);
 
-    // sodium light sliding over roof + hips
+    // neon light sliding over roof + hips
     ctx.save();
     ctx.clip(body);
     const g = ctx.createLinearGradient(0, Y(1), 0, Y(0.4));
-    g.addColorStop(0, rgba(SODIUM, 0.1 + light * 0.55));
-    g.addColorStop(0.5, rgba(SODIUM, 0.03 + light * 0.12));
-    g.addColorStop(1, rgba(SODIUM, 0));
+    g.addColorStop(0, rgba(NEON, 0.1 + light * 0.55));
+    g.addColorStop(0.5, rgba(NEON, 0.03 + light * 0.12));
+    g.addColorStop(1, rgba(NEON, 0));
     ctx.fillStyle = g;
     ctx.fillRect(X(-0.6), Y(1.05), W * 1.2, H);
     ctx.restore();
-    ctx.strokeStyle = rgba(SODIUM, 0.25 + light * 0.6);
+    ctx.strokeStyle = rgba(NEON, 0.25 + light * 0.6);
     ctx.lineWidth = Math.max(1, W * 0.004);
     ctx.beginPath();
     ctx.moveTo(X(-0.3), Y(0.6));
@@ -302,7 +302,7 @@ export class Highway {
     ctx.fillRect(X(-0.36), Y(0.66), W * 0.72, H * 0.06);
     ctx.fillRect(X(-0.37), Y(0.7), W * 0.03, H * 0.1);
     ctx.fillRect(X(0.34), Y(0.7), W * 0.03, H * 0.1);
-    ctx.fillStyle = rgba(SODIUM, 0.2 + light * 0.5);
+    ctx.fillStyle = rgba(NEON, 0.2 + light * 0.5);
     ctx.fillRect(X(-0.36), Y(0.66), W * 0.72, Math.max(1, H * 0.008));
 
     // full-width red light bar + glow
@@ -366,7 +366,7 @@ export class Sparks {
     ctx.fillRect(0, 0, w, h);
 
     // fender edge silhouette catching the glow
-    ctx.strokeStyle = 'rgba(232,137,43,0.35)';
+    ctx.strokeStyle = 'rgba(255,62,201,0.35)';
     ctx.lineWidth = h * 0.012;
     ctx.beginPath();
     ctx.arc(ex - h * 0.05, ey + h * 0.55, h * 0.56, Math.PI * 1.08, Math.PI * 1.62);
@@ -390,7 +390,7 @@ export class Sparks {
       s.x += s.vx * dt;
       s.y += s.vy * dt;
       const k = 1 - s.life / s.max;
-      ctx.strokeStyle = `rgba(255,${(150 + 100 * k) | 0},${(60 * k) | 0},${k})`;
+      ctx.strokeStyle = `rgba(255,${(90 + 150 * k) | 0},${(200 + 40 * k) | 0},${k})`;
       ctx.lineWidth = Math.max(1, h * 0.004 * k);
       ctx.beginPath();
       ctx.moveTo(s.px, s.py);
@@ -400,9 +400,9 @@ export class Sparks {
     });
 
     const hot = ctx.createRadialGradient(ex, ey, 0, ex, ey, h * 0.18);
-    hot.addColorStop(0, 'rgba(255,240,200,0.9)');
-    hot.addColorStop(0.2, 'rgba(232,137,43,0.4)');
-    hot.addColorStop(1, 'rgba(232,137,43,0)');
+    hot.addColorStop(0, 'rgba(255,236,250,0.9)');
+    hot.addColorStop(0.2, 'rgba(255,62,201,0.4)');
+    hot.addColorStop(1, 'rgba(255,62,201,0)');
     ctx.fillStyle = hot;
     ctx.fillRect(ex - h * 0.2, ey - h * 0.2, h * 0.4, h * 0.4);
     ctx.globalCompositeOperation = 'source-over';

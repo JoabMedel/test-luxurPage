@@ -45,7 +45,7 @@ export function runLoader(): Promise<void> {
     }
 
     spin = gsap.to(wheel, { rotation: 360, duration: 5.5, ease: 'none', repeat: -1, paused: true });
-    gsap.set(paths, { fill: '#8c8c8c' });
+    gsap.set(paths, { fill: '#9d3cff' }); // fills in from the page's violet
     gsap.set(wheel, { scale: 0.55, opacity: 0 });
 
     const tl = gsap.timeline({ onComplete: finish });

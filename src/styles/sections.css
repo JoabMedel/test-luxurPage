@@ -21,7 +21,7 @@
 .loader-rwb path {
   fill: var(--white);
   fill-opacity: 0;
-  stroke: var(--grey);
+  stroke: var(--violet);
   stroke-width: 1.4;
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
@@ -306,7 +306,12 @@ html:not(.js) .loader {
   height: 100svh;
   min-height: 34vw;
   overflow: clip;
-  background: var(--white);
+  /* the night's light at rest, before any ink: violet pooling up from the
+     lower left, magenta spilling in from the upper right */
+  background:
+    radial-gradient(70% 60% at 12% 105%, rgb(157 60 255 / 0.24), rgb(157 60 255 / 0)),
+    radial-gradient(55% 50% at 92% -5%, rgb(255 62 201 / 0.16), rgb(255 62 201 / 0)),
+    var(--black);
   isolation: isolate;
   touch-action: pan-y;
 }
@@ -316,8 +321,8 @@ html:not(.js) .loader {
   display: grid;
   place-items: center;
 }
-/* no transform on the lockup itself: it would isolate the difference blend of
-   the Japanese line; the parallax moves the logo and the line separately */
+/* no transform on the lockup itself: the parallax moves the logo and the
+   Japanese line separately */
 .hero-lockup {
   width: 97.5vw;
 }
@@ -327,7 +332,7 @@ html:not(.js) .loader {
 }
 .hero-mark {
   width: 100%;
-  color: var(--black);
+  color: var(--white);
   overflow: visible;
   will-change: transform;
 }
@@ -344,10 +349,11 @@ html:not(.js) .loader {
   letter-spacing: 0.14em;
   white-space: nowrap;
 }
+/* the rule is a thin neon tube: magenta at the reading, cyan at the meaning */
 .hero-ja-rule {
   flex: 1;
   height: 1px;
-  background: currentColor;
+  background: linear-gradient(90deg, var(--magenta), var(--violet), var(--cyan));
 }
 .hero-fluid {
   position: absolute;
@@ -357,11 +363,11 @@ html:not(.js) .loader {
   z-index: 1;
   pointer-events: none;
 }
-.diff {
+/* hero copy rides above the ink */
+.hero-over {
   position: relative;
   z-index: 2;
   color: var(--white);
-  mix-blend-mode: difference;
 }
 .hero-tl,
 .hero-bl,
@@ -369,8 +375,7 @@ html:not(.js) .loader {
   position: absolute;
   margin: 0;
 }
-/* no z-index on the corner wrappers: a stacking context would cut the
-   difference blend off from the hero backdrop */
+/* the corner wrappers stay out of the way; their copy sits above the ink */
 .hero-bl {
   z-index: 2;
 }
@@ -416,7 +421,7 @@ html:not(.js) .loader {
 .chip {
   display: inline-grid;
   place-items: center;
-  background: var(--black);
+  background: var(--violet);
   color: var(--white);
   border-radius: 999px;
   padding: 0.35vw 0.7vw;
@@ -461,7 +466,7 @@ html:not(.js) .loader {
 /* ============================================================= MANIFESTO */
 .manifesto {
   position: relative;
-  background: var(--white);
+  background: var(--black);
   padding-block: 16vw 14vw;
   align-items: start;
 }
@@ -494,7 +499,7 @@ html:not(.js) .loader {
 .reel {
   position: relative;
   height: 170vh;
-  background: var(--white);
+  background: var(--black);
 }
 .reel-sticky {
   position: sticky;
@@ -518,8 +523,8 @@ html:not(.js) .loader {
 .reel-text {
   margin: 0;
 }
-/* Sticker-bomb backdrop: stickers straight on the page's white (the file's
-   wall is #fff and only their shadows show it, so there is no box), margin to
+/* Sticker-bomb backdrop: stickers cut off their wall onto transparency
+   (tools/night-decals.mjs), stuck straight on the page's black, margin to
    margin under the nav, the shrunk card landing on its lower right like one
    more thing stuck to the wall. Width-led, capped so its foot stays clear of
    the copy on wide, short screens (13vw ≈ the top offset plus the copy). */
@@ -528,7 +533,7 @@ html:not(.js) .loader {
   top: 4vw;
   left: 0;
   right: 0;
-  width: min(100vw - var(--m) * 2, (100vh - 13vw) * 2800 / 1142);
+  width: min(100vw - var(--m) * 2, (100vh - 13vw) * 2800 / 1147);
   margin-inline: auto;
   pointer-events: none;
 }
@@ -579,7 +584,7 @@ img.reel-shot.is-on {
   margin: 0;
   display: flex;
   justify-content: space-between;
-  color: rgb(255 255 255 / 0.7);
+  color: rgb(205 184 255 / 0.8);
   font-variant-numeric: tabular-nums;
 }
 /* client reel: the poster (its first frame) waits underneath until playback */
@@ -806,7 +811,8 @@ img.reel-shot.is-on {
   object-fit: cover;
 }
 /* daylight photo graded down to the night key: lower exposure, heavier
-   top (sky) and edges, so it sits in the black section like the rest */
+   top (sky) and edges in a violet black, a magenta glow off the wet ground;
+   the paint keeps its own colour */
 .grade-night .build-media-inner > img {
   filter: brightness(0.68) contrast(1.12) saturate(0.88);
 }
@@ -816,8 +822,8 @@ img.reel-shot.is-on {
   inset: 0;
   pointer-events: none;
   background:
-    linear-gradient(to bottom, rgb(0 0 0 / 0.66), rgb(0 0 0 / 0.18) 38%, rgb(0 0 0 / 0) 58%, rgb(0 0 0 / 0) 72%, rgb(0 0 0 / 0.38)),
-    radial-gradient(120% 90% at 55% 55%, rgb(0 0 0 / 0) 55%, rgb(0 0 0 / 0.45));
+    linear-gradient(to bottom, rgb(8 2 20 / 0.7), rgb(14 3 32 / 0.22) 38%, rgb(14 3 32 / 0) 58%, rgb(70 8 80 / 0) 72%, rgb(70 8 80 / 0.42)),
+    radial-gradient(120% 90% at 55% 55%, rgb(10 2 24 / 0) 55%, rgb(10 2 24 / 0.5));
 }
 .pending {
   position: absolute;
@@ -847,10 +853,10 @@ img.reel-shot.is-on {
   font-size: 1.25vw;
   line-height: 1;
   letter-spacing: 0;
-  color: rgb(255 255 255 / 0.55);
+  color: var(--magenta);
 }
 .build-n {
-  color: var(--white);
+  color: var(--magenta);
   margin-right: 0.6em;
 }
 .builds-foot {
@@ -959,8 +965,8 @@ img.reel-shot.is-on {
   /* the bezel; its light on the wall is .film-glow (a 14vw blurred shadow here
      cost a GPU blur pass and froze the first scroll into the film) */
   box-shadow:
-    0 0 0 1.4vw #070707,
-    0 0 0 1.55vw #1a1a1a;
+    0 0 0 1.4vw #070509,
+    0 0 0 1.55vw #1d1229;
   will-change: transform;
 }
 .film-canvas {
@@ -1000,12 +1006,12 @@ img.reel-shot.is-on {
 .film-grain .grain {
   mix-blend-mode: normal;
 }
-/* the screen's sodium light on the wall, round its resting place (scenes.ts) */
+/* the screen's magenta light on the wall, round its resting place (scenes.ts) */
 .film-glow {
   position: absolute;
   left: 0;
   top: 0;
-  background: radial-gradient(closest-side, rgb(232 137 43 / 0.16) 50%, rgb(232 137 43 / 0.05) 78%, transparent);
+  background: radial-gradient(closest-side, rgb(255 62 201 / 0.16) 50%, rgb(157 60 255 / 0.06) 78%, transparent);
   pointer-events: none;
 }
 /* the screen in the polished floor (scenes.ts draws and places it): light
@@ -1057,7 +1063,7 @@ img.reel-shot.is-on {
   transition: height 0.3s var(--ease-o3);
 }
 .sound-pill[aria-pressed="true"] {
-  border-color: var(--white);
+  border-color: var(--magenta);
 }
 .sound-pill[aria-pressed="true"] .sound-bars i {
   animation: eq 0.9s ease-in-out infinite alternate;
@@ -1295,8 +1301,15 @@ img.reel-shot.is-on {
   overflow: visible;
   opacity: 0.72;
 }
+/* the letters lit like loose shop signs: magenta, violet, cyan in turn */
 .cl-letter path {
-  fill: var(--white);
+  fill: var(--magenta);
+}
+.cl-letter:nth-child(3n + 1) path {
+  fill: var(--lilac);
+}
+.cl-letter:nth-child(3n + 2) path {
+  fill: var(--cyan);
 }
 @media (max-width: 991px) {
   .services {
@@ -1320,7 +1333,7 @@ img.reel-shot.is-on {
 .owners {
   padding-block: 8vw 12vw;
   align-items: start;
-  border-top: 1px solid rgb(255 255 255 / 0.14);
+  border-top: 1px solid rgb(157 60 255 / 0.4);
   margin-inline: 0;
 }
 .owners-title {
@@ -1384,12 +1397,16 @@ img.reel-shot.is-on {
   left: var(--x);
   top: var(--y);
   margin: 0;
-  color: rgb(255 255 255 / 0.82);
+  color: rgb(69 230 255 / 0.85);
   font-size: calc(var(--fs-ui) * 1.15);
   text-transform: none;
   white-space: pre;
 }
+.gb[data-garbage] {
+  color: rgb(255 62 201 / 0.9);
+}
 .gb-ja {
+  color: var(--magenta);
   font-family: var(--mincho);
   font-weight: 900;
   letter-spacing: 0.3em;
@@ -1410,7 +1427,7 @@ img.reel-shot.is-on {
   width: 0.06em;
   height: 0.8em;
   margin-left: 0.04em;
-  background: currentColor;
+  background: var(--magenta);
   vertical-align: -0.04em;
   animation: caret 0.9s steps(1) infinite;
 }

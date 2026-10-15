@@ -31,12 +31,12 @@ export const MEDIA = {
   },
   loaderWheel: { src: '/media/loader-wheel.webp', alt: '' },
   aluminium: '/media/aluminium.webp',
-  workshop: { src: '/media/workshop.webp', alt: 'Dark concrete workshop at night: two lifts holding covered cars, tyre stacks, fluorescent tubes and a polished epoxy floor' },
-  tarp: { src: '/media/tarp.webp', alt: 'A low, wide car under a fitted grey cover, lit by a single fluorescent tube in a dark workshop' },
+  workshop: { src: '/media/workshop.webp', alt: 'Dark concrete workshop at night: two lifts holding covered cars, tyre stacks, magenta and cyan neon tubes and a polished epoxy floor' },
+  tarp: { src: '/media/tarp.webp', alt: 'A low, wide car under a fitted cover, lit by a single magenta neon tube in a dark workshop' },
   detailCut: { src: '/media/detail-cut.webp', alt: 'Macro of a freshly cut fender edge: bare metal burr beside a pencil guide line' },
   detailRivets: { src: '/media/detail-rivets.webp', alt: 'An open palm holding a small pile of steel dome rivets' },
-  /** Reel backdrop: JDM sticker bomb, re-exposed onto the page's white by tools/clean-decals.mjs. Decorative. */
-  decals: { src: '/media/decals.webp', srcSm: '/media/decals-sm.webp', width: 2800, height: 1142 },
+  /** Reel backdrop: JDM sticker bomb, cut off its wall onto transparency by tools/night-decals.mjs. Decorative. */
+  decals: { src: '/media/decals.webp', srcSm: '/media/decals-sm.webp', width: 2800, height: 1147 },
 
   /**
    * Footage. Leave null to use the coded stand-ins.
@@ -73,9 +73,9 @@ export const MEDIA = {
     ],
     poster: '/media/film/poster.webp',
     posterSm: '/media/film/poster-sm.webp',
-    alt: 'A white RWB widebody 911 seen from behind, cruising down an empty elevated expressway at night under orange sodium lamps',
+    alt: 'A white RWB widebody 911 seen from behind, cruising down an empty elevated expressway at night under magenta lamps',
   } as null | LoopVideo,
-  /** Client photography: event shot graded into the night key by tools/grade-nakai.mjs. */
+  /** Client photography: event shot graded into the neon night key by tools/grade-nakai.mjs. */
   nakai: {
     src: '/media/nakai.webp',
     srcSm: '/media/nakai-sm.webp',

@@ -712,7 +712,7 @@ export function film(lenis: Lenis | null) {
     if (src) reflection.draw(src, settle);
   };
 
-  const CAPTIONS = ['[ Air-cooled flat-six idling ]', '[ Sodium lamps hum overhead ]', '[ Tyres hiss on cold asphalt ]'];
+  const CAPTIONS = ['[ Air-cooled flat-six idling ]', '[ Neon hums overhead ]', '[ Tyres hiss on cold asphalt ]'];
   let capI = 0;
   let capT = 0;
   let raf = 0;

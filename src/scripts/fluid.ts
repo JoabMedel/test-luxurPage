@@ -3,8 +3,10 @@
  *
  * A small stable-fluids solver (WebGL2, no Three.js) whose dye field is used as
  * a hard-edged mask: smoothstep(0.5, 0.51, dye). Inside the mask we paint the
- * hidden layer: black outside the letters, riveted raw aluminium with a slow
- * travelling highlight inside them. The logo shape comes from the same SVG
+ * hidden layer, lit by the page's neon (magenta at the left, violet, cyan at the
+ * right): outside the letters the ink glows deep with a bright rim where the
+ * liquid ends, like a tube; inside them, riveted raw aluminium catches that
+ * light under a slow travelling highlight. The logo shape comes from the same SVG
  * path data as the DOM logo (src/lib/logo.ts) and is sampled in logo-local
  * UVs, so both layers stay aligned while the page scrolls.
  *
@@ -107,6 +109,11 @@ uniform float uHasAlu, uTime;
 
 float hash(vec2 p){ return fract(sin(dot(p, vec2(41.3, 289.1))) * 43758.5453); }
 
+// the page's neon (global.css): --magenta, --violet, --cyan
+const vec3 MAGENTA = vec3(1., .243, .788);
+const vec3 VIOLET = vec3(.616, .235, 1.);
+const vec3 CYAN = vec3(.271, .902, 1.);
+
 vec3 procedural(vec2 luv){
   // brushed raw aluminium + rivet rows, used until the texture arrives
   float grain = hash(vec2(floor(luv.y * 900.), floor(luv.x * 6.)));
@@ -138,7 +145,16 @@ void main(){
   alu += sweep * vec3(.55, .56, .58);
   alu += (dye - .5) * .015; // faint liquid shading inside the drop
 
-  vec3 col = alu * letter;
+  // the light along the width; as a tint it keeps the metal's brightness
+  float t = clamp(vUv.x, 0., 1.);
+  vec3 neon = t < .5 ? mix(MAGENTA, VIOLET, t * 2.) : mix(VIOLET, CYAN, t * 2. - 1.);
+  vec3 lit = neon / dot(neon, vec3(.2126, .7152, .0722));
+  vec3 metal = min(alu * mix(vec3(1.), lit, .3), 1.);
+  // the ink: a deep glow, a bright rim where the liquid ends
+  float rim = 1. - smoothstep(.51, .62, dye);
+  vec3 ink = neon * (.14 + .55 * rim);
+
+  vec3 col = mix(ink, metal, letter);
   o = vec4(col * m, m);
 }`;
 

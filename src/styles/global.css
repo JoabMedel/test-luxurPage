@@ -6,10 +6,14 @@
 
 /* ------------------------------------------------------------------ tokens */
 :root {
+  /* neon night: black ground, violet and magenta light, a cold cyan counterpoint */
   --white: #ffffff;
   --black: #000000;
-  --grey: #8c8c8c;
-  --sodium: #e8892b;
+  --grey: #948aa8; /* violet grey: labels, marginalia (6.5:1 on black) */
+  --violet: #9d3cff; /* the page's neon; white type on it passes 4.6:1 */
+  --magenta: #ff3ec9; /* lamps, signs, the hot accent (6.8:1 on black) */
+  --cyan: #45e6ff; /* cold neon, used sparingly */
+  --lilac: #cdb8ff; /* lit edges and rules: violet that still reads as light */
   --shu: #d23b2a; /* 朱 vermilion: reserved for the sun disc and the hanko seal */
 
   --sans: "Inter Tight Variable", "Neue Montreal", "Helvetica Neue", Arial, sans-serif;
@@ -45,7 +49,7 @@
 
 /* -------------------------------------------------------------------- base */
 html {
-  background: var(--white);
+  background: var(--black);
   -webkit-text-size-adjust: 100%;
 }
 html.lenis,
@@ -61,8 +65,8 @@ html.lenis body {
 
 body {
   margin: 0;
-  background: var(--white);
-  color: var(--black);
+  background: var(--black);
+  color: var(--white);
   font-family: var(--sans);
   font-size: var(--fs-p);
   font-weight: 400;
@@ -77,11 +81,7 @@ body.is-loading {
 }
 
 ::selection {
-  background: var(--black);
-  color: var(--white);
-}
-.is-dark ::selection {
-  background: var(--white);
+  background: var(--magenta);
   color: var(--black);
 }
 
@@ -108,7 +108,7 @@ button {
 }
 
 :focus-visible {
-  outline: 2px solid currentColor;
+  outline: 2px solid var(--magenta);
   outline-offset: 4px;
 }
 
@@ -189,20 +189,22 @@ button {
     color 0.4s var(--ease-o3),
     border-color 0.4s var(--ease-o3);
 }
+/* solid: a lit neon tube; on hover it flicks to magenta */
 .pill--solid {
-  background: var(--black);
+  background: var(--violet);
   color: var(--white);
 }
 .pill--solid:hover {
-  background: #1c1c1c;
+  background: var(--magenta);
+  color: var(--black);
 }
 .pill--line {
-  border: 1px solid rgb(255 255 255 / 0.4);
+  border: 1px solid rgb(205 184 255 / 0.45);
   color: var(--white);
 }
 .pill--line:hover,
 .pill--line:focus-visible {
-  border-color: rgb(255 255 255 / 1);
+  border-color: var(--magenta);
 }
 .pill .arrow {
   display: inline-block;
@@ -239,14 +241,12 @@ button {
   top: var(--m);
   z-index: 200;
   transform: translateY(-200%);
-  background: var(--black);
-  color: var(--white);
 }
 .skip-link:focus {
   transform: none;
 }
 
-/* vertical Japanese marginalia (tategaki) */
+/* vertical Japanese marginalia (tategaki), lettered like the signs of a night street */
 .kanji-v {
   position: absolute;
   z-index: 0;
@@ -257,7 +257,7 @@ button {
   font-size: 1.04vw;
   line-height: 1;
   letter-spacing: 0.4em;
-  color: var(--grey);
+  color: var(--magenta);
   pointer-events: none;
   user-select: none;
 }
