@@ -11,6 +11,10 @@
 .loader-stage {
   --lit: 0; /* the sign's power, 0 → 1 (loader.ts) */
   position: relative;
+  /* above the GPU warm-up: its black tiles and glyphs vanish against black,
+     but not against the sign's violet light on the wall, so the light (being
+     see-through) is laid over them instead and they still get drawn */
+  z-index: 1;
   width: 26vw;
   display: grid;
   place-items: center;
@@ -96,6 +100,7 @@
 }
 .loader-count {
   position: absolute;
+  z-index: 1; /* above the GPU warm-up, like the sign */
   left: 50%;
   bottom: var(--m);
   translate: -50% 0;
@@ -348,13 +353,6 @@
   white-space: nowrap;
   /* the signs' tight halo too, on glyphs that are ready at once (the kanji's webfont may land after the loader) */
   text-shadow: 0 0 0.25em #000;
-}
-@media (max-width: 991px) {
-  /* one row, clear of the mark; what doesn't fit is simply not warmed */
-  .wu-strip {
-    flex-wrap: nowrap;
-    overflow: clip;
-  }
 }
 
 html:not(.js) .loader {

@@ -86,6 +86,10 @@ const PHOTO = 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACQAwCdASpAAEAAPt
     <!-- glowing letters beside paths (their tile draws multisampled, as the hero's does): the logo
          with its halo on its own layer, a cluster letter with its tight one, the hero's pill -->
     <i class="wu wu-bare wu-glow-paths">
+      <!-- an even-odd curved fill repainted frame after frame in this multisampled tile: a partial
+           repaint resumes the tile's MSAA pass ("msaa load"), as the film section's does on the way
+           down (the old white-filled loader used to warm this by chance). First in the row, so a phone's narrow view still draws it -->
+      <svg class="wu-repaint" viewBox={`0 0 ${RAUH_WELT[0].width + RWB_OVERHANG} ${CAP}`}><path d={RAUH_WELT[0].d} fill-rule="evenodd" /></svg>
       <LogoMark class="hero-mark wu-logo" label="" />
       <span class="wu-letter"><svg viewBox={`0 0 ${RAUH_WELT[0].width + RWB_OVERHANG} ${CAP}`}><path d={RAUH_WELT[0].d} fill-rule="evenodd" /></svg></span>
       <span class="wu-pills-on-path">
@@ -94,10 +98,6 @@ const PHOTO = 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACQAwCdASpAAEAAPt
         <span class="pill pill--line">Write</span>
         <span class="chip">EN</span>
       </span>
-      <!-- an even-odd curved fill repainted frame after frame in this multisampled tile: a partial
-           repaint resumes the tile's MSAA pass ("msaa load"), as the film section's does on the way
-           down (the old white-filled loader used to warm this by chance) -->
-      <svg class="wu-repaint" viewBox={`0 0 ${RAUH_WELT[0].width + RWB_OVERHANG} ${CAP}`}><path d={RAUH_WELT[0].d} fill-rule="evenodd" /></svg>
     </i>
   </div>
   <!-- blended, fading or see-through layers hide nothing, so they stack, page-sized where size matters -->
