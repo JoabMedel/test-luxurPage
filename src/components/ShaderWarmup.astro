@@ -23,6 +23,8 @@
  * fold gets its tiles here.
  */
 import { SCRAMBLE_CHARS } from '../lib/scramble';
+import { RAUH_WELT, RWB_OVERHANG, CAP } from '../lib/wordmark';
+import LogoMark from './LogoMark.astro';
 
 // 64 px black lossy WebP: lossy photos are decoded to YUV on the GPU, which has pipelines of its own
 const PHOTO = 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACQAwCdASpAAEAAPtFor1KoJiQioggBABoJaQAAEDdTUAV4hbkAAP7znYAAAAAA';
@@ -53,7 +55,22 @@ const PHOTO = 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACQAwCdASpAAEAAPt
     <i class="wu wu-bare wu-layer wu-ridden"><video muted playsinline loop preload="none" disablepictureinpicture disableremoteplayback></video></i>
     <!-- the scramble's katakana and kanji fall back to a system font: resolve it now -->
     <span class="t-label wu-glyphs">{SCRAMBLE_CHARS}</span>
+    <!-- neon glows: the page's own classes at the page's sizes, since a blur's route and kernel
+         follow the shape's size and radius. Signs (kanji, build numbers) with a two-step halo,
+         terminal text with one, glowing tubes (pills, chip, rules, caret) -->
+    <span class="wu-glows">
+      <span class="kanji-v" lang="ja">職人</span>
+      <span class="t-label gb">every car has a name</span>
+      <span class="pill pill--solid">Book a build</span>
+      <span class="pill pill--line">Sound off</span>
+      <span class="chip">EN</span>
+      <span class="wu-rule"></span>
+      <span class="wu-owners"></span>
+      <span class="t-h wu-caret-line">e<span class="gl-caret"></span></span>
+    </span>
   </div>
+  <!-- the sun at its own size, on its own layer, clipped like the closing's horizon -->
+  <div class="wu-horizon"><span class="sun"></span></div>
   <!-- a path makes its whole GPU tile draw multisampled, so paths live down in a corner of their own:
        a backdrop, then curves, then the hanko's filter and a photo over them (the kanji and seal in The Man);
        and curves first with a flat fill over them (the reel) -->
@@ -66,6 +83,13 @@ const PHOTO = 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACQAwCdASpAAEAAPt
     <i class="wu wu-bare wu-layer">
       <svg viewBox="0 0 10 10"><path d="M1 1C4 0 6 9 9 9L1 9Z" fill="#000"></path></svg>
       <i class="wu-flat"></i>
+    </i>
+    <!-- glowing letters beside paths (their tile draws multisampled, as the hero's does): the logo
+         with its halo on its own layer, a cluster letter with its tight one, the hero's pill -->
+    <i class="wu wu-bare wu-glow-paths">
+      <LogoMark class="hero-mark wu-logo" label="" />
+      <span class="wu-letter"><svg viewBox={`0 0 ${RAUH_WELT[0].width + RWB_OVERHANG} ${CAP}`}><path d={RAUH_WELT[0].d} fill-rule="evenodd" /></svg></span>
+      <span class="pill pill--solid">Book</span>
     </i>
   </div>
   <!-- blended, fading or see-through layers hide nothing, so they stack, page-sized where size matters -->

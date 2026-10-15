@@ -167,9 +167,108 @@
   color: #000;
   border-color: rgb(0 0 0 / 0.4); /* see-through like the real one: an opaque ring draws differently */
 }
+/* neon glows: the page's own elements, inked black (colour never changes a pipeline) */
+.wu-glows {
+  position: relative;
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.6vw;
+  width: 40vw;
+  padding: 1.6vw;
+}
+.wu-glows > *,
+.wu-glow-paths > * {
+  position: relative;
+  inset: auto;
+  color: #000;
+}
+.warmup .kanji-v,
+.warmup .gb,
+.warmup .chip,
+.warmup .wu-glows .pill,
+.warmup .wu-glow-paths .pill {
+  position: relative;
+  inset: auto;
+  color: #000;
+  border-color: rgb(0 0 0 / 0.4);
+  text-shadow: 0 0 0.2em #000, 0 0 0.7em rgb(0 0 0 / 0.55);
+}
+.warmup .gb {
+  text-shadow: 0 0 0.6em rgb(0 0 0 / 0.55);
+}
+.warmup .pill--solid,
+.warmup .chip {
+  background: linear-gradient(#000, #010101);
+  box-shadow: 0 0 1.1em rgb(0 0 0 / 0.6);
+  text-shadow: none;
+}
+.warmup .wu-glows .pill--line {
+  text-shadow: none;
+}
+.wu-rule {
+  width: 30vw;
+  height: 1px;
+  background: linear-gradient(90deg, #000, #010101, #000);
+  box-shadow: 0 0 0.6vw rgb(0 0 0 / 0.85);
+}
+.wu-owners {
+  width: 30vw;
+  height: 1px;
+  background: #000;
+  box-shadow: 0 0 0.8vw 0.1vw rgb(0 0 0 / 0.8);
+}
+.wu-caret-line {
+  color: #000;
+}
+.warmup .gl-caret {
+  display: inline-block;
+  width: 0.06em;
+  height: 0.8em;
+  background: #000;
+  box-shadow: 0 0 0.25em #000;
+}
+.wu-horizon {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 30vw;
+  height: 14vw;
+  overflow: clip;
+}
+.warmup .sun {
+  background: #000;
+  box-shadow: 0 0 5vw 0.6vw rgb(0 0 0 / 0.5);
+}
+.wu-glow-paths {
+  width: 40vw;
+  height: auto;
+  display: flex;
+  align-items: center;
+  gap: 1vw;
+}
+.warmup .wu-logo {
+  position: relative;
+  width: 24vw;
+  color: #000;
+  filter: drop-shadow(0 0 1.4vw rgb(0 0 0 / 0.45));
+}
+.wu-letter {
+  width: 3vw;
+  will-change: transform;
+}
+.wu-letter svg {
+  overflow: visible;
+  opacity: 0.92;
+  rotate: 14deg;
+  filter: drop-shadow(0 0 0.27vw rgb(0 0 0 / 0.85)); /* 0.5cqw of the 54vw cluster */
+}
 .wu-glyphs {
   color: #000;
   white-space: nowrap;
+  /* the signs' tight halo too, on glyphs that are ready at once (the kanji's webfont may land after the loader) */
+  text-shadow: 0 0 0.25em #000;
 }
 @media (max-width: 991px) {
   /* one row, clear of the mark; what doesn't fit is simply not warmed */
@@ -300,6 +399,10 @@ html:not(.js) .loader {
 }
 
 /* ================================================================== HERO */
+:root {
+  /* the hero's height (100svh, never under 34vw): the manifesto continues its light from it */
+  --hero-h: max(100svh, 34vw);
+}
 .hero {
   position: relative;
   height: 100vh;
@@ -307,10 +410,11 @@ html:not(.js) .loader {
   min-height: 34vw;
   overflow: clip;
   /* the night's light at rest, before any ink: violet pooling up from the
-     lower left, magenta spilling in from the upper right */
+     lower left (centred just under the hero's foot, so the manifesto carries
+     it on), magenta spilling in from the upper right */
   background:
-    radial-gradient(70% 60% at 12% 105%, rgb(157 60 255 / 0.24), rgb(157 60 255 / 0)),
-    radial-gradient(55% 50% at 92% -5%, rgb(255 62 201 / 0.16), rgb(255 62 201 / 0)),
+    radial-gradient(70% calc(var(--hero-h) * 0.6) at 12% calc(var(--hero-h) * 1.05), rgb(157 60 255 / 0.32), rgb(157 60 255 / 0)),
+    radial-gradient(55% 50% at 92% -5%, rgb(255 62 201 / 0.22), rgb(255 62 201 / 0)),
     var(--black);
   isolation: isolate;
   touch-action: pan-y;
@@ -330,11 +434,13 @@ html:not(.js) .loader {
   margin: 0;
   font-size: inherit;
 }
+/* white tubes with a violet halo; the parallax only moves the layer, so the halo is painted once */
 .hero-mark {
   width: 100%;
   color: var(--white);
   overflow: visible;
   will-change: transform;
+  filter: drop-shadow(0 0 1.4vw rgb(157 60 255 / 0.45));
 }
 /* Japanese line under the logo: brand reading ↔ what the name means */
 .hero-ja {
@@ -354,6 +460,7 @@ html:not(.js) .loader {
   flex: 1;
   height: 1px;
   background: linear-gradient(90deg, var(--magenta), var(--violet), var(--cyan));
+  box-shadow: 0 0 0.6vw rgb(190 90 255 / 0.85);
 }
 .hero-fluid {
   position: absolute;
@@ -423,6 +530,7 @@ html:not(.js) .loader {
   place-items: center;
   background: var(--violet);
   color: var(--white);
+  box-shadow: 0 0 1em var(--glow-violet);
   border-radius: 999px;
   padding: 0.35vw 0.7vw;
   font-family: var(--mono);
@@ -464,11 +572,25 @@ html:not(.js) .loader {
 }
 
 /* ============================================================= MANIFESTO */
+/* no seam with the hero: its violet pool carries on across the edge (same
+   centre and radii, measured from the hero's foot), then the manifesto's own
+   light, a violet bloom behind the statement and a magenta glint by its
+   kanji. Every pool is spent before the section's foot, so the reel starts black */
 .manifesto {
   position: relative;
-  background: var(--black);
+  background:
+    /* on tall screens the hero's pool outlasts the section: fade it out before the reel */
+    linear-gradient(to bottom, rgb(0 0 0 / 0) 70%, var(--black)),
+    radial-gradient(70% calc(var(--hero-h) * 0.6) at 12% calc(var(--hero-h) * 0.05), rgb(157 60 255 / 0.32), rgb(157 60 255 / 0)),
+    radial-gradient(50% 46% at 64% 50%, rgb(157 60 255 / 0.17), rgb(157 60 255 / 0)),
+    radial-gradient(22% 36% at 95% 42%, rgb(255 62 201 / 0.12), rgb(255 62 201 / 0)),
+    var(--black);
   padding-block: 16vw 14vw;
   align-items: start;
+}
+.m-n {
+  color: var(--hot);
+  text-shadow: var(--glow-sign);
 }
 .m-label {
   grid-column: 1 / 4;
@@ -853,10 +975,12 @@ img.reel-shot.is-on {
   font-size: 1.25vw;
   line-height: 1;
   letter-spacing: 0;
-  color: var(--magenta);
+  color: var(--hot);
+  text-shadow: var(--glow-sign);
 }
 .build-n {
-  color: var(--magenta);
+  color: var(--hot);
+  text-shadow: var(--glow-sign);
   margin-right: 0.6em;
 }
 .builds-foot {
@@ -1011,7 +1135,7 @@ img.reel-shot.is-on {
   position: absolute;
   left: 0;
   top: 0;
-  background: radial-gradient(closest-side, rgb(255 62 201 / 0.16) 50%, rgb(157 60 255 / 0.06) 78%, transparent);
+  background: radial-gradient(closest-side, rgb(255 62 201 / 0.26) 50%, rgb(157 60 255 / 0.1) 78%, transparent);
   pointer-events: none;
 }
 /* the screen in the polished floor (scenes.ts draws and places it): light
@@ -1043,6 +1167,16 @@ img.reel-shot.is-on {
   z-index: 3;
   display: flex;
   gap: 0.6vw;
+}
+/* frosted glass over the film, which is light enough: no glow of their own
+   (a halo on a backdrop-filtered pill takes GPU pipelines of its own) */
+.sound-pill,
+.film-toggle,
+.sound-pill:hover,
+.film-toggle:hover,
+.sound-pill:focus-visible,
+.film-toggle:focus-visible {
+  box-shadow: none;
 }
 .sound-pill,
 .film-toggle {
@@ -1267,11 +1401,13 @@ img.reel-shot.is-on {
   grid-column: 10 / 13;
   margin: 0.35vw 0 0;
 }
+/* the pieces float in a violet haze, as under a shop's neon */
 .cluster {
   position: relative;
   width: 54vw;
   aspect-ratio: 1;
   margin: 7vw auto 0;
+  background: radial-gradient(closest-side, rgb(157 60 255 / 0.2), rgb(157 60 255 / 0));
   container-type: inline-size;
   touch-action: pan-y;
 }
@@ -1299,7 +1435,14 @@ img.reel-shot.is-on {
 }
 .cl-letter svg {
   overflow: visible;
-  opacity: 0.72;
+  opacity: 0.92;
+  filter: drop-shadow(0 0 0.5cqw rgb(255 62 201 / 0.85));
+}
+.cl-letter:nth-child(3n + 1) svg {
+  filter: drop-shadow(0 0 0.5cqw rgb(157 60 255 / 0.9));
+}
+.cl-letter:nth-child(3n + 2) svg {
+  filter: drop-shadow(0 0 0.5cqw rgb(69 230 255 / 0.75));
 }
 /* the letters lit like loose shop signs: magenta, violet, cyan in turn */
 .cl-letter path {
@@ -1331,10 +1474,21 @@ img.reel-shot.is-on {
 
 /* ================================================================ OWNERS */
 .owners {
+  position: relative;
   padding-block: 8vw 12vw;
   align-items: start;
   border-top: 1px solid rgb(157 60 255 / 0.4);
   margin-inline: 0;
+}
+/* the rule lit as a thin violet tube */
+.owners::before {
+  content: "";
+  position: absolute;
+  inset: -1px 0 auto;
+  height: 1px;
+  background: var(--lilac);
+  box-shadow: 0 0 0.8vw 0.1vw rgb(157 60 255 / 0.8);
+  pointer-events: none;
 }
 .owners-title {
   grid-column: 1 / 5;
@@ -1398,15 +1552,18 @@ img.reel-shot.is-on {
   top: var(--y);
   margin: 0;
   color: rgb(69 230 255 / 0.85);
+  text-shadow: 0 0 0.6em rgb(69 230 255 / 0.55);
   font-size: calc(var(--fs-ui) * 1.15);
   text-transform: none;
   white-space: pre;
 }
 .gb[data-garbage] {
   color: rgb(255 62 201 / 0.9);
+  text-shadow: 0 0 0.6em rgb(255 62 201 / 0.55);
 }
 .gb-ja {
-  color: var(--magenta);
+  color: var(--hot);
+  text-shadow: var(--glow-sign);
   font-family: var(--mincho);
   font-weight: 900;
   letter-spacing: 0.3em;
@@ -1428,6 +1585,7 @@ img.reel-shot.is-on {
   height: 0.8em;
   margin-left: 0.04em;
   background: var(--magenta);
+  box-shadow: 0 0 0.25em var(--magenta);
   vertical-align: -0.04em;
   animation: caret 0.9s steps(1) infinite;
 }
@@ -1505,12 +1663,14 @@ img.reel-shot.is-on {
   gap: 0.8vw;
   flex-wrap: wrap;
 }
+/* the city's neon glowing over the horizon, behind the logo */
 .closing-mark-wrap {
   position: relative;
   padding-top: 12vw;
   display: grid;
   place-items: center;
   overflow: clip;
+  background: radial-gradient(60% 90% at 50% 100%, rgb(157 60 255 / 0.28), rgb(157 60 255 / 0));
 }
 /* hinomaru: the sun rising behind the logo, the credits line as horizon */
 .sun {
@@ -1521,6 +1681,8 @@ img.reel-shot.is-on {
   aspect-ratio: 1;
   border-radius: 50%;
   background: var(--shu);
+  /* it only translates, so its halo is painted once */
+  box-shadow: 0 0 5vw 0.6vw rgb(210 59 42 / 0.5);
   translate: -50% 50%;
   will-change: transform;
 }
