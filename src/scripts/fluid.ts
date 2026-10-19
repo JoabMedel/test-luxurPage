@@ -17,7 +17,8 @@
  * fades out before the field's foot instead of stopping at a straight edge.
  *
  * Settings from the brief: sim 256 (128 on mobile), dye 512, dissipation
- * 0.962 (dye) / 0.988 (velocity), force 5900, curl 0.
+ * 0.988 (velocity), force 5900, curl 0. The dye dissipates at 0.985 (the brief
+ * had 0.962) so the ink lingers ~2.5× longer after the cursor passes.
  */
 import { LOGO } from '../lib/logo';
 import { env } from './env';
@@ -25,7 +26,7 @@ import { env } from './env';
 const CONFIG = {
   sim: env.mobile ? 128 : 256,
   dye: env.mobile ? 384 : 512,
-  dyeDissipation: 0.962,
+  dyeDissipation: 0.985, // per 60 fps frame; closer to 1 = the ink lingers longer
   velDissipation: 0.988,
   pressure: 0.8,
   iterations: 20,
@@ -567,7 +568,7 @@ export function initFluid(field: HTMLElement, hero: HTMLElement, canvas: HTMLCan
   let prev = 0;
   let sleptAt = 0;
   let visible = true;
-  const IDLE_MS = 3200; // fallback: dye is fully gone well before this
+  const IDLE_MS = 8000; // fallback: dye is fully gone well before this
   const sleep = () => {
     prev = 0;
     sleptAt = performance.now();
