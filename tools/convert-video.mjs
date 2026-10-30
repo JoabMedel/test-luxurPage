@@ -8,7 +8,8 @@
  *   FFMPEG=/path/to/ffmpeg node tools/convert-video.mjs warmup
  *
  * reel — client delivery: a macOS screen recording (3360×2100, ReplayKit,
- *        ~32 fps VFR, no audio) of a 23.976p film shown letterboxed.
+ *        ~32 fps VFR, no audio) of a 23.976p film shown letterboxed; the page
+ *        loops its first 30.7 s.
  * film — Higgsfield (Kling 2.6, 24 fps, silent), untouched apart from the cut
  *        into a 6.9 s loop and a 1920×1080 resize (assets-src/film-master.mp4,
  *        see docs/ASSETS.md #7). No software stabilisation: it added judder.
@@ -35,8 +36,11 @@ const PRESETS = {
   reel: {
     // rows 106–1995 of the capture are picture; above and below is screen.
     // 23.976p seen on a 60 Hz display (3:2 repeats + stray captures):
-    // nearest-slot resampling lands back on the film's frames (3 repeats in 1807, measured)
-    clean: 'crop=3360:1890:0:106,fps=24000/1001',
+    // nearest-slot resampling lands back on the film's frames (3 repeats in 1807, measured).
+    // Then only the edit's opening, shots 1–14 (frames 0–736, 30.7 s of 75.4): every build
+    // colour, the crowd and the shop lights, at less than half the weight; it loops on a
+    // hard cut (frame 737 is the next shot's first), like every other cut in the edit
+    clean: 'crop=3360:1890:0:106,fps=24000/1001,trim=end_frame=737',
     crf: { av1: 42, hevc: 30, avc: 27 },
     // client footage: the night's light only, the builds keep their paint
     grade: real,

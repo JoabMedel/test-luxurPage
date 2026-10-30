@@ -40,7 +40,7 @@ export const MEDIA = {
 
   /**
    * Footage. Leave null to use the coded stand-ins.
-   * Reel (client): 75 s, 16:9, 23.976 fps, silent loop.
+   * Reel (client): the edit's first 30.7 s (of 75 s), 16:9, 23.976 fps, silent loop.
    */
   reel: {
     hd: [
